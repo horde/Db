@@ -25,7 +25,7 @@ before_script:
     export DB_ADAPTER_PDO_MYSQL_TEST_CONFIG='{"db":{"adapter":{"pdo":{"mysql":{"test":{"host":"localhost","username":"root","password":"","dbname":"test"}}}}}}';
     export DB_ADAPTER_PDO_PGSQL_TEST_CONFIG='{"db":{"adapter":{"pdo":{"pgsql":{"test":{"username":"postgres","password":"","dbname":"test"}}}}}}';
   - phpenv config-rm xdebug.ini || echo "XDebug not enabled"
-  - pear install channel://pear.horde.org/Horde_Role
+  - pear install channel://pear.horde.org/Horde_Test
   - pear install package.xml
 script:
   - php $(find test -name AllTests.php)
