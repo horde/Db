@@ -1063,12 +1063,21 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
                 $quotedTable = $this->quoteTableName($table);
                 $quotedPk = $this->quoteColumnName($pk);
 
-                $sql = sprintf('SELECT setval(%s, (SELECT COALESCE(MAX(%s) + (SELECT increment_by FROM %s), (SELECT min_value FROM %s)) FROM %s), false)',
+                if ($this->postgresqlVersion() >= 100000) {
+                    $sql = sprintf('SELECT setval(%s, (SELECT COALESCE(MAX(%s) + (SELECT increment_by FROM pg_sequences WHERE sequencename=%s), (SELECT min_value FROM pg_sequences WHERE sequencename=%s)) FROM %s), false)',
+                                       $quotedSequence,
+                                       $quotedPk,
+                                       $quotedSequence,
+                                       $quotedSequence,
+                                       $quotedTable);
+                } else {
+                    $sql = sprintf('SELECT setval(%s, (SELECT COALESCE(MAX(%s) + (SELECT increment_by FROM %s), (SELECT min_value FROM %s)) FROM %s), false)',
                                $quotedSequence,
                                $quotedPk,
                                $sequence,
                                $sequence,
                                $quotedTable);
+                 };
                 $this->selectValue($sql, 'Reset sequence');
             } else {
                 if ($this->_logger) {
@@ -1146,6 +1155,9 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
                 $version = $this->selectValue('SELECT version()');
                 if (preg_match('/PostgreSQL (\d+)\.(\d+)\.(\d+)/', $version, $matches))
                     $this->_version = ($matches[1] * 10000) + ($matches[2] * 100) + $matches[3];
+                else if (preg_match('/PostgreSQL (\d\d+)\.(\d+)/', $version, $matches))
+                    $this->_version = ($matches[1] * 10000) + ($matches[2] * 100);
+
             } catch (Exception $e) {
                 return 0;
             }
