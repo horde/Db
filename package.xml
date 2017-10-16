@@ -23,7 +23,7 @@
   <email>jan@horde.org</email>
   <active>yes</active>
  </lead>
- <date>2017-03-20</date>
+ <date>2017-10-17</date>
  <version>
   <release>2.4.1</release>
   <api>2.4.0</api>
@@ -46,8 +46,6 @@
    <dir name="doc">
     <dir name="Horde">
      <dir name="Db">
-      <file name="COPYING" role="doc" />
-      <file name="README" role="doc" />
       <file name="README_TESTING" role="doc" />
       <file name="TODO" role="doc" />
       <file name="UPGRADING" role="doc" />
@@ -198,6 +196,8 @@
      </dir> <!-- /test/Horde/Db -->
     </dir> <!-- /test/Horde -->
    </dir> <!-- /test -->
+   <file name="LICENSE" role="doc" />
+   <file name="README" role="doc" />
   </dir> <!-- / -->
  </contents>
  <dependencies>
@@ -285,22 +285,12 @@
  <phprelease>
   <filelist>
    <install as="horde-db-migrate-component" name="bin/horde-db-migrate-component" />
-   <install as="COPYING" name="doc/Horde/Db/COPYING" />
-   <install as="README" name="doc/Horde/Db/README" />
    <install as="README_TESTING" name="doc/Horde/Db/README_TESTING" />
    <install as="TODO" name="doc/Horde/Db/TODO" />
    <install as="UPGRADING" name="doc/Horde/Db/UPGRADING" />
    <install as="Horde/Db.php" name="lib/Horde/Db.php" />
    <install as="Horde/Db/Adapter.php" name="lib/Horde/Db/Adapter.php" />
-   <install as="Horde/Db/Exception.php" name="lib/Horde/Db/Exception.php" />
-   <install as="Horde/Db/SearchParser.php" name="lib/Horde/Db/SearchParser.php" />
-   <install as="Horde/Db/StatementParser.php" name="lib/Horde/Db/StatementParser.php" />
-   <install as="Horde/Db/Value.php" name="lib/Horde/Db/Value.php" />
    <install as="Horde/Db/Adapter/Base.php" name="lib/Horde/Db/Adapter/Base.php" />
-   <install as="Horde/Db/Adapter/Mysql.php" name="lib/Horde/Db/Adapter/Mysql.php" />
-   <install as="Horde/Db/Adapter/Mysqli.php" name="lib/Horde/Db/Adapter/Mysqli.php" />
-   <install as="Horde/Db/Adapter/Oci8.php" name="lib/Horde/Db/Adapter/Oci8.php" />
-   <install as="Horde/Db/Adapter/SplitRead.php" name="lib/Horde/Db/Adapter/SplitRead.php" />
    <install as="Horde/Db/Adapter/Base/Column.php" name="lib/Horde/Db/Adapter/Base/Column.php" />
    <install as="Horde/Db/Adapter/Base/ColumnDefinition.php" name="lib/Horde/Db/Adapter/Base/ColumnDefinition.php" />
    <install as="Horde/Db/Adapter/Base/Index.php" name="lib/Horde/Db/Adapter/Base/Index.php" />
@@ -308,10 +298,13 @@
    <install as="Horde/Db/Adapter/Base/Schema.php" name="lib/Horde/Db/Adapter/Base/Schema.php" />
    <install as="Horde/Db/Adapter/Base/Table.php" name="lib/Horde/Db/Adapter/Base/Table.php" />
    <install as="Horde/Db/Adapter/Base/TableDefinition.php" name="lib/Horde/Db/Adapter/Base/TableDefinition.php" />
+   <install as="Horde/Db/Adapter/Mysql.php" name="lib/Horde/Db/Adapter/Mysql.php" />
    <install as="Horde/Db/Adapter/Mysql/Column.php" name="lib/Horde/Db/Adapter/Mysql/Column.php" />
    <install as="Horde/Db/Adapter/Mysql/Result.php" name="lib/Horde/Db/Adapter/Mysql/Result.php" />
    <install as="Horde/Db/Adapter/Mysql/Schema.php" name="lib/Horde/Db/Adapter/Mysql/Schema.php" />
+   <install as="Horde/Db/Adapter/Mysqli.php" name="lib/Horde/Db/Adapter/Mysqli.php" />
    <install as="Horde/Db/Adapter/Mysqli/Result.php" name="lib/Horde/Db/Adapter/Mysqli/Result.php" />
+   <install as="Horde/Db/Adapter/Oci8.php" name="lib/Horde/Db/Adapter/Oci8.php" />
    <install as="Horde/Db/Adapter/Oracle/Column.php" name="lib/Horde/Db/Adapter/Oracle/Column.php" />
    <install as="Horde/Db/Adapter/Oracle/Result.php" name="lib/Horde/Db/Adapter/Oracle/Result.php" />
    <install as="Horde/Db/Adapter/Oracle/Schema.php" name="lib/Horde/Db/Adapter/Oracle/Schema.php" />
@@ -323,29 +316,30 @@
    <install as="Horde/Db/Adapter/Pdo/Sqlite.php" name="lib/Horde/Db/Adapter/Pdo/Sqlite.php" />
    <install as="Horde/Db/Adapter/Postgresql/Column.php" name="lib/Horde/Db/Adapter/Postgresql/Column.php" />
    <install as="Horde/Db/Adapter/Postgresql/Schema.php" name="lib/Horde/Db/Adapter/Postgresql/Schema.php" />
+   <install as="Horde/Db/Adapter/SplitRead.php" name="lib/Horde/Db/Adapter/SplitRead.php" />
    <install as="Horde/Db/Adapter/Sqlite/Column.php" name="lib/Horde/Db/Adapter/Sqlite/Column.php" />
    <install as="Horde/Db/Adapter/Sqlite/Schema.php" name="lib/Horde/Db/Adapter/Sqlite/Schema.php" />
+   <install as="Horde/Db/Exception.php" name="lib/Horde/Db/Exception.php" />
    <install as="Horde/Db/Migration/Base.php" name="lib/Horde/Db/Migration/Base.php" />
    <install as="Horde/Db/Migration/Exception.php" name="lib/Horde/Db/Migration/Exception.php" />
    <install as="Horde/Db/Migration/Migrator.php" name="lib/Horde/Db/Migration/Migrator.php" />
+   <install as="Horde/Db/SearchParser.php" name="lib/Horde/Db/SearchParser.php" />
+   <install as="Horde/Db/StatementParser.php" name="lib/Horde/Db/StatementParser.php" />
+   <install as="Horde/Db/Value.php" name="lib/Horde/Db/Value.php" />
    <install as="Horde/Db/Value/Binary.php" name="lib/Horde/Db/Value/Binary.php" />
    <install as="Horde/Db/Value/Lob.php" name="lib/Horde/Db/Value/Lob.php" />
    <install as="Horde/Db/Value/Text.php" name="lib/Horde/Db/Value/Text.php" />
-   <install as="Horde/Db/AllTests.php" name="test/Horde/Db/AllTests.php" />
-   <install as="Horde/Db/bootstrap.php" name="test/Horde/Db/bootstrap.php" />
-   <install as="Horde/Db/phpunit.xml" name="test/Horde/Db/phpunit.xml" />
-   <install as="Horde/Db/StatementParserTest.php" name="test/Horde/Db/StatementParserTest.php" />
+   <install as="LICENSE" name="LICENSE" />
+   <install as="README" name="README" />
    <install as="Horde/Db/Adapter/ColumnBase.php" name="test/Horde/Db/Adapter/ColumnBase.php" />
    <install as="Horde/Db/Adapter/conf.php.dist" name="test/Horde/Db/Adapter/conf.php.dist" />
+   <install as="Horde/Db/Adapter/Mysql/ColumnDefinition.php" name="test/Horde/Db/Adapter/Mysql/ColumnDefinition.php" />
+   <install as="Horde/Db/Adapter/Mysql/ColumnTest.php" name="test/Horde/Db/Adapter/Mysql/ColumnTest.php" />
+   <install as="Horde/Db/Adapter/Mysql/TestTableDefinition.php" name="test/Horde/Db/Adapter/Mysql/TestTableDefinition.php" />
    <install as="Horde/Db/Adapter/MysqlBase.php" name="test/Horde/Db/Adapter/MysqlBase.php" />
    <install as="Horde/Db/Adapter/MysqliTest.php" name="test/Horde/Db/Adapter/MysqliTest.php" />
    <install as="Horde/Db/Adapter/MysqlTest.php" name="test/Horde/Db/Adapter/MysqlTest.php" />
    <install as="Horde/Db/Adapter/Oci8Test.php" name="test/Horde/Db/Adapter/Oci8Test.php" />
-   <install as="Horde/Db/Adapter/TestBase.php" name="test/Horde/Db/Adapter/TestBase.php" />
-   <install as="Horde/Db/Adapter/TestTableDefinition.php" name="test/Horde/Db/Adapter/TestTableDefinition.php" />
-   <install as="Horde/Db/Adapter/Mysql/ColumnDefinition.php" name="test/Horde/Db/Adapter/Mysql/ColumnDefinition.php" />
-   <install as="Horde/Db/Adapter/Mysql/ColumnTest.php" name="test/Horde/Db/Adapter/Mysql/ColumnTest.php" />
-   <install as="Horde/Db/Adapter/Mysql/TestTableDefinition.php" name="test/Horde/Db/Adapter/Mysql/TestTableDefinition.php" />
    <install as="Horde/Db/Adapter/Oracle/ColumnDefinition.php" name="test/Horde/Db/Adapter/Oracle/ColumnDefinition.php" />
    <install as="Horde/Db/Adapter/Oracle/ColumnTest.php" name="test/Horde/Db/Adapter/Oracle/ColumnTest.php" />
    <install as="Horde/Db/Adapter/Oracle/TestTableDefinition.php" name="test/Horde/Db/Adapter/Oracle/TestTableDefinition.php" />
@@ -358,10 +352,13 @@
    <install as="Horde/Db/Adapter/Sqlite/ColumnDefinition.php" name="test/Horde/Db/Adapter/Sqlite/ColumnDefinition.php" />
    <install as="Horde/Db/Adapter/Sqlite/ColumnTest.php" name="test/Horde/Db/Adapter/Sqlite/ColumnTest.php" />
    <install as="Horde/Db/Adapter/Sqlite/TestTableDefinition.php" name="test/Horde/Db/Adapter/Sqlite/TestTableDefinition.php" />
-   <install as="Horde/Db/fixtures/drop_create_table.sql" name="test/Horde/Db/fixtures/drop_create_table.sql" />
-   <install as="Horde/Db/fixtures/unit_tests.sql" name="test/Horde/Db/fixtures/unit_tests.sql" />
+   <install as="Horde/Db/Adapter/TestBase.php" name="test/Horde/Db/Adapter/TestBase.php" />
+   <install as="Horde/Db/Adapter/TestTableDefinition.php" name="test/Horde/Db/Adapter/TestTableDefinition.php" />
+   <install as="Horde/Db/AllTests.php" name="test/Horde/Db/AllTests.php" />
+   <install as="Horde/Db/bootstrap.php" name="test/Horde/Db/bootstrap.php" />
    <install as="Horde/Db/fixtures/charsets/cp1257.txt" name="test/Horde/Db/fixtures/charsets/cp1257.txt" />
    <install as="Horde/Db/fixtures/charsets/utf8.txt" name="test/Horde/Db/fixtures/charsets/utf8.txt" />
+   <install as="Horde/Db/fixtures/drop_create_table.sql" name="test/Horde/Db/fixtures/drop_create_table.sql" />
    <install as="Horde/Db/fixtures/migrations/1_users_have_last_names1.php" name="test/Horde/Db/fixtures/migrations/1_users_have_last_names1.php" />
    <install as="Horde/Db/fixtures/migrations/2_we_need_reminders1.php" name="test/Horde/Db/fixtures/migrations/2_we_need_reminders1.php" />
    <install as="Horde/Db/fixtures/migrations/3_innocent_jointable1.php" name="test/Horde/Db/fixtures/migrations/3_innocent_jointable1.php" />
@@ -374,8 +371,11 @@
    <install as="Horde/Db/fixtures/migrations_with_missing_versions/3_we_need_reminders.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/3_we_need_reminders.php" />
    <install as="Horde/Db/fixtures/migrations_with_missing_versions/4_innocent_jointable3.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/4_innocent_jointable3.php" />
    <install as="Horde/Db/fixtures/migrations_with_missing_versions/1000_users_have_middle_names.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/1000_users_have_middle_names.php" />
+   <install as="Horde/Db/fixtures/unit_tests.sql" name="test/Horde/Db/fixtures/unit_tests.sql" />
    <install as="Horde/Db/Migration/BaseTest.php" name="test/Horde/Db/Migration/BaseTest.php" />
    <install as="Horde/Db/Migration/MigratorTest.php" name="test/Horde/Db/Migration/MigratorTest.php" />
+   <install as="Horde/Db/phpunit.xml" name="test/Horde/Db/phpunit.xml" />
+   <install as="Horde/Db/StatementParserTest.php" name="test/Horde/Db/StatementParserTest.php" />
   </filelist>
  </phprelease>
  <changelog>
@@ -984,7 +984,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-03-20</date>
+   <date>2017-10-17</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
 * 
