@@ -46,9 +46,9 @@
    <dir name="doc">
     <dir name="Horde">
      <dir name="Db">
-      <file name="README_TESTING" role="doc" />
-      <file name="TODO" role="doc" />
-      <file name="UPGRADING" role="doc" />
+      <file name="README_TESTING.rst" role="doc" />
+      <file name="TODO.rst" role="doc" />
+      <file name="UPGRADING.rst" role="doc" />
      </dir> <!-- /doc/Horde/Db -->
     </dir> <!-- /doc/Horde -->
    </dir> <!-- /doc -->
@@ -285,9 +285,9 @@
  <phprelease>
   <filelist>
    <install as="horde-db-migrate-component" name="bin/horde-db-migrate-component" />
-   <install as="README_TESTING" name="doc/Horde/Db/README_TESTING" />
-   <install as="TODO" name="doc/Horde/Db/TODO" />
-   <install as="UPGRADING" name="doc/Horde/Db/UPGRADING" />
+   <install as="README_TESTING.rst" name="doc/Horde/Db/README_TESTING.rst" />
+   <install as="TODO.rst" name="doc/Horde/Db/TODO.rst" />
+   <install as="UPGRADING.rst" name="doc/Horde/Db/UPGRADING.rst" />
    <install as="Horde/Db.php" name="lib/Horde/Db.php" />
    <install as="Horde/Db/Adapter.php" name="lib/Horde/Db/Adapter.php" />
    <install as="Horde/Db/Adapter/Base.php" name="lib/Horde/Db/Adapter/Base.php" />
