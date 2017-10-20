@@ -23,7 +23,7 @@
   <email>jan@horde.org</email>
   <active>yes</active>
  </lead>
- <date>2017-10-17</date>
+ <date>2017-10-20</date>
  <version>
   <release>2.4.1</release>
   <api>2.4.0</api>
@@ -191,7 +191,6 @@
       </dir> <!-- /test/Horde/Db/Migration -->
       <file name="AllTests.php" role="test" />
       <file name="bootstrap.php" role="test" />
-      <file name="phpunit.xml" role="test" />
       <file name="StatementParserTest.php" role="test" />
      </dir> <!-- /test/Horde/Db -->
     </dir> <!-- /test/Horde -->
@@ -374,7 +373,6 @@
    <install as="Horde/Db/fixtures/unit_tests.sql" name="test/Horde/Db/fixtures/unit_tests.sql" />
    <install as="Horde/Db/Migration/BaseTest.php" name="test/Horde/Db/Migration/BaseTest.php" />
    <install as="Horde/Db/Migration/MigratorTest.php" name="test/Horde/Db/Migration/MigratorTest.php" />
-   <install as="Horde/Db/phpunit.xml" name="test/Horde/Db/phpunit.xml" />
    <install as="Horde/Db/StatementParserTest.php" name="test/Horde/Db/StatementParserTest.php" />
   </filelist>
  </phprelease>
@@ -984,7 +982,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-10-17</date>
+   <date>2017-10-20</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
 * 
