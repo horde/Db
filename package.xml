@@ -23,7 +23,7 @@
   <email>jan@horde.org</email>
   <active>yes</active>
  </lead>
- <date>2017-10-20</date>
+ <date>2017-10-27</date>
  <version>
   <release>2.4.1</release>
   <api>2.4.0</api>
@@ -45,6 +45,7 @@
    <dir name="doc">
     <dir name="Horde">
      <dir name="Db">
+      <file name="CHANGES" role="doc" />
       <file name="README_TESTING.rst" role="doc" />
       <file name="TODO.rst" role="doc" />
       <file name="UPGRADING.rst" role="doc" />
@@ -283,6 +284,7 @@
  <phprelease>
   <filelist>
    <install as="horde-db-migrate-component" name="bin/horde-db-migrate-component" />
+   <install as="CHANGES" name="doc/Horde/Db/CHANGES" />
    <install as="README_TESTING.rst" name="doc/Horde/Db/README_TESTING.rst" />
    <install as="TODO.rst" name="doc/Horde/Db/TODO.rst" />
    <install as="UPGRADING.rst" name="doc/Horde/Db/UPGRADING.rst" />
@@ -981,7 +983,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-10-20</date>
+   <date>2017-10-27</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
    </notes>
