@@ -5,3 +5,51 @@ full: Database abstraction library
 description: Horde database/SQL abstraction layer
 list: dev
 type: library
+homepage: https://www.horde.org/libraries/Horde_Db
+authors:
+  -
+    name: Mike Naberezny
+    user: mnaberez
+    email: mike@naberezny.com
+    active: false
+    role: lead
+  -
+    name: Chuck Hagenbuch
+    user: chuck
+    email: chuck@horde.org
+    active: false
+    role: lead
+  -
+    name: Jan Schneider
+    user: jan
+    email: jan@horde.org
+    active: true
+    role: lead
+version:
+  release: 2.4.1
+  api: 2.4.0
+state:
+  release: stable
+  api: stable
+license:
+  identifier: BSD-2-Clause
+  uri: http://www.horde.org/licenses/bsd
+dependencies:
+  required:
+    php: ^5.3 || ^7
+    pear:
+      pear.horde.org/Horde_Date: ^2
+      pear.horde.org/Horde_Exception: ^2
+      pear.horde.org/Horde_Support: ^2
+      pear.horde.org/Horde_Util: ^2
+  optional:
+    pear:
+      pear.horde.org/Horde_Autoloader: ^2
+      pear.horde.org/Horde_Cache: ^2
+      pear.horde.org/Horde_Log: ^2
+      pear.horde.org/Horde_Test: ^2.1
+    ext:
+      mysql: '*'
+      mysqli: '*'
+      oci8: '*'
+      PDO: '*'
