@@ -34,7 +34,6 @@
  </stability>
  <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
  <notes>
-* 
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -985,7 +984,6 @@
    <date>2017-10-20</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
-* 
    </notes>
   </release>
  </changelog>
