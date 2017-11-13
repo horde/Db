@@ -1,8 +1,8 @@
 {
     "name": "horde/db",
-    "description": "Horde Database Libraries",
+    "description": "Database abstraction library",
     "type": "library",
-    "homepage": "https://pear.horde.org",
+    "homepage": "https://www.horde.org/libraries/Horde_Db",
     "license": "BSD-2-Clause",
     "authors": [
         {
@@ -22,7 +22,7 @@
         }
     ],
     "version": "2.4.1",
-    "time": "2017-10-20",
+    "time": "2017-11-11",
     "repositories": [
         {
             "type": "pear",
