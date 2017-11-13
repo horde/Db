@@ -8,6 +8,12 @@ type: library
 homepage: https://www.horde.org/libraries/Horde_Db
 authors:
   -
+    name: Jan Schneider
+    user: jan
+    email: jan@horde.org
+    active: true
+    role: lead
+  -
     name: Mike Naberezny
     user: mnaberez
     email: mike@naberezny.com
@@ -18,12 +24,6 @@ authors:
     user: chuck
     email: chuck@horde.org
     active: false
-    role: lead
-  -
-    name: Jan Schneider
-    user: jan
-    email: jan@horde.org
-    active: true
     role: lead
 version:
   release: 2.4.1
