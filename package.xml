@@ -3,8 +3,14 @@
  <name>Horde_Db</name>
  <channel>pear.horde.org</channel>
  <extends>Db</extends>
- <summary>Horde Database Libraries</summary>
+ <summary>Database abstraction library</summary>
  <description>Horde database/SQL abstraction layer</description>
+ <lead>
+  <name>Jan Schneider</name>
+  <user>jan</user>
+  <email>jan@horde.org</email>
+  <active>yes</active>
+ </lead>
  <lead>
   <name>Mike Naberezny</name>
   <user>mnaberez</user>
@@ -17,13 +23,7 @@
   <email>chuck@horde.org</email>
   <active>no</active>
  </lead>
- <lead>
-  <name>Jan Schneider</name>
-  <user>jan</user>
-  <email>jan@horde.org</email>
-  <active>yes</active>
- </lead>
- <date>2017-10-30</date>
+ <date>2017-11-14</date>
  <version>
   <release>2.4.1</release>
   <api>2.4.0</api>
@@ -986,7 +986,7 @@
    <stability>
     <release>stable</release>
     <api>stable</api></stability>
-   <date>2017-10-30</date>
+   <date>2017-11-14</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
 * 

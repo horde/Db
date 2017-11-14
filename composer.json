@@ -1,10 +1,15 @@
 {
     "name": "horde/db",
-    "description": "Horde Database Libraries",
+    "description": "Database abstraction library",
     "type": "library",
-    "homepage": "https://pear.horde.org",
+    "homepage": "https://www.horde.org/libraries/Horde_Db",
     "license": "BSD-2-Clause",
     "authors": [
+        {
+            "name": "Jan Schneider",
+            "email": "jan@horde.org",
+            "role": "lead"
+        },
         {
             "name": "Mike Naberezny",
             "email": "mike@naberezny.com",
@@ -14,15 +19,10 @@
             "name": "Chuck Hagenbuch",
             "email": "chuck@horde.org",
             "role": "lead"
-        },
-        {
-            "name": "Jan Schneider",
-            "email": "jan@horde.org",
-            "role": "lead"
         }
     ],
     "version": "2.4.1",
-    "time": "2017-03-20",
+    "time": "2017-11-14",
     "repositories": [
         {
             "type": "pear",
