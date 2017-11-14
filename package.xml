@@ -194,7 +194,6 @@
       </dir> <!-- /test/Horde/Db/Migration -->
       <file name="AllTests.php" role="test" />
       <file name="bootstrap.php" role="test" />
-      <file name="phpunit.xml" role="test" />
       <file name="StatementParserTest.php" role="test" />
      </dir> <!-- /test/Horde/Db -->
     </dir> <!-- /test/Horde -->
@@ -335,7 +334,6 @@
    <install as="Horde/Db/Value/Text.php" name="lib/Horde/Db/Value/Text.php" />
    <install as="Horde/Db/AllTests.php" name="test/Horde/Db/AllTests.php" />
    <install as="Horde/Db/bootstrap.php" name="test/Horde/Db/bootstrap.php" />
-   <install as="Horde/Db/phpunit.xml" name="test/Horde/Db/phpunit.xml" />
    <install as="Horde/Db/StatementParserTest.php" name="test/Horde/Db/StatementParserTest.php" />
    <install as="Horde/Db/Adapter/ColumnBase.php" name="test/Horde/Db/Adapter/ColumnBase.php" />
    <install as="Horde/Db/Adapter/conf.php.dist" name="test/Horde/Db/Adapter/conf.php.dist" />
