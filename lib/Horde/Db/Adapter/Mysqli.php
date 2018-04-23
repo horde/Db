@@ -128,7 +128,7 @@ class Horde_Db_Adapter_Mysqli extends Horde_Db_Adapter_Base
             );
             $mysqli->real_connect(
                 $config['host'], $config['username'], $config['password'],
-                $config['dbname'], $config['port'], $config['socket']);
+                $config['dbname'], $config['port'], $config['socket'], MYSQLI_CLIENT_SSL);
         } else {
             $mysqli = new mysqli(
                 $config['host'], $config['username'], $config['password'],
