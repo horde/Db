@@ -1143,9 +1143,8 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     {
         if (!$this->_version) {
             try {
-                $version = $this->selectValue('SELECT version()');
-                if (preg_match('/PostgreSQL (\d+)\.(\d+)\.(\d+)/', $version, $matches))
-                    $this->_version = ($matches[1] * 10000) + ($matches[2] * 100) + $matches[3];
+                $version = $this->selectValue('SHOW server_version_num');
+                $this->_version = $version;
             } catch (Exception $e) {
                 return 0;
             }
