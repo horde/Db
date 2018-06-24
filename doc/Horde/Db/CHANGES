@@ -1,6 +1,10 @@
-----------
-v2.4.1-git
-----------
+------
+v2.4.1
+------
+
+[mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski
+      <PaulSzymanski@users.noreply.github.com>).
+
 
 
 ------
