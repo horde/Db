@@ -1063,23 +1063,30 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
                 $quotedTable = $this->quoteTableName($table);
                 $quotedPk = $this->quoteColumnName($pk);
                 if ($this->postgresqlVersion() >= 100000) {
-                    $sql = sprintf('SELECT setval(%s, (SELECT COALESCE(MAX(%s) + (SELECT
-                                increment_by FROM pg_sequences where schemaname= ANY
-                                (CURRENT_SCHEMAS(false)) and sequencename=%s), (SELECT min_value FROM
-                                pg_sequences where schemaname= ANY (CURRENT_SCHEMAS(false)) and
-                                sequencename=%s)) FROM %s), false)',
-                                $quotedSequence,
-                                $quotedPk,
-                                $quotedSequence,
-                                $quotedSequence,
-                                $quotedTable);
+                    $sql = sprintf('
+                        SELECT setval(
+                            %s,
+                            (SELECT COALESCE(
+                                MAX(%s) + (SELECT increment_by FROM pg_sequences WHERE schemaname=ANY(CURRENT_SCHEMAS(false)) AND sequencename=%s),
+                                (SELECT min_value FROM pg_sequences WHERE schemaname=ANY(CURRENT_SCHEMAS(false)) AND sequencename=%s)
+                             ) FROM %s),
+                             false
+                         )',
+                         $quotedSequence,
+                         $quotedPk,
+                         $quotedSequence,
+                         $quotedSequence,
+                         $quotedTable
+                    );
                 } else {
-                    $sql = sprintf('SELECT setval(%s, (SELECT COALESCE(MAX(%s) + (SELECT increment_by FROM %s), (SELECT min_value FROM %s)) FROM %s), false)',
-                                $quotedSequence,
-                                $quotedPk,
-                                $sequence,
-                                $sequence,
-                                $quotedTable);
+                    $sql = sprintf(
+                        'SELECT setval(%s, (SELECT COALESCE(MAX(%s) + (SELECT increment_by FROM %s), (SELECT min_value FROM %s)) FROM %s), false)',
+                        $quotedSequence,
+                        $quotedPk,
+                        $sequence,
+                        $sequence,
+                        $quotedTable
+                    );
                 }
                 $this->selectValue($sql, 'Reset sequence');
             } else {
@@ -1155,8 +1162,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     {
         if (!$this->_version) {
             try {
-                $version = $this->selectValue('SHOW server_version_num');
-                $this->_version = $version;
+                $this->_version = $this->selectValue('SHOW server_version_num');
             } catch (Exception $e) {
                 return 0;
             }
