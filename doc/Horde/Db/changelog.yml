@@ -8,9 +8,9 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |+
+  notes: |
+    [jan] Fix sequences on PostrgreSQL 10+ (Ivan Sergio Borgonovo <mail@webthatworks.it>, PR #3).
     [mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski <PaulSzymanski@users.noreply.github.com>).
-    
 2.4.0:
   api: 2.4.0
   state:
