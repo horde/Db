@@ -2,7 +2,7 @@
 id: Db
 name: Db
 full: Database abstraction library
-description: Horde database/SQL abstraction layer
+description: Database access and SQL abstraction layer.
 list: dev
 type: library
 homepage: https://www.horde.org/libraries/Horde_Db
