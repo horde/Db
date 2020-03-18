@@ -1149,6 +1149,10 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
             $result = $this->selectOne($sql, 'PK and custom sequence');
         }
 
+        if (!$result) {
+            return array(null, null);
+        }
+
         // [primary_key, sequence]
         return array($result['attname'], $result['relname']);
     }
