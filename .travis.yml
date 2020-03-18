@@ -11,6 +11,27 @@ jobs:
   fast_finish: true
   allow_failures:
     - php: nightly
+  include:
+    - addons:
+        postgres: 9.4
+    - addons:
+        postgres: 9.5
+    - addons:
+        postgres: 9.6
+    - addons:
+        postgres: 10
+    - addons:
+        postgres: 11
+        apt:
+          packages:
+            - postgresql-11
+            - postgresql-client-11
+    - addons:
+        postgres: 12
+        apt:
+          packages:
+            - postgresql-12
+            - postgresql-client-12
 services:
   - mysql
   - postgresql
