@@ -26,6 +26,8 @@ jobs:
           packages:
             - postgresql-11
             - postgresql-client-11
+      env:
+        - PGPORT=5433
     - addons:
         postgres: 12
         apt:
