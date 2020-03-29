@@ -20,20 +20,6 @@ jobs:
         postgres: 9.6
     - addons:
         postgres: 10
-    - addons:
-        postgres: 11
-        apt:
-          packages:
-            - postgresql-11
-            - postgresql-client-11
-      env:
-        - PGPORT=5433
-    - addons:
-        postgres: 12
-        apt:
-          packages:
-            - postgresql-12
-            - postgresql-client-12
 services:
   - mysql
   - postgresql
