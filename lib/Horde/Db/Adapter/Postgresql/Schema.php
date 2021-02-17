@@ -388,12 +388,13 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     {
         /* @todo See if we can get this from information_schema instead */
         return $this->selectAll('
-            SELECT a.attname, format_type(a.atttypid, a.atttypmod), d.adsrc, a.attnotnull
-              FROM pg_attribute a LEFT JOIN pg_attrdef d
-                ON a.attrelid = d.adrelid AND a.attnum = d.adnum
-             WHERE a.attrelid = ' . $this->quote($tableName) . '::regclass
-               AND a.attnum > 0 AND NOT a.attisdropped
-             ORDER BY a.attnum', $name);
+          SELECT a.attname, format_type(a.atttypid, a.atttypmod),
+            pg_get_expr(d.adbin, d.adrelid) AS adsrc, a.attnotnull
+          FROM pg_attribute a
+          LEFT JOIN pg_attrdef d ON a.attrelid = d.adrelid AND a.attnum = d.adnum
+          WHERE a.attrelid = ' . $this->quote($tableName) . '::regclass
+            AND a.attnum > 0 AND NOT a.attisdropped
+          ORDER BY a.attnum;', $name);
     }
 
     /**
@@ -1127,25 +1128,13 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         $result = $this->selectOne($sql, 'PK and serial sequence');
 
         if (!$result) {
-            // If that fails, try parsing the primary key's default value.
-            // Support the 7.x and 8.0 nextval('foo'::text) as well as
-            // the 8.1+ nextval('foo'::regclass).
             $sql = "
-            SELECT attr.attname,
-              CASE
-                WHEN split_part(def.adsrc, '''', 2) ~ '.' THEN
-                  substr(split_part(def.adsrc, '''', 2),
-                         strpos(split_part(def.adsrc, '''', 2), '.')+1)
-                ELSE split_part(def.adsrc, '''', 2)
-              END AS relname
-            FROM pg_class       t
-            JOIN pg_attribute   attr ON (t.oid = attrelid)
-            JOIN pg_attrdef     def  ON (adrelid = attrelid AND adnum = attnum)
-            JOIN pg_constraint  cons ON (conrelid = adrelid AND adnum = conkey[1])
-            WHERE t.oid = '$table'::regclass
-              AND cons.contype = 'p'
-              AND def.adsrc ~* 'nextval'";
-
+              SELECT c.column_name, c.ordinal_position,
+                  pg_get_serial_sequence(t.table_name, c.column_name) as relname
+              FROM information_schema.key_column_usage AS c
+              LEFT JOIN information_schema.table_constraints AS t
+                ON t.constraint_name = c.constraint_name
+              WHERE t.table_name = '$table' AND t.constraint_type = 'PRIMARY KEY';";
             $result = $this->selectOne($sql, 'PK and custom sequence');
         }
 
