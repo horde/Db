@@ -31,17 +31,17 @@
     ],
     "require": {
         "horde/horde-installer-plugin": "*",
-        "php": "^5.3 || ^7",
-        "horde/date": "^2",
-        "horde/exception": "^2",
-        "horde/support": "^2",
-        "horde/util": "^2"
+        "php": "^7",
+        "horde/date": "^3",
+        "horde/exception": "^3",
+        "horde/support": "^3",
+        "horde/util": "^3"
     },
     "suggest": {
-        "horde/autoloader": "^2",
-        "horde/cache": "^2",
-        "horde/log": "^2",
-        "horde/test": "^2.1",
+        "horde/autoloader": "^3",
+        "horde/cache": "^3",
+        "horde/log": "^3",
+        "horde/test": "^3",
         "ext-mysql": "*",
         "ext-mysqli": "*",
         "ext-oci8": "*",
