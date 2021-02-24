@@ -50,9 +50,6 @@
     "autoload": {
         "psr-0": {
             "Horde_Db": "lib/"
-        },
-        "psr-4": {
-            "Horde\\Db\\": "src/"
         }
     },
     "bin": [
