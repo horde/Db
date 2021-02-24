@@ -1,10 +1,11 @@
-------
-v2.4.1
-------
+------------
+v3.0.0alpha1
+------------
 
+[jan] Fix sequences on PostgreSQL 10+ (Ivan Sergio Borgonovo
+      <mail@webthatworks.it>, PR #3).
 [mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski
       <PaulSzymanski@users.noreply.github.com>).
-
 
 
 ------
