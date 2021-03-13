@@ -6,6 +6,11 @@
     "license": "BSD-2-Clause",
     "authors": [
         {
+            "name": "Jan Schneider",
+            "email": "jan@horde.org",
+            "role": "lead"
+        },
+        {
             "name": "Mike Naberezny",
             "email": "mike@naberezny.com",
             "role": "lead"
@@ -14,45 +19,38 @@
             "name": "Chuck Hagenbuch",
             "email": "chuck@horde.org",
             "role": "lead"
-        },
-        {
-            "name": "Jan Schneider",
-            "email": "jan@horde.org",
-            "role": "lead"
         }
     ],
-    "version": "2.4.2",
-    "time": "2021-02-17",
+    "time": "2021-03-13",
     "repositories": [
         {
-            "type": "pear",
-            "url": "https://pear.horde.org"
+            "type": "composer",
+            "url": "https://horde-satis.maintaina.com/"
         }
     ],
     "require": {
-        "php": "^5.3 || ^7",
-        "pear-pear.horde.org/Horde_Date": "^2",
-        "pear-pear.horde.org/Horde_Exception": "^2",
-        "pear-pear.horde.org/Horde_Support": "^2",
-        "pear-pear.horde.org/Horde_Util": "^2"
+        "php": "^7",
+        "horde/date": "^3",
+        "horde/exception": "^3",
+        "horde/support": "^3",
+        "horde/util": "^3"
     },
     "suggest": {
-        "pear-pear.horde.org/Horde_Autoloader": "^2",
-        "pear-pear.horde.org/Horde_Cache": "^2",
-        "pear-pear.horde.org/Horde_Log": "^2",
-        "pear-pear.horde.org/Horde_Test": "^2.1",
+        "horde/autoloader": "^3",
+        "horde/cache": "^3",
+        "horde/log": "^3",
+        "horde/test": "^3",
         "ext-mysql": "*",
         "ext-mysqli": "*",
         "ext-oci8": "*",
         "ext-PDO": "*"
     },
-    "replace": {
-        "pear-pear.horde.org/Horde_Db": "2.*",
-        "pear-horde/Horde_Db": "2.*"
-    },
     "autoload": {
         "psr-0": {
             "Horde_Db": "lib/"
         }
-    }
+    },
+    "bin": [
+        "bin/horde-db-migrate-component"
+    ]
 }

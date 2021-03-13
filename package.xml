@@ -6,6 +6,12 @@
  <summary>Database abstraction library</summary>
  <description>Database access and SQL abstraction layer.</description>
  <lead>
+  <name>Jan Schneider</name>
+  <user>jan</user>
+  <email>jan@horde.org</email>
+  <active>yes</active>
+ </lead>
+ <lead>
   <name>Mike Naberezny</name>
   <user>mnaberez</user>
   <email>mike@naberezny.com</email>
@@ -17,24 +23,18 @@
   <email>chuck@horde.org</email>
   <active>no</active>
  </lead>
- <lead>
-  <name>Jan Schneider</name>
-  <user>jan</user>
-  <email>jan@horde.org</email>
-  <active>yes</active>
- </lead>
- <date>2021-02-17</date>
+ <date>2021-03-13</date>
  <version>
-  <release>2.4.2</release>
-  <api>2.4.0</api>
+  <release>3.0.0alpha3</release>
+  <api>3.0.0alpha1</api>
  </version>
  <stability>
-  <release>stable</release>
-  <api>stable</api>
+  <release>alpha</release>
+  <api>alpha</api>
  </stability>
  <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
  <notes>
-* 
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
@@ -203,71 +203,15 @@
  <dependencies>
   <required>
    <php>
-    <min>5.3.0</min>
+    <min>7.0.0</min>
     <max>8.0.0alpha1</max>
     <exclude>8.0.0alpha1</exclude>
    </php>
    <pearinstaller>
     <min>1.7.0</min>
    </pearinstaller>
-   <package>
-    <name>Horde_Date</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
-   <package>
-    <name>Horde_Exception</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
-   <package>
-    <name>Horde_Support</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
-   <package>
-    <name>Horde_Util</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
   </required>
   <optional>
-   <package>
-    <name>Horde_Autoloader</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
-   <package>
-    <name>Horde_Cache</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
-   <package>
-    <name>Horde_Log</name>
-    <channel>pear.horde.org</channel>
-    <min>2.0.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
-   <package>
-    <name>Horde_Test</name>
-    <channel>pear.horde.org</channel>
-    <min>2.1.0</min>
-    <max>3.0.0alpha1</max>
-    <exclude>3.0.0alpha1</exclude>
-   </package>
    <extension>
     <name>mysql</name>
    </extension>
@@ -379,48 +323,6 @@
   </filelist>
  </phprelease>
  <changelog>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
   <release>
    <version>
     <release>0.1.0</release>
@@ -1102,7 +1004,6 @@
    <date>2021-02-17</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
-* [jan] Fix compatibility with PostgreSQL 12+ (Ivan Sergio Borgonovo &lt;mail@webthatworks.it&gt;, PR #2).
 * [jan] Fix sequences on PostgreSQL 10+ (Ivan Sergio Borgonovo &lt;mail@webthatworks.it&gt;, PR #3).
 * [mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski &lt;PaulSzymanski@users.noreply.github.com&gt;).
    </notes>
@@ -1119,7 +1020,22 @@
    <date>2021-02-17</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
-* 
+* |+
+   </notes>
+  </release>
+  <release>
+   <version>
+    <release>3.0.0alpha3</release>
+    <api>3.0.0alpha1</api>
+   </version>
+   <stability>
+    <release>alpha</release>
+    <api>alpha</api>
+   </stability>
+   <date>2021-02-17</date>
+   <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
+   <notes>
+* |+
    </notes>
   </release>
  </changelog>

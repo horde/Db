@@ -1,16 +1,19 @@
+------------
+v3.0.0alpha3
+------------
+
+|+
+
 ------
 v2.4.2
 ------
 
-
-
+|+
 
 ------
 v2.4.1
 ------
 
-[jan] Fix compatibility with PostgreSQL 12+ (Ivan Sergio Borgonovo
-      <mail@webthatworks.it>, PR #2).
 [jan] Fix sequences on PostgreSQL 10+ (Ivan Sergio Borgonovo
       <mail@webthatworks.it>, PR #3).
 [mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski
