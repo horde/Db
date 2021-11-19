@@ -36,7 +36,7 @@ license:
   uri: http://www.horde.org/licenses/bsd
 dependencies:
   required:
-    php: ^7
+    php: ^7.4 || ^8
     composer:
       horde/date: ^3
       horde/exception: ^3
@@ -47,9 +47,14 @@ dependencies:
       horde/autoloader: ^3
       horde/cache: ^3
       horde/log: ^3
-      horde/test: ^3
     ext:
       mysql: '*'
       mysqli: '*'
       oci8: '*'
       PDO: '*'
+  dev:
+    composer:
+      horde/test: ^3
+      horde/autoloader: ^3
+      horde/cache: ^3
+      horde/log: ^3
