@@ -56,7 +56,7 @@ class Schema extends BaseSchema
      *                         signed status, if necessary. For example
      *                         "varchar" and "60" in "company_name varchar(60)"
      *                         or "unsigned => true" in "int(10) UNSIGNED".
-     * @param boolean $null    Whether this column allows NULL values.
+     * @param bool $null    Whether this column allows NULL values.
      *
      * @return Column  A column object.
      */
@@ -139,7 +139,7 @@ class Schema extends BaseSchema
      */
     public function tables()
     {
-        return $this->selectValues('SHOW TABLES');
+        return $this->adapter->selectValues('SHOW TABLES');
     }
 
     /**
@@ -153,15 +153,15 @@ class Schema extends BaseSchema
     public function primaryKey($tableName, $name = null)
     {
         // Share the column cache with the columns() method
-        $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
         if (!$rows) {
-            $rows = $this->selectAll(
+            $rows = $this->adapter->selectAll(
                 'SHOW FIELDS FROM ' . $this->quoteTableName($tableName),
                 $name
             );
 
-            $this->cacheWrite("tables/columns/$tableName", serialize($rows));
+            $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
         $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, array());
@@ -184,12 +184,12 @@ class Schema extends BaseSchema
      */
     public function indexes($tableName, $name=null)
     {
-        $indexes = @unserialize($this->cacheRead("tables/indexes/$tableName"));
+        $indexes = @unserialize($this->adapter->cacheRead("tables/indexes/$tableName"));
 
         if (!$indexes) {
             $indexes = [];
             $currentIndex = null;
-            foreach ($this->select('SHOW KEYS FROM ' . $this->quoteTableName($tableName)) as $row) {
+            foreach ($this->adapter->select('SHOW KEYS FROM ' . $this->quoteTableName($tableName)) as $row) {
                 if ($currentIndex != $row['Key_name']) {
                     if ($row['Key_name'] == 'PRIMARY') {
                         continue;
@@ -206,7 +206,7 @@ class Schema extends BaseSchema
                 $indexes[count($indexes) - 1]->columns[] = $row['Column_name'];
             }
 
-            $this->cacheWrite("tables/indexes/$tableName", serialize($indexes));
+            $this->adapter->cacheWrite("tables/indexes/$tableName", serialize($indexes));
         }
 
         return $indexes;
@@ -222,12 +222,12 @@ class Schema extends BaseSchema
      */
     public function columns($tableName, $name=null)
     {
-        $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
         if (!$rows) {
-            $rows = $this->selectAll('SHOW FIELDS FROM ' . $this->quoteTableName($tableName), $name);
+            $rows = $this->adapter->selectAll('SHOW FIELDS FROM ' . $this->quoteTableName($tableName), $name);
 
-            $this->cacheWrite("tables/columns/$tableName", serialize($rows));
+            $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
         // Create columns from rows.
@@ -276,13 +276,13 @@ class Schema extends BaseSchema
      */
     public function renameTable($name, $newName)
     {
-        $this->_clearTableCache($name);
+        $this->clearTableCache($name);
         $sql = sprintf(
             'ALTER TABLE %s RENAME %s',
             $this->quoteTableName($name),
             $this->quoteTableName($newName)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -301,7 +301,7 @@ class Schema extends BaseSchema
         $type,
         $options = []
     ) {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $quotedTableName = $this->quoteTableName($tableName);
         $quotedColumnName = $this->quoteColumnName($columnName);
@@ -319,7 +319,7 @@ class Schema extends BaseSchema
             $quotedTableName,
             $this->quoteString($columnName)
         );
-        $row = $this->selectOne($sql);
+        $row = $this->adapter->selectOne($sql);
         if (!array_key_exists('default', $options)) {
             $options['default'] = $row['Default'];
             $options['column'] = $this->makeColumn(
@@ -353,7 +353,7 @@ class Schema extends BaseSchema
             $sql = $this->addColumnOptions($sql, $options);
         }
 
-        $this->execute($sql);
+        $this->adapter->execute($sql);
     }
 
     /**
@@ -368,7 +368,7 @@ class Schema extends BaseSchema
      */
     public function changeColumnDefault($tableName, $columnName, $default)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $quotedTableName = $this->quoteTableName($tableName);
         $quotedColumnName = $this->quoteColumnName($columnName);
@@ -378,7 +378,7 @@ class Schema extends BaseSchema
             $quotedTableName,
             $this->quoteString($columnName)
         );
-        $res = $this->selectOne($sql);
+        $res = $this->adapter->selectOne($sql);
         $column = $this->makeColumn($columnName, $res['Default'], $res['Type'], $res['Null'] == 'YES');
 
         $default = $this->quote($default, $column);
@@ -390,7 +390,7 @@ class Schema extends BaseSchema
             $res['Type'],
             $default
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -402,7 +402,7 @@ class Schema extends BaseSchema
      */
     public function renameColumn($tableName, $columnName, $newColumnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $quotedTableName = $this->quoteTableName($tableName);
         $quotedColumnName = $this->quoteColumnName($columnName);
@@ -412,7 +412,7 @@ class Schema extends BaseSchema
             $quotedTableName,
             $this->quoteString($columnName)
         );
-        $res = $this->selectOne($sql);
+        $res = $this->adapter->selectOne($sql);
         $currentType = $res['Type'];
 
         $sql = sprintf(
@@ -423,7 +423,7 @@ class Schema extends BaseSchema
             $currentType
         );
 
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -435,12 +435,12 @@ class Schema extends BaseSchema
      */
     public function removePrimaryKey($tableName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf(
             'ALTER TABLE %s DROP PRIMARY KEY',
             $this->quoteTableName($tableName)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -468,7 +468,7 @@ class Schema extends BaseSchema
      */
     public function createDatabase($name, $options = [])
     {
-        return $this->execute("CREATE DATABASE `$name`");
+        return $this->adapter->execute("CREATE DATABASE `$name`");
     }
 
     /**
@@ -478,7 +478,7 @@ class Schema extends BaseSchema
      */
     public function dropDatabase($name)
     {
-        return $this->execute("DROP DATABASE IF EXISTS `$name`");
+        return $this->adapter->execute("DROP DATABASE IF EXISTS `$name`");
     }
 
     /**
@@ -488,7 +488,7 @@ class Schema extends BaseSchema
      */
     public function currentDatabase()
     {
-        return $this->selectValue('SELECT DATABASE() AS db');
+        return $this->adapter->selectValue('SELECT DATABASE() AS db');
     }
 
     /**
@@ -498,7 +498,7 @@ class Schema extends BaseSchema
      * @param integer $limit      Maximum column length (non decimal type only)
      * @param integer $precision  The number precision (decimal type only).
      * @param integer $scale      The number scaling (decimal columns only).
-     * @param boolean $unsigned   Whether the column is an unsigned number
+     * @param bool $unsigned   Whether the column is an unsigned number
      *                            (non decimal columns only).
      *
      * @return string  The SQL definition. If $type is not one of the
@@ -567,7 +567,7 @@ class Schema extends BaseSchema
      * @param string $lhs    The column or expression to test.
      * @param string $op     The operator.
      * @param string $rhs    The comparison value.
-     * @param boolean $bind  If true, the method returns the query and a list
+     * @param bool $bind  If true, the method returns the query and a list
      *                       of values suitable for binding as an array.
      * @param array $params  Any additional parameters for the operator.
      *
@@ -615,8 +615,8 @@ class Schema extends BaseSchema
      */
     public function setCharset($charset)
     {
-        $charset = $this->_mysqlCharsetName($charset);
-        $this->execute('SET NAMES ' . $this->quoteString($charset));
+        $charset = $this->mysqlCharsetName($charset);
+        $this->adapter->execute('SET NAMES ' . $this->quoteString($charset));
     }
 
     /**
@@ -626,14 +626,14 @@ class Schema extends BaseSchema
      *
      * @return string  MySQL-normalized charset.
      */
-    public function _mysqlCharsetName($charset)
+    public function mysqlCharsetName($charset)
     {
         $charset = preg_replace(
             array('/[^a-z0-9]/', '/iso8859(\d)/'),
             array('', 'latin$1'),
             Horde_String::lower($charset)
         );
-        $validCharsets = $this->selectValues('SHOW CHARACTER SET');
+        $validCharsets = $this->adapter->selectValues('SHOW CHARACTER SET');
         if (!in_array($charset, $validCharsets)) {
             throw new DbException($charset . ' is not supported by MySQL (' . implode(', ', $validCharsets) . ')');
         }
@@ -663,7 +663,7 @@ class Schema extends BaseSchema
      */
     public function showVariable($name)
     {
-        $value = $this->selectOne('SHOW VARIABLES LIKE ' . $this->quoteString($name));
+        $value = $this->adapter->selectOne('SHOW VARIABLES LIKE ' . $this->quoteString($name));
         if ($value['Variable_name'] == $name) {
             return $value['Value'];
         } else {

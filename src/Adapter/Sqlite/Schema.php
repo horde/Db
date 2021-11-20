@@ -54,7 +54,7 @@ class Schema extends BaseSchema
      *                         signed status, if necessary. For example
      *                         "varchar" and "60" in "company_name varchar(60)"
      *                         or "unsigned => true" in "int(10) UNSIGNED".
-     * @param boolean $null    Whether this column allows NULL values.
+     * @param bool $null    Whether this column allows NULL values.
      *
      * @return Column  A column object.
      */
@@ -99,7 +99,7 @@ class Schema extends BaseSchema
     public function nativeDatabaseTypes()
     {
         return array(
-            'autoincrementKey' => $this->_defaultPrimaryKeyType(),
+            'autoincrementKey' => $this->defaultPrimaryKeyType(),
             'string'     => array('name' => 'varchar',  'limit' => 255),
             'text'       => array('name' => 'text',     'limit' => null),
             'mediumtext' => array('name' => 'text',     'limit' => null),
@@ -123,7 +123,7 @@ class Schema extends BaseSchema
      */
     public function tables()
     {
-        return $this->selectValues("SELECT name FROM sqlite_master WHERE type = 'table' UNION ALL SELECT name FROM sqlite_temp_master WHERE type = 'table' AND name != 'sqlite_sequence' ORDER BY name");
+        return $this->adapter->selectValues("SELECT name FROM sqlite_master WHERE type = 'table' UNION ALL SELECT name FROM sqlite_temp_master WHERE type = 'table' AND name != 'sqlite_sequence' ORDER BY name");
     }
 
     /**
@@ -137,12 +137,12 @@ class Schema extends BaseSchema
     public function primaryKey($tableName, $name = null)
     {
         // Share the columns cache with the columns() method
-        $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
         if (!$rows) {
-            $rows = $this->selectAll('PRAGMA table_info(' . $this->quoteTableName($tableName) . ')', $name);
+            $rows = $this->adapter->selectAll('PRAGMA table_info(' . $this->quoteTableName($tableName) . ')', $name);
 
-            $this->cacheWrite("tables/columns/$tableName", serialize($rows));
+            $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
         $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, array());
@@ -165,25 +165,25 @@ class Schema extends BaseSchema
      */
     public function indexes($tableName, $name = null)
     {
-        $indexes = @unserialize($this->cacheRead("tables/indexes/$tableName"));
+        $indexes = @unserialize($this->adapter->cacheRead("tables/indexes/$tableName"));
 
         if (!$indexes) {
             $indexes = [];
-            foreach ($this->select('PRAGMA index_list(' . $this->quoteTableName($tableName) . ')') as $row) {
+            foreach ($this->adapter->select('PRAGMA index_list(' . $this->quoteTableName($tableName) . ')') as $row) {
                 if (strpos($row['name'], 'sqlite_') !== false) {
                     // ignore internal sqlite_* index tables
                     continue;
                 }
                 $index = $this->makeIndex(
                     $tableName, $row['name'], false, (bool)$row['unique'], array());
-                foreach ($this->select('PRAGMA index_info(' . $this->quoteColumnName($index->name) . ')') as $field) {
+                foreach ($this->adapter->select('PRAGMA index_info(' . $this->quoteColumnName($index->name) . ')') as $field) {
                     $index->columns[] = $field['name'];
                 }
 
                 $indexes[] = $index;
             }
 
-            $this->cacheWrite("tables/indexes/$tableName", serialize($indexes));
+            $this->adapter->cacheWrite("tables/indexes/$tableName", serialize($indexes));
         }
 
         return $indexes;
@@ -199,11 +199,11 @@ class Schema extends BaseSchema
      */
     public function columns($tableName, $name = null)
     {
-        $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
         if (!$rows) {
-            $rows = $this->selectAll('PRAGMA table_info(' . $this->quoteTableName($tableName) . ')', $name);
-            $this->cacheWrite("tables/columns/$tableName", serialize($rows));
+            $rows = $this->adapter->selectAll('PRAGMA table_info(' . $this->quoteTableName($tableName) . ')', $name);
+            $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
         // create columns from rows
@@ -224,11 +224,11 @@ class Schema extends BaseSchema
      */
     public function renameTable($name, $newName)
     {
-        $this->_clearTableCache($name);
+        $this->clearTableCache($name);
         $sql = sprintf('ALTER TABLE %s RENAME TO %s',
                        $this->quoteTableName($name),
                        $this->quoteTableName($newName));
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -243,12 +243,12 @@ class Schema extends BaseSchema
      */
     public function addColumn($tableName, $columnName, $type, $options = [])
     {
-        if ($this->transactionStarted()) {
+        if ($this->adapter->transactionStarted()) {
             throw new DbException('Cannot add columns to a SQLite database while inside a transaction');
         }
 
         if ($type == 'autoincrementKey') {
-            $this->_alterTable(
+            $this->alterTable(
                 $tableName,
                 [],
                 function ($definition) use ($columnName, $type, $options) {
@@ -260,7 +260,7 @@ class Schema extends BaseSchema
         }
 
         // See last paragraph on http://www.sqlite.org/lang_altertable.html
-        $this->execute('VACUUM');
+        $this->adapter->execute('VACUUM');
     }
 
     /**
@@ -271,9 +271,9 @@ class Schema extends BaseSchema
      */
     public function removeColumn($tableName, $columnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
-        return $this->_alterTable(
+        return $this->alterTable(
             $tableName,
             [],
             function ($definition) use ($columnName) {
@@ -294,7 +294,7 @@ class Schema extends BaseSchema
      */
     public function changeColumn($tableName, $columnName, $type, $options = [])
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $defs = array(
             function ($definition) use ($columnName, $type) {
@@ -333,7 +333,7 @@ class Schema extends BaseSchema
             };
         }
 
-        return $this->_alterTable(
+        return $this->alterTable(
             $tableName,
             [],
             function ($definition) use ($defs) {
@@ -356,9 +356,9 @@ class Schema extends BaseSchema
      */
     public function changeColumnDefault($tableName, $columnName, $default)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
-        return $this->_alterTable(
+        return $this->alterTable(
             $tableName,
             [],
             function ($definition) use ($columnName, $default) {
@@ -376,9 +376,9 @@ class Schema extends BaseSchema
      */
     public function renameColumn($tableName, $columnName, $newColumnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
-        return $this->_alterTable(
+        return $this->alterTable(
             $tableName,
             array('rename' => array($columnName => $newColumnName)));
     }
@@ -393,12 +393,12 @@ class Schema extends BaseSchema
      */
     public function addPrimaryKey($tableName, $columns)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $columns = (array)$columns;
         $callback = function ($definition) use ($columns) {
             $definition->primaryKey($columns);
         };
-        $this->_alterTable($tableName, [], $callback);
+        $this->alterTable($tableName, [], $callback);
     }
 
     /**
@@ -410,11 +410,11 @@ class Schema extends BaseSchema
      */
     public function removePrimaryKey($tableName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $callback = function ($definition) {
             $definition->primaryKey(false);
         };
-        $this->_alterTable($tableName, [], $callback);
+        $this->alterTable($tableName, [], $callback);
     }
 
     /**
@@ -429,11 +429,11 @@ class Schema extends BaseSchema
      */
     public function removeIndex($tableName, $options=array())
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $index = $this->indexName($tableName, $options);
         $sql = 'DROP INDEX ' . $this->quoteColumnName($index);
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -470,7 +470,9 @@ class Schema extends BaseSchema
      */
     public function currentDatabase()
     {
-        return $this->_config['dbname'];
+        // TODO: Broken implementation. config is never created
+        return '';
+//        return $this->config['dbname'];
     }
 
     /**
@@ -528,9 +530,9 @@ class Schema extends BaseSchema
      *
      * @return string  Primary key type definition.
      */
-    protected function _defaultPrimaryKeyType()
+    protected function defaultPrimaryKeyType()
     {
-        if ($this->supportsAutoIncrement()) {
+        if ($this->adapter->supportsAutoIncrement()) {
             return 'INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL';
         } else {
             return 'INTEGER PRIMARY KEY NOT NULL';
@@ -552,20 +554,20 @@ class Schema extends BaseSchema
      *                            Horde_Db_Adapter_Base_TableDefinition object
      *                            available in $definition. See _copyTable().
      */
-    protected function _alterTable($tableName, $options = [], $callback = null)
+    protected function alterTable($tableName, $options = [], $callback = null)
     {
-        $this->beginDbTransaction();
+        $this->adapter->beginDbTransaction();
 
         $alteredTableName = 'altered_' . $tableName;
-        $this->_moveTable($tableName,
+        $this->moveTable($tableName,
                           $alteredTableName,
                           array_merge($options, array('temporary' => true)));
-        $this->_moveTable($alteredTableName,
+        $this->moveTable($alteredTableName,
                           $tableName,
                           [],
                           $callback);
 
-        $this->commitDbTransaction();
+        $this->adapter->commitDbTransaction();
     }
 
     /**
@@ -584,10 +586,10 @@ class Schema extends BaseSchema
      *                            Horde_Db_Adapter_Base_TableDefinition object
      *                            available in $definition. See _copyTable().
      */
-    protected function _moveTable($from, $to, $options = [],
+    protected function moveTable($from, $to, $options = [],
                                   $callback = null)
     {
-        $this->_copyTable($from, $to, $options, $callback);
+        $this->copyTable($from, $to, $options, $callback);
         $this->dropTable($from);
     }
 
@@ -606,7 +608,7 @@ class Schema extends BaseSchema
      *                            Horde_Db_Adapter_Base_TableDefinition object
      *                            available in $definition.
      */
-    protected function _copyTable($from, $to, $options = [],
+    protected function copyTable($from, $to, $options = [],
                                   $callback = null)
     {
         $fromColumns = $this->columns($from);
@@ -615,7 +617,7 @@ class Schema extends BaseSchema
             /* A primary key is not necessarily what matches the pseudo type
              * "autoincrementKey". We need to parse the table definition to
              * find out if the column is AUTOINCREMENT too. */
-            $tableDefinition = $this->selectValue('SELECT sql FROM sqlite_master WHERE name = ? UNION ALL SELECT sql FROM sqlite_temp_master WHERE name = ?',
+            $tableDefinition = $this->adapter->selectValue('SELECT sql FROM sqlite_master WHERE name = ? UNION ALL SELECT sql FROM sqlite_temp_master WHERE name = ?',
                                                   array($from, $from));
             if (strpos($tableDefinition, $this->quoteColumnName($pk->columns[0]) . ' INTEGER PRIMARY KEY AUTOINCREMENT')) {
                 $pkColumn = $pk->columns[0];
@@ -658,11 +660,11 @@ class Schema extends BaseSchema
 
         $definition->end();
 
-        $this->_copyTableIndexes(
+        $this->copyTableIndexes(
             $from,
             $to,
             isset($options['rename']) ? $options['rename'] : array());
-        $this->_copyTableContents(
+        $this->copyTableContents(
             $from,
             $to,
             array_map(
@@ -680,7 +682,7 @@ class Schema extends BaseSchema
      * @param array $rename  A hash of columns to rename during the copy, with
      *                       original names as keys and the new names as values.
      */
-    protected function _copyTableIndexes($from, $to, $rename = [])
+    protected function copyTableIndexes($from, $to, $rename = [])
     {
         $toColumnNames = [];
         foreach ($this->columns($to) as $c) {
@@ -726,7 +728,7 @@ class Schema extends BaseSchema
      *                        original names as keys and the new names as
      *                        values.
      */
-    protected function _copyTableContents($from, $to, $columns,
+    protected function copyTableContents($from, $to, $columns,
                                           $rename = [])
     {
         $columnMappings = array_combine($columns, $columns);
@@ -764,6 +766,6 @@ class Schema extends BaseSchema
                        $quotedToColumns,
                        $quotedFromColumns,
                        $quotedFrom);
-        $this->execute($sql);
+        $this->adapter->execute($sql);
     }
 }

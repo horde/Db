@@ -21,8 +21,8 @@ use \Horde\Db\Value;
  * @copyright 2006-2021 Horde LLC
  * @license   http://www.horde.org/licenses/bsd
  * @package   Db
- * @property  $value  The binary value as a string. @since Horde_Db 2.1.0
- * @property  $stream  The binary value as a stream. @since Horde_Db 2.4.0
+ * @property  mixed $value  The binary value as a string. @since Horde_Db 2.1.0
+ * @property  resource $stream  The binary value as a stream. @since Horde_Db 2.4.0
  */
 abstract class Lob implements Value
 {
@@ -31,19 +31,19 @@ abstract class Lob implements Value
      *
      * @var string
      */
-    protected $_value;
+    protected $value;
 
     /**
      * Binary stream value to be quoted
      *
-     * @var stream
+     * @var resource
      */
-    protected $_stream;
+    protected $stream;
 
     /**
      * Constructor
      *
-     * @param string|stream $binaryValue  The binary value in a string or
+     * @param string|resource $binaryValue  The binary value in a string or
      *                                    stream resource.
      */
     public function __construct($binaryValue)
@@ -62,22 +62,22 @@ abstract class Lob implements Value
     {
         switch ($name) {
         case 'value':
-            if (isset($this->_value)) {
-                return $this->_value;
+            if (isset($this->value)) {
+                return $this->value;
             }
-            if (isset($this->_stream)) {
-                rewind($this->_stream);
-                return stream_get_contents($this->_stream);
+            if (isset($this->stream)) {
+                rewind($this->stream);
+                return stream_get_contents($this->stream);
             }
             break;
 
         case 'stream':
-            if (isset($this->_stream)) {
-                return $this->_stream;
+            if (isset($this->stream)) {
+                return $this->stream;
             }
-            if (isset($this->_value)) {
+            if (isset($this->value)) {
                 $stream = @fopen('php://temp', 'r+');
-                fwrite($stream, $this->_value);
+                fwrite($stream, $this->value);
                 rewind($stream);
                 return $stream;
             }
@@ -93,7 +93,7 @@ abstract class Lob implements Value
         switch ($name) {
         case 'value':
         case 'stream':
-            $this->{'_' . $name} = $value;
+            $this->$name = $value;
             break;
         }
     }

@@ -38,42 +38,42 @@ class Column extends BaseColumn
     /**
      * @var array
      */
-    protected $_hasEmptyStringDefault = array('binary', 'string', 'text');
+    protected $hasEmptyStringDefault = array('binary', 'string', 'text');
 
     /**
-     * @var string
+     * @var string|null
      */
-    protected $_originalDefault = null;
+    protected $originalDefault = null;
 
     /**
      * Construct
      * @param   string  $name
-     * @param   string  $default
-     * @param   string  $sqlType
-     * @param   boolean $null
+     * @param   string|null  $default optional
+     * @param   string|null  $sqlType optional
+     * @param   bool $null optional
      */
-    public function __construct($name, $default, $sqlType=null, $null=true)
+    public function __construct(string $name, string $default = null, string $sqlType=null, bool $null=true)
     {
-        $this->_originalDefault = $default;
+        $this->originalDefault = $default;
         parent::__construct($name, $default, $sqlType, $null);
 
-        if ($this->_isMissingDefaultForgedAsEmptyString()) {
-            $this->_default = null;
+        if ($this->isMissingDefaultForgedAsEmptyString()) {
+            $this->default = null;
         }
     }
 
     /**
      */
-    protected function _setSimplifiedType()
+    protected function setSimplifiedType()
     {
-        if (strpos(Horde_String::lower($this->_sqlType), 'tinyint(1)') !== false) {
-            $this->_type = 'boolean';
+        if (strpos(Horde_String::lower($this->sqlType), 'tinyint(1)') !== false) {
+            $this->type = 'boolean';
             return;
-        } elseif (preg_match('/enum/i', $this->_sqlType)) {
-            $this->_type = 'string';
+        } elseif (preg_match('/enum/i', $this->sqlType)) {
+            $this->type = 'string';
             return;
         }
-        parent::_setSimplifiedType();
+        parent::setSimplifiedType();
     }
 
     /**
@@ -85,11 +85,11 @@ class Column extends BaseColumn
      * Test whether the column has default '', is not null, and is not
      * a type allowing default ''.
      *
-     * @return  boolean
+     * @return  bool
      */
-    protected function _isMissingDefaultForgedAsEmptyString()
+    protected function isMissingDefaultForgedAsEmptyString()
     {
-        return !$this->_null && $this->_originalDefault == '' &&
-            !in_array($this->_type, $this->_hasEmptyStringDefault);
+        return !$this->null && $this->originalDefault == '' &&
+            !in_array($this->type, $this->hasEmptyStringDefault);
     }
 }

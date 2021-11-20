@@ -38,7 +38,7 @@ class Mysql extends Base
     /**
      * @var string
      */
-    protected $_schemaClass = MysqlSchema::class;
+    protected $schemaClass = MysqlSchema::class;
 
     /**
      * @return  string
@@ -66,17 +66,17 @@ class Mysql extends Base
      */
     public function connect()
     {
-        if ($this->_active) {
+        if ($this->active) {
             return;
         }
 
         parent::connect();
 
-        // ? $this->_connection->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
+        // ? $this->connection->setAttribute(PDO::MYSQL_ATTR_USE_BUFFERED_QUERY, true);
 
         // Set the default charset. http://dev.mysql.com/doc/refman/5.1/en/charset-connection.html
-        if (!empty($this->_config['charset'])) {
-            $this->setCharset($this->_config['charset']);
+        if (!empty($this->config['charset'])) {
+            $this->schema->setCharset($this->config['charset']);
         }
     }
 
@@ -94,35 +94,35 @@ class Mysql extends Base
      * @throws  DbException
      * @return  array  [dsn, username, password]
      */
-    protected function _parseConfig()
+    protected function parseConfig()
     {
-        $this->_config['adapter'] = 'mysql';
+        $this->config['adapter'] = 'mysql';
 
-        $this->_checkRequiredConfig(array('adapter', 'username'));
+        $this->checkRequiredConfig(array('adapter', 'username'));
 
-        if (!empty($this->_config['socket'])) {
-            $this->_config['unix_socket'] = $this->_config['socket'];
-            unset($this->_config['socket']);
+        if (!empty($this->config['socket'])) {
+            $this->config['unix_socket'] = $this->config['socket'];
+            unset($this->config['socket']);
         }
 
-        if (!empty($this->_config['host']) &&
-            $this->_config['host'] == 'localhost') {
-            $this->_config['host'] = '127.0.0.1';
+        if (!empty($this->config['host']) &&
+            $this->config['host'] == 'localhost') {
+            $this->config['host'] = '127.0.0.1';
         }
 
         // Try an empty password if it's not set.
-        if (!isset($this->_config['password'])) {
-            $this->_config['password'] = '';
+        if (!isset($this->config['password'])) {
+            $this->config['password'] = '';
         }
 
         // Collect options to build PDO Data Source Name (DSN) string.
-        $dsnOpts = $this->_config;
+        $dsnOpts = $this->config;
         unset($dsnOpts['adapter'],
               $dsnOpts['username'],
               $dsnOpts['password'],
               $dsnOpts['charset'],
               $dsnOpts['phptype']);
-        $dsnOpts = $this->_normalizeConfig($dsnOpts);
+        $dsnOpts = $this->normalizeConfig($dsnOpts);
 
         if (isset($dsnOpts['port'])) {
             if (empty($dsnOpts['host'])) {
@@ -139,8 +139,8 @@ class Mysql extends Base
 
         // Return DSN and user/pass for connection.
         return array(
-            $this->_buildDsnString($dsnOpts),
-            $this->_config['username'],
-            $this->_config['password']);
+            $this->buildDsnString($dsnOpts),
+            $this->config['username'],
+            $this->config['password']);
     }
 }

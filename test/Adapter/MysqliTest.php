@@ -80,6 +80,6 @@ class MysqliTest extends MysqlBase
 
     public function testAdapterName()
     {
-        $this->assertEquals('MySQLi', $this->_conn->adapterName());
+        $this->assertEquals('MySQLi', $this->conn->adapterName());
     }
 }

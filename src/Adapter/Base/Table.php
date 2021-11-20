@@ -41,10 +41,10 @@ class Table implements ArrayAccess, IteratorAggregate
      *
      * @var string
      */
-    protected $_name;
-    protected $_primaryKey;
-    protected $_columns;
-    protected $_indexes;
+    protected $name;
+    protected $primaryKey;
+    protected $columns;
+    protected $indexes;
 
 
     /*##########################################################################
@@ -58,10 +58,10 @@ class Table implements ArrayAccess, IteratorAggregate
      */
     public function __construct($name, $primaryKey, $columns, $indexes)
     {
-        $this->_name       = $name;
-        $this->_primaryKey = $primaryKey;
-        $this->_columns    = $columns;
-        $this->_indexes    = $indexes;
+        $this->name       = $name;
+        $this->primaryKey = $primaryKey;
+        $this->columns    = $columns;
+        $this->indexes    = $indexes;
     }
 
 
@@ -74,7 +74,7 @@ class Table implements ArrayAccess, IteratorAggregate
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -82,7 +82,7 @@ class Table implements ArrayAccess, IteratorAggregate
      */
     public function getPrimaryKey()
     {
-        return $this->_primaryKey;
+        return $this->primaryKey;
     }
 
     /**
@@ -90,24 +90,24 @@ class Table implements ArrayAccess, IteratorAggregate
      */
     public function getColumns()
     {
-        return $this->_columns;
+        return $this->columns;
     }
 
     /**
-     * @return  Column
+     * @return  Column|null
      */
     public function getColumn($column)
     {
-        return isset($this->_columns[$column]) ? $this->_columns[$column] : null;
+        return isset($this->columns[$column]) ? $this->columns[$column] : null;
     }
 
     /**
      * @return  array
      */
-    public function getColumnNames()
+    public function getColumnNames(): array
     {
         $names = [];
-        foreach ($this->_columns as $column) {
+        foreach ($this->columns as $column) {
             $names[] = $column->getName();
         }
         return $names;
@@ -116,9 +116,9 @@ class Table implements ArrayAccess, IteratorAggregate
     /**
      * @return  array
      */
-    public function getIndexes()
+    public function getIndexes(): array
     {
-        return $this->_indexes;
+        return $this->indexes;
     }
 
     /**
@@ -127,7 +127,7 @@ class Table implements ArrayAccess, IteratorAggregate
     public function getIndexNames()
     {
         $names = [];
-        foreach ($this->_indexes as $index) {
+        foreach ($this->indexes as $index) {
             $names[] = $index->getName();
         }
         return $names;
@@ -145,7 +145,7 @@ class Table implements ArrayAccess, IteratorAggregate
 
     public function __isset($key)
     {
-        return isset($this->_columns[$key]);
+        return isset($this->columns[$key]);
     }
 
 
@@ -161,7 +161,7 @@ class Table implements ArrayAccess, IteratorAggregate
      */
     public function offsetExists($offset)
     {
-        return isset($this->_columns[$offset]);
+        return isset($this->columns[$offset]);
     }
 
     /**
@@ -201,7 +201,7 @@ class Table implements ArrayAccess, IteratorAggregate
 
     public function getIterator()
     {
-        return new ArrayIterator($this->_columns);
+        return new ArrayIterator($this->columns);
     }
 
 

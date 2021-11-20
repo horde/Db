@@ -41,13 +41,13 @@ class Sqlite extends Base
     /**
      * @var string
      */
-    protected $_schemaClass = SqliteSchema::class;
+    protected $schemaClass = SqliteSchema::class;
 
     /**
      * SQLite version number
-     * @var integer
+     * @var int
      */
-    protected $_sqliteVersion;
+    protected $sqliteVersion;
 
     /**
      * @return  string
@@ -58,7 +58,7 @@ class Sqlite extends Base
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function supportsMigrations()
     {
@@ -69,18 +69,18 @@ class Sqlite extends Base
      * Does this adapter support using DISTINCT within COUNT?  This is +true+
      * for all adapters except sqlite.
      *
-     * @return  boolean
+     * @return  bool
      */
     public function supportsCountDistinct()
     {
-        return $this->_sqliteVersion >= '3.2.6';
+        return $this->sqliteVersion >= '3.2.6';
     }
 
     /**
      * Does this adapter support using INTERVAL statements?  This is +true+
      * for all adapters except sqlite.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsInterval()
     {
@@ -89,7 +89,7 @@ class Sqlite extends Base
 
     public function supportsAutoIncrement()
     {
-        return $this->_sqliteVersion >= '3.1.0';
+        return $this->sqliteVersion >= '3.1.0';
     }
 
 
@@ -104,30 +104,30 @@ class Sqlite extends Base
      */
     public function connect()
     {
-        if ($this->_active) {
+        if ($this->active) {
             return;
         }
 
         parent::connect();
 
-        $this->_connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
+        $this->connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 
-        $this->_lastQuery = $sql = 'PRAGMA full_column_names=0';
-        $retval = $this->_connection->exec($sql);
+        $this->lastQuery = $sql = 'PRAGMA full_column_names=0';
+        $retval = $this->connection->exec($sql);
         if ($retval === false) {
-            $error = $this->_connection->errorInfo();
+            $error = $this->connection->errorInfo();
             throw new DbException($error[2]);
         }
 
-        $this->_lastQuery = $sql = 'PRAGMA short_column_names=1';
-        $retval = $this->_connection->exec($sql);
+        $this->lastQuery = $sql = 'PRAGMA short_column_names=1';
+        $retval = $this->connection->exec($sql);
         if ($retval === false) {
-            $error = $this->_connection->errorInfo();
+            $error = $this->connection->errorInfo();
             throw new DbException($error[2]);
         }
 
-        $this->_lastQuery = $sql = 'SELECT sqlite_version(*)';
-        $this->_sqliteVersion = $this->selectValue($sql);
+        $this->lastQuery = $sql = 'SELECT sqlite_version(*)';
+        $this->sqliteVersion = $this->selectValue($sql);
     }
 
 
@@ -144,7 +144,7 @@ class Sqlite extends Base
      */
     public function execute($sql, $arg1=null, $arg2=null)
     {
-        return $this->_catchSchemaChanges('execute', array($sql, $arg1, $arg2));
+        return $this->catchSchemaChanges('execute', array($sql, $arg1, $arg2));
     }
 
     /**
@@ -152,7 +152,7 @@ class Sqlite extends Base
      */
     public function beginDbTransaction()
     {
-        return $this->_catchSchemaChanges('beginDbTransaction');
+        return $this->catchSchemaChanges('beginDbTransaction');
     }
 
     /**
@@ -160,7 +160,7 @@ class Sqlite extends Base
      */
     public function commitDbTransaction()
     {
-        return $this->_catchSchemaChanges('commitDbTransaction');
+        return $this->catchSchemaChanges('commitDbTransaction');
     }
 
     /**
@@ -169,7 +169,7 @@ class Sqlite extends Base
      */
     public function rollbackDbTransaction()
     {
-        return $this->_catchSchemaChanges('rollbackDbTransaction');
+        return $this->catchSchemaChanges('rollbackDbTransaction');
     }
 
     /**
@@ -189,7 +189,7 @@ class Sqlite extends Base
     # Protected
     ##########################################################################*/
 
-    protected function _catchSchemaChanges($method, $args = [])
+    protected function catchSchemaChanges($method, $args = [])
     {
         try {
             return call_user_func_array(array($this, "parent::$method"), $args);
@@ -203,7 +203,7 @@ class Sqlite extends Base
         }
     }
 
-    protected function _buildDsnString($params)
+    protected function buildDsnString($params)
     {
         return 'sqlite:' . $params['dbname'];
     }
@@ -214,19 +214,19 @@ class Sqlite extends Base
      * @throws  DbException
      * @return  array  [dsn, username, password]
      */
-    protected function _parseConfig()
+    protected function parseConfig()
     {
         // check required config keys are present
-        if (empty($this->_config['database']) && empty($this->_config['dbname'])) {
+        if (empty($this->config['database']) && empty($this->config['dbname'])) {
             $msg = 'Either dbname or database is required';
             throw new DbException($msg);
         }
 
         // collect options to build PDO Data Source Name (DSN) string
-        $dsnOpts = $this->_config;
+        $dsnOpts = $this->config;
         unset($dsnOpts['adapter'], $dsnOpts['username'], $dsnOpts['password']);
 
         // return DSN and dummy user/pass for connection
-        return array($this->_buildDsnString($this->_normalizeConfig($dsnOpts)), '', '');
+        return array($this->buildDsnString($this->normalizeConfig($dsnOpts)), '', '');
     }
 }

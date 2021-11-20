@@ -44,29 +44,29 @@ class Migrator
     /**
      * @var string
      */
-    protected $_direction = null;
+    protected $direction = null;
 
     /**
      * @var string
      */
-    protected $_migrationsPath = null;
+    protected $migrationsPath = null;
 
     /**
-     * @var integer
+     * @var int
      */
-    protected $_targetVersion = null;
+    protected $targetVersion = null;
 
     /**
      * @var string
      */
-    protected $_schemaTableName = 'schema_info';
+    protected $schemaTableName = 'schema_info';
 
     /**
      * @var Horde_Log_Logger|null
      */
-    protected $_logger;
-    protected $_inflector;
-    protected Adapter $_connection;
+    protected $logger;
+    protected $inflector;
+    protected Adapter $connection;
 
     /**
      * Constructor.
@@ -90,17 +90,17 @@ class Migrator
             throw new MigrationException('This database does not yet support migrations');
         }
 
-        $this->_connection = $connection;
-        $this->_logger = $logger ? $logger : new Horde_Support_Stub();
-        $this->_inflector = new Horde_Support_Inflector();
+        $this->connection = $connection;
+        $this->logger = $logger ? $logger : new Horde_Support_Stub();
+        $this->inflector = new Horde_Support_Inflector();
         if (isset($options['migrationsPath'])) {
-            $this->_migrationsPath = $options['migrationsPath'];
+            $this->migrationsPath = $options['migrationsPath'];
         }
         if (isset($options['schemaTableName'])) {
-            $this->_schemaTableName = $options['schemaTableName'];
+            $this->schemaTableName = $options['schemaTableName'];
         }
 
-        $this->_initializeSchemaInformation();
+        $this->initializeSchemaInformation();
     }
 
     /**
@@ -123,9 +123,9 @@ class Migrator
      */
     public function up($targetVersion = null)
     {
-        $this->_targetVersion = $targetVersion;
-        $this->_direction = 'up';
-        $this->_doMigrate();
+        $this->targetVersion = $targetVersion;
+        $this->direction = 'up';
+        $this->doMigrate();
     }
 
     /**
@@ -133,30 +133,30 @@ class Migrator
      */
     public function down($targetVersion = null)
     {
-        $this->_targetVersion = $targetVersion;
-        $this->_direction = 'down';
-        $this->_doMigrate();
+        $this->targetVersion = $targetVersion;
+        $this->direction = 'down';
+        $this->doMigrate();
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getCurrentVersion()
     {
-        return in_array($this->_schemaTableName, $this->_connection->tables())
-            ? $this->_connection->selectValue('SELECT version FROM ' . $this->_schemaTableName)
+        return in_array($this->schemaTableName, $this->connection->tables())
+            ? $this->connection->selectValue('SELECT version FROM ' . $this->schemaTableName)
             : 0;
     }
 
     /**
-     * @return integer
+     * @return int
      */
     public function getTargetVersion()
     {
         $migrations = [];
-        foreach ($this->_getMigrationFiles() as $migrationFile) {
-            list($version, $name) = $this->_getMigrationVersionAndName($migrationFile);
-            $this->_assertUniqueMigrationVersion($migrations, $version);
+        foreach ($this->getMigrationFiles() as $migrationFile) {
+            list($version, $name) = $this->getMigrationVersionAndName($migrationFile);
+            $this->assertUniqueMigrationVersion($migrations, $version);
             $migrations[$version] = $name;
         }
 
@@ -171,7 +171,7 @@ class Migrator
      */
     public function setMigrationsPath($migrationsPath)
     {
-        $this->_migrationsPath = $migrationsPath;
+        $this->migrationsPath = $migrationsPath;
     }
 
     /**
@@ -179,7 +179,7 @@ class Migrator
      */
     public function setLogger(Horde_Log_Logger $logger)
     {
-        $this->_logger = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -187,47 +187,47 @@ class Migrator
      */
     public function setInflector(Horde_Support_Inflector $inflector)
     {
-        $this->_inflector = $inflector;
+        $this->inflector = $inflector;
     }
 
     /**
      * Performs the migration.
      */
-    protected function _doMigrate()
+    protected function doMigrate()
     {
-        foreach ($this->_getMigrationClasses() as $migration) {
-            if ($this->_hasReachedTargetVersion($migration->version)) {
-                $this->_logger->info('Reached target version: ' . $this->_targetVersion);
+        foreach ($this->getMigrationClasses() as $migration) {
+            if ($this->hasReachedTargetVersion($migration->version)) {
+                $this->logger->info('Reached target version: ' . $this->targetVersion);
                 return;
             }
-            if ($this->_isIrrelevantMigration($migration->version)) {
+            if ($this->isIrrelevantMigration($migration->version)) {
                 continue;
             }
 
-            $this->_logger->info('Migrating ' . ($this->_direction == 'up' ? 'to ' : 'from ') . get_class($migration) . ' (' . $migration->version . ')');
-            $migration->migrate($this->_direction);
-            $this->_setSchemaVersion($migration->version);
+            $this->logger->info('Migrating ' . ($this->direction == 'up' ? 'to ' : 'from ') . get_class($migration) . ' (' . $migration->version . ')');
+            $migration->migrate($this->direction);
+            $this->setSchemaVersion($migration->version);
         }
     }
 
     /**
      * @return array
      */
-    protected function _getMigrationClasses()
+    protected function getMigrationClasses()
     {
         $migrations = [];
-        foreach ($this->_getMigrationFiles() as $migrationFile) {
+        foreach ($this->getMigrationFiles() as $migrationFile) {
             require_once $migrationFile;
-            list($version, $name) = $this->_getMigrationVersionAndName($migrationFile);
-            $this->_assertUniqueMigrationVersion($migrations, $version);
-            $migrations[$version] = $this->_getMigrationClass($name, $version);
+            list($version, $name) = $this->getMigrationVersionAndName($migrationFile);
+            $this->assertUniqueMigrationVersion($migrations, $version);
+            $migrations[$version] = $this->getMigrationClass($name, $version);
         }
 
         // Sort by version.
         uksort($migrations, 'strnatcmp');
         $sorted = array_values($migrations);
 
-        return $this->_isDown() ? array_reverse($sorted) : $sorted;
+        return $this->isDown() ? array_reverse($sorted) : $sorted;
     }
 
     /**
@@ -236,7 +236,7 @@ class Migrator
      *
      * @throws MigrationException
      */
-    protected function _assertUniqueMigrationVersion($migrations, $version)
+    protected function assertUniqueMigrationVersion($migrations, $version)
     {
         if (isset($migrations[$version])) {
             throw new MigrationException('Multiple migrations have the version number ' . $version);
@@ -248,14 +248,14 @@ class Migrator
      *
      * @return array
      */
-    protected function _getMigrationFiles()
+    protected function getMigrationFiles()
     {
         return array_keys(
             iterator_to_array(
                 new RegexIterator(
                     new RecursiveIteratorIterator(
                         new RecursiveDirectoryIterator(
-                            $this->_migrationsPath
+                            $this->migrationsPath
                         )
                     ),
                     '/' . preg_quote(DIRECTORY_SEPARATOR, '/') . '\d+_.*\.php$/',
@@ -274,11 +274,11 @@ class Migrator
      *
      * @return  Base
      */
-    protected function _getMigrationClass($migrationName, $version)
+    protected function getMigrationClass($migrationName, $version)
     {
-        $className = $this->_inflector->camelize($migrationName);
-        $class = new $className($this->_connection, $version);
-        $class->setLogger($this->_logger);
+        $className = $this->inflector->camelize($migrationName);
+        $class = new $className($this->connection, $version);
+        $class->setLogger($this->logger);
 
         return $class;
     }
@@ -288,7 +288,7 @@ class Migrator
      *
      * @return array  ($version, $name)
      */
-    protected function _getMigrationVersionAndName($migrationFile)
+    protected function getMigrationVersionAndName($migrationFile)
     {
         preg_match_all('/([0-9]+)_([_a-z0-9]*).php/', $migrationFile, $matches);
         return array($matches[1][0], $matches[2][0]);
@@ -297,68 +297,68 @@ class Migrator
     /**
      * @TODO
      */
-    protected function _initializeSchemaInformation()
+    protected function initializeSchemaInformation()
     {
-        if (in_array($this->_schemaTableName, $this->_connection->tables())) {
+        if (in_array($this->schemaTableName, $this->connection->tables())) {
             return;
         }
-        $schemaTable = $this->_connection->createTable($this->_schemaTableName, array('autoincrementKey' => false));
+        $schemaTable = $this->connection->createTable($this->schemaTableName, array('autoincrementKey' => false));
         $schemaTable->column('version', 'integer');
         $schemaTable->end();
-        $this->_connection->insert('INSERT INTO ' . $this->_schemaTableName . ' (version) VALUES (0)', null, null, null, 1);
+        $this->connection->insert('INSERT INTO ' . $this->schemaTableName . ' (version) VALUES (0)', null, null, null, 1);
     }
 
     /**
      * @param integer $version
      */
-    protected function _setSchemaVersion($version)
+    protected function setSchemaVersion($version)
     {
-        $version = $this->_isDown() ? $version - 1 : $version;
+        $version = $this->isDown() ? $version - 1 : $version;
         if ($version) {
-            $sql = 'UPDATE ' . $this->_schemaTableName . ' SET version = ' . (int)$version;
-            $this->_connection->update($sql);
+            $sql = 'UPDATE ' . $this->schemaTableName . ' SET version = ' . (int)$version;
+            $this->connection->update($sql);
         } else {
-            $this->_connection->dropTable($this->_schemaTableName);
+            $this->connection->dropTable($this->schemaTableName);
         }
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    protected function _isUp()
+    protected function isUp()
     {
-        return $this->_direction == 'up';
+        return $this->direction == 'up';
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    protected function _isDown()
+    protected function isDown()
     {
-        return $this->_direction == 'down';
+        return $this->direction == 'down';
     }
 
     /**
-     * @return boolean
+     * @return bool
      */
-    protected function _hasReachedTargetVersion($version)
+    protected function hasReachedTargetVersion($version)
     {
-        if ($this->_targetVersion === null) {
+        if ($this->targetVersion === null) {
             return false;
         }
 
-        return ($this->_isUp()   && $version - 1 >= $this->_targetVersion) ||
-               ($this->_isDown() && $version     <= $this->_targetVersion);
+        return ($this->isUp()   && $version - 1 >= $this->targetVersion) ||
+               ($this->isDown() && $version     <= $this->targetVersion);
     }
 
     /**
-     * @param integer $version
+     * @param int $version
      *
-     * @return  boolean
+     * @return  bool
      */
-    protected function _isIrrelevantMigration($version)
+    protected function isIrrelevantMigration($version)
     {
-        return ($this->_isUp()   && $version <= self::getCurrentVersion()) ||
-               ($this->_isDown() && $version >  self::getCurrentVersion());
+        return ($this->isUp()   && $version <= self::getCurrentVersion()) ||
+               ($this->isDown() && $version >  self::getCurrentVersion());
     }
 }

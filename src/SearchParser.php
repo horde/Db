@@ -112,51 +112,51 @@ class SearchParser
         }
 
         /* Call the expression parser. */
-        return self::_parseKeywords1($column, $tokens);
+        return self::parseKeywords1($column, $tokens);
     }
 
-    protected static function _parseKeywords1($column, &$tokens)
+    protected static function parseKeywords1($column, &$tokens)
     {
         if (count($tokens) == 0) {
             throw new DbException('Empty search terms');
         }
-        $lhs = self::_parseKeywords2($column, $tokens);
+        $lhs = self::parseKeywords2($column, $tokens);
         if (count($tokens) == 0 || $tokens[0] != '!OR') {
             return $lhs;
         }
         array_shift($tokens);
-        $rhs = self::_parseKeywords1($column, $tokens);
+        $rhs = self::parseKeywords1($column, $tokens);
         return "($lhs OR $rhs)";
     }
 
-    protected static function _parseKeywords2($column, &$tokens)
+    protected static function parseKeywords2($column, &$tokens)
     {
-        $lhs = self::_parseKeywords3($column, $tokens);
+        $lhs = self::parseKeywords3($column, $tokens);
         if (sizeof($tokens) == 0 || $tokens[0] == '!)' || $tokens[0] == '!OR') {
             return $lhs;
         }
-        $rhs = self::_parseKeywords2($column, $tokens);
+        $rhs = self::parseKeywords2($column, $tokens);
         return "($lhs AND $rhs)";
     }
 
-    protected static function _parseKeywords3($column, &$tokens)
+    protected static function parseKeywords3($column, &$tokens)
     {
         if ($tokens[0] == '!NOT') {
             array_shift($tokens);
-            $lhs = self::_parseKeywords4($column, $tokens);
+            $lhs = self::parseKeywords4($column, $tokens);
             if (is_a($lhs, 'PEAR_Error')) {
                 return $lhs;
             }
             return "(NOT $lhs)";
         }
-        return self::_parseKeywords4($column, $tokens);
+        return self::parseKeywords4($column, $tokens);
     }
 
-    protected static function _parseKeywords4($column, &$tokens)
+    protected static function parseKeywords4($column, &$tokens)
     {
         if ($tokens[0] == '!(') {
             array_shift($tokens);
-            $lhs = self::_parseKeywords1($column, $tokens);
+            $lhs = self::parseKeywords1($column, $tokens);
             if (sizeof($tokens) == 0 || $tokens[0] != '!)') {
                 throw new DbException('Expected ")"');
             }

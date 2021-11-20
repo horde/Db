@@ -80,22 +80,22 @@ class Oci8Test extends TestBase
 
     public function testAdapterName()
     {
-        $this->assertEquals('Oracle', $this->_conn->adapterName());
+        $this->assertEquals('Oracle', $this->conn->adapterName());
     }
 
     public function testSupportsMigrations()
     {
-        $this->assertTrue($this->_conn->supportsMigrations());
+        $this->assertTrue($this->conn->supportsMigrations());
     }
 
     public function testSupportsCountDistinct()
     {
-        $this->assertTrue($this->_conn->supportsCountDistinct());
+        $this->assertTrue($this->conn->supportsCountDistinct());
     }
 
     public function testSupportsInterval()
     {
-        $this->assertTrue($this->_conn->supportsInterval());
+        $this->assertTrue($this->conn->supportsInterval());
     }
 
 
@@ -105,45 +105,45 @@ class Oci8Test extends TestBase
 
     public function testQuoteNull()
     {
-        $this->assertEquals('NULL', $this->_conn->quote(null));
+        $this->assertEquals('NULL', $this->conn->quote(null));
     }
 
     public function testQuoteTrue()
     {
-        $this->assertEquals('1', $this->_conn->quote(true));
+        $this->assertEquals('1', $this->conn->quote(true));
     }
 
     public function testQuoteFalse()
     {
-        $this->assertEquals('0', $this->_conn->quote(false));
+        $this->assertEquals('0', $this->conn->quote(false));
     }
 
     public function testQuoteInteger()
     {
-        $this->assertEquals('42', $this->_conn->quote(42));
+        $this->assertEquals('42', $this->conn->quote(42));
     }
 
     public function testQuoteFloat()
     {
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.2', $this->conn->quote(42.2));
         setlocale(LC_NUMERIC, 'de_DE.UTF-8');
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.2', $this->conn->quote(42.2));
     }
 
     public function testQuoteString()
     {
-        $this->assertEquals("'my string'", $this->_conn->quote('my string'));
+        $this->assertEquals("'my string'", $this->conn->quote('my string'));
     }
 
     public function testQuoteDirtyString()
     {
-        $this->assertEquals("'derek''s string'", $this->_conn->quote('derek\'s string'));
+        $this->assertEquals("'derek''s string'", $this->conn->quote('derek\'s string'));
     }
 
     public function testQuoteColumnName()
     {
         $col = new Column('age', 'NULL', 'int', true, 11);
-        $this->assertEquals('1', $this->_conn->quote(true, $col));
+        $this->assertEquals('1', $this->conn->quote(true, $col));
     }
 
 
@@ -153,13 +153,13 @@ class Oci8Test extends TestBase
 
     public function testNativeDatabaseTypes()
     {
-        $types = $this->_conn->nativeDatabaseTypes();
+        $types = $this->conn->nativeDatabaseTypes();
         $this->assertEquals(array('name' => 'number', 'limit' => null), $types['integer']);
     }
 
     public function testTableAliasLength()
     {
-        $len = $this->_conn->tableAliasLength();
+        $len = $this->conn->tableAliasLength();
         $this->assertEquals(30, $len);
     }
 
@@ -169,28 +169,28 @@ class Oci8Test extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('number', $beforeChange->getSqlType());
 
-        $this->_conn->changeColumn('sports', 'is_college', 'string');
+        $this->conn->changeColumn('sports', 'is_college', 'string');
 
         $afterChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('varchar2', $afterChange->getSqlType());
 
-        $table = $this->_conn->createTable('text_to_binary');
+        $table = $this->conn->createTable('text_to_binary');
         $table->column('data', 'text');
         $table->end();
-        $this->_conn->insert(
+        $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
             array('foo')
         );
-        $this->_conn->insert(
+        $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
             array(null)
         );
 
-        $this->_conn->changeColumn('text_to_binary', 'data', 'binary');
+        $this->conn->changeColumn('text_to_binary', 'data', 'binary');
 
         $afterChange = $this->_getColumn('text_to_binary', 'data');
         $this->assertEquals('blob', $afterChange->getSqlType());
-        $values = $this->_conn->selectValues('SELECT data FROM text_to_binary');
+        $values = $this->conn->selectValues('SELECT data FROM text_to_binary');
         $this->assertInstanceOf('OCI-Lob', $values[0]);
         $this->assertEquals('foo', $values[0]->read($values[0]->size()));
         $this->assertEquals(null, $values[1]);
@@ -202,7 +202,7 @@ class Oci8Test extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('number', $beforeChange->getSqlType());
 
-        $this->_conn->changeColumn(
+        $this->conn->changeColumn(
             'sports',
             'is_college',
             'string',
@@ -220,7 +220,7 @@ class Oci8Test extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('number', $beforeChange->getSqlType());
 
-        $this->_conn->changeColumn(
+        $this->conn->changeColumn(
             'sports',
             'is_college',
             'decimal',
@@ -237,7 +237,7 @@ class Oci8Test extends TestBase
     {
         $this->_createTestUsersTable();
 
-        $this->_conn->renameColumn('users', 'first_name', 'nick_name');
+        $this->conn->renameColumn('users', 'first_name', 'nick_name');
         $this->assertTrue(in_array('nick_name', $this->_columnNames('users')));
 
         $this->_createTestTable('sports');
@@ -245,7 +245,7 @@ class Oci8Test extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('number', $beforeChange->getSqlType());
 
-        $this->_conn->renameColumn('sports', 'is_college', 'is_renamed');
+        $this->conn->renameColumn('sports', 'is_college', 'is_renamed');
 
         $afterChange = $this->_getColumn('sports', 'is_renamed');
         $this->assertEquals('number', $afterChange->getSqlType());
@@ -253,131 +253,131 @@ class Oci8Test extends TestBase
 
     public function testIndexNameByMultiColumn()
     {
-        $name = $this->_conn->indexName('sports', array('column' =>
+        $name = $this->conn->indexName('sports', array('column' =>
                                                 array('name', 'is_college')));
         $this->assertEquals('ind_sports_5ca2d9c7', $name);
     }
 
     public function testTypeToSqlTypePrimaryKey()
     {
-        $result = $this->_conn->typeToSql('autoincrementKey');
+        $result = $this->conn->typeToSql('autoincrementKey');
         $this->assertEquals('number NOT NULL PRIMARY KEY', $result);
     }
 
     public function testTypeToSqlTypeString()
     {
-        $result = $this->_conn->typeToSql('string');
+        $result = $this->conn->typeToSql('string');
         $this->assertEquals('varchar2(255)', $result);
     }
 
     public function testTypeToSqlTypeText()
     {
-        $result = $this->_conn->typeToSql('text');
+        $result = $this->conn->typeToSql('text');
         $this->assertEquals('clob', $result);
     }
 
     public function testTypeToSqlTypeBinary()
     {
-        $result = $this->_conn->typeToSql('binary');
+        $result = $this->conn->typeToSql('binary');
         $this->assertEquals('blob', $result);
     }
 
     public function testTypeToSqlTypeFloat()
     {
-        $result = $this->_conn->typeToSql('float');
+        $result = $this->conn->typeToSql('float');
         $this->assertEquals('float', $result);
     }
 
     public function testTypeToSqlTypeDatetime()
     {
-        $result = $this->_conn->typeToSql('datetime');
+        $result = $this->conn->typeToSql('datetime');
         $this->assertEquals('date', $result);
     }
 
     public function testTypeToSqlTypeTimestamp()
     {
-        $result = $this->_conn->typeToSql('timestamp');
+        $result = $this->conn->typeToSql('timestamp');
         $this->assertEquals('date', $result);
     }
 
     public function testTypeToSqlInt()
     {
-        $result = $this->_conn->typeToSql('integer');
+        $result = $this->conn->typeToSql('integer');
         $this->assertEquals('number', $result);
     }
 
     public function testTypeToSqlIntLimit()
     {
-        $result = $this->_conn->typeToSql('integer', '1');
+        $result = $this->conn->typeToSql('integer', '1');
         $this->assertEquals('number(1)', $result);
     }
 
     public function testTypeToSqlDecimalPrecision()
     {
-        $result = $this->_conn->typeToSql('decimal', null, '5');
+        $result = $this->conn->typeToSql('decimal', null, '5');
         $this->assertEquals('number(5)', $result);
     }
 
     public function testTypeToSqlDecimalScale()
     {
-        $result = $this->_conn->typeToSql('decimal', null, '5', '2');
+        $result = $this->conn->typeToSql('decimal', null, '5', '2');
         $this->assertEquals('number(5, 2)', $result);
     }
 
     public function testTypeToSqlBoolean()
     {
-        $result = $this->_conn->typeToSql('boolean');
+        $result = $this->conn->typeToSql('boolean');
         $this->assertEquals('number(1)', $result);
     }
 
     public function testAddColumnOptions()
     {
-        $result = $this->_conn->addColumnOptions('test', array());
+        $result = $this->conn->addColumnOptions('test', array());
         $this->assertEquals('test', $result);
     }
 
     public function testAddColumnOptionsDefault()
     {
         $options = array('default' => '0');
-        $result = $this->_conn->addColumnOptions('test', $options);
+        $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test DEFAULT \'0\'', $result);
     }
 
     public function testAddColumnOptionsNull()
     {
         $options = array('null' => true);
-        $result = $this->_conn->addColumnOptions('test', $options);
+        $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test NULL', $result);
     }
 
     public function testAddColumnOptionsNotNull()
     {
         $options = array('null' => false);
-        $result = $this->_conn->addColumnOptions('test', $options);
+        $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test NOT NULL', $result);
     }
 
     public function testBug14163()
     {
-        $table = $this->_conn->createTable('binary_testings');
+        $table = $this->conn->createTable('binary_testings');
         $table->column('data', 'binary', array('null' => false));
         $table->end();
         $blob = new BinaryValue('foo');
-        $this->_conn->insertBlob('binary_testings', array('data' => $blob));
-        $this->_conn->updateBlob('binary_testings', array('data' => ''));
-        $this->_conn->insertBlob('binary_testings', array('data' => ''));
+        $this->conn->insertBlob('binary_testings', array('data' => $blob));
+        $this->conn->updateBlob('binary_testings', array('data' => ''));
+        $this->conn->insertBlob('binary_testings', array('data' => ''));
     }
 
     public function testModifyDate()
     {
-        $modifiedDate = $this->_conn->modifyDate('mystart', '+', 1, 'DAY');
+        $modifiedDate = $this->conn->modifyDate('mystart', '+', 1, 'DAY');
         $this->assertEquals('mystart + INTERVAL \'1\' DAY', $modifiedDate);
 
-        $t = $this->_conn->createTable('dates');
+        $t = $this->conn->createTable('dates');
         $t->column('mystart', 'datetime');
         $t->column('myend', 'datetime');
         $t->end();
-        $this->_conn->insert(
+        $this->conn->insert(
             'INSERT INTO dates (mystart, myend) VALUES (?, ?)',
             array(
                 '2011-12-10 00:00:00',
@@ -386,7 +386,7 @@ class Oci8Test extends TestBase
         );
         $this->assertEquals(
             1,
-            $this->_conn->selectValue('SELECT COUNT(*) FROM dates WHERE '
+            $this->conn->selectValue('SELECT COUNT(*) FROM dates WHERE '
                                       . $modifiedDate . ' = myend')
         );
     }
@@ -395,71 +395,71 @@ class Oci8Test extends TestBase
     {
         $this->assertEquals(
             'BITAND(bitmap, 2)',
-            $this->_conn->buildClause('bitmap', '&', 2)
+            $this->conn->buildClause('bitmap', '&', 2)
         );
         $this->assertEquals(
             array('BITAND(bitmap, ?)', array(2)),
-            $this->_conn->buildClause('bitmap', '&', 2, true)
+            $this->conn->buildClause('bitmap', '&', 2, true)
         );
 
         $this->assertEquals(
             'bitmap + 2 - BITAND(bitmap, 2)',
-            $this->_conn->buildClause('bitmap', '|', 2)
+            $this->conn->buildClause('bitmap', '|', 2)
         );
         $this->assertEquals(
             array('bitmap + ? - BITAND(bitmap, ?)', array(2, 2)),
-            $this->_conn->buildClause('bitmap', '|', 2, true)
+            $this->conn->buildClause('bitmap', '|', 2, true)
         );
 
         $this->assertEquals(
             "LOWER(name) LIKE LOWER('%search%')",
-            $this->_conn->buildClause('name', 'LIKE', 'search')
+            $this->conn->buildClause('name', 'LIKE', 'search')
         );
         $this->assertEquals(
             array('LOWER(name) LIKE LOWER(?)', array('%search%')),
-            $this->_conn->buildClause('name', 'LIKE', 'search', true)
+            $this->conn->buildClause('name', 'LIKE', 'search', true)
         );
         $this->assertEquals(
             "LOWER(name) LIKE LOWER('%search\&replace\?%')",
-            $this->_conn->buildClause('name', 'LIKE', 'search&replace?')
+            $this->conn->buildClause('name', 'LIKE', 'search&replace?')
         );
         $this->assertEquals(
             array('LOWER(name) LIKE LOWER(?)', array('%search&replace?%')),
-            $this->_conn->buildClause('name', 'LIKE', 'search&replace?', true)
+            $this->conn->buildClause('name', 'LIKE', 'search&replace?', true)
         );
         $this->assertEquals(
             "(LOWER(name) LIKE LOWER('search\&replace\?%') OR LOWER(name) LIKE LOWER('% search\&replace\?%'))",
-            $this->_conn->buildClause('name', 'LIKE', 'search&replace?', false, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', 'search&replace?', false, array('begin' => true))
         );
         $this->assertEquals(
             array('(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))',
                   array('search&replace?%', '% search&replace?%')),
-            $this->_conn->buildClause('name', 'LIKE', 'search&replace?', true, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', 'search&replace?', true, array('begin' => true))
         );
 
         $this->assertEquals(
             'value = 2',
-            $this->_conn->buildClause('value', '=', 2)
+            $this->conn->buildClause('value', '=', 2)
         );
         $this->assertEquals(
             array('value = ?', array(2)),
-            $this->_conn->buildClause('value', '=', 2, true)
+            $this->conn->buildClause('value', '=', 2, true)
         );
         $this->assertEquals(
             "value = 'foo'",
-            $this->_conn->buildClause('value', '=', 'foo')
+            $this->conn->buildClause('value', '=', 'foo')
         );
         $this->assertEquals(
             array('value = ?', array('foo')),
-            $this->_conn->buildClause('value', '=', 'foo', true)
+            $this->conn->buildClause('value', '=', 'foo', true)
         );
         $this->assertEquals(
             "value = 'foo\?bar'",
-            $this->_conn->buildClause('value', '=', 'foo?bar')
+            $this->conn->buildClause('value', '=', 'foo?bar')
         );
         $this->assertEquals(
             array('value = ?', array('foo?bar')),
-            $this->_conn->buildClause('value', '=', 'foo?bar', true)
+            $this->conn->buildClause('value', '=', 'foo?bar', true)
         );
     }
 }

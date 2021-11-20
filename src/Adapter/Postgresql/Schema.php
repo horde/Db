@@ -45,14 +45,14 @@ class Schema extends BaseSchema
      *
      * @var string
      */
-    protected $_schemaSearchPath = '';
+    protected $schemaSearchPath = '';
 
     /**
      * Cached version.
      *
-     * @var integer
+     * @var int
      */
-    protected $_version;
+    protected $version;
 
 
     /*##########################################################################
@@ -70,7 +70,7 @@ class Schema extends BaseSchema
      *                         signed status, if necessary. For example
      *                         "varchar" and "60" in "company_name varchar(60)"
      *                         or "unsigned => true" in "int(10) UNSIGNED".
-     * @param boolean $null    Whether this column allows NULL values.
+     * @param bool $null    Whether this column allows NULL values.
      *
      * @return Column  A column object.
      */
@@ -117,7 +117,7 @@ class Schema extends BaseSchema
             return "'" . $value . "'";
         }
         if (is_string($value) && substr($column->getSqlType(), 0, 3) == 'bit') {
-            if (preg_match('/^[0-9A-F]*$/i')) {
+            if (preg_match('/^[0-9A-F]*$/i', $value)) {
                 // Hexadecimal notation
                 return "X'" . $value . "'";
             }
@@ -190,7 +190,7 @@ class Schema extends BaseSchema
      *
      * @return string  Escaped/encoded binary value.
      */
-    protected function _quoteBinaryCallback($matches)
+    protected function quoteBinaryCallback($matches)
     {
         return sprintf('\\\\%03.o', ord($matches[0]));
     }
@@ -250,11 +250,11 @@ class Schema extends BaseSchema
      * Returns the configured supported identifier length supported by
      * PostgreSQL.
      *
-     * @return integer  The maximum table alias length.
+     * @return int  The maximum table alias length.
      */
     public function tableAliasLength()
     {
-        return (int)$this->selectValue('SHOW max_identifier_length');
+        return (int)$this->adapter->selectValue('SHOW max_identifier_length');
     }
 
     /**
@@ -264,7 +264,7 @@ class Schema extends BaseSchema
      */
     public function tables()
     {
-        return $this->selectValues('SELECT table_name FROM information_schema.tables WHERE table_schema = ANY (CURRENT_SCHEMAS(false));');
+        return $this->adapter->selectValues('SELECT table_name FROM information_schema.tables WHERE table_schema = ANY (CURRENT_SCHEMAS(false));');
     }
 
     /**
@@ -285,7 +285,7 @@ class Schema extends BaseSchema
                                        FROM information_schema.table_constraints
                                        WHERE table_name = ?
                                            AND constraint_type = ?)';
-        $pk = $this->selectValues($sql,
+        $pk = $this->adapter->selectValues($sql,
                                   array($tableName, $tableName, 'PRIMARY KEY'),
                                   $name);
 
@@ -302,7 +302,7 @@ class Schema extends BaseSchema
      */
     public function indexes($tableName, $name = null)
     {
-        $indexes = @unserialize($this->cacheRead("tables/indexes/$tableName"));
+        $indexes = @unserialize($this->adapter->cacheRead("tables/indexes/$tableName"));
 
         if (!$indexes) {
 
@@ -323,7 +323,7 @@ class Schema extends BaseSchema
                    OR d.indkey[8] = a.attnum OR d.indkey[9] = a.attnum)
               ORDER BY i.relname";
 
-            $result = $this->select($sql, $name);
+            $result = $this->adapter->select($sql, $name);
 
             $currentIndex = null;
             $indexes = [];
@@ -337,7 +337,7 @@ class Schema extends BaseSchema
                 $indexes[count($indexes) - 1]->columns[] = $row['attname'];
             }
 
-            $this->cacheWrite("tables/indexes/$tableName", serialize($indexes));
+            $this->adapter->cacheWrite("tables/indexes/$tableName", serialize($indexes));
         }
 
         return $indexes;
@@ -353,12 +353,12 @@ class Schema extends BaseSchema
      */
     public function columns($tableName, $name = null)
     {
-        $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
         if (!$rows) {
-            $rows = $this->_columnDefinitions($tableName, $name);
+            $rows = $this->columnDefinitions($tableName, $name);
 
-            $this->cacheWrite("tables/columns/$tableName", serialize($rows));
+            $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
         // Create columns from rows.
@@ -391,10 +391,10 @@ class Schema extends BaseSchema
      *  - format_type includes the column size constraint, e.g. varchar(50)
      *  - ::regclass is a function that gives the id for a table name
      */
-    protected function _columnDefinitions($tableName, $name = null)
+    protected function columnDefinitions($tableName, $name = null)
     {
         /* @todo See if we can get this from information_schema instead */
-        return $this->selectAll('
+        return $this->adapter->selectAll('
           SELECT a.attname, format_type(a.atttypid, a.atttypmod),
             pg_get_expr(d.adbin, d.adrelid) AS adsrc, a.attnotnull
           FROM pg_attribute a
@@ -412,9 +412,9 @@ class Schema extends BaseSchema
      */
     public function renameTable($name, $newName)
     {
-        $this->_clearTableCache($name);
+        $this->clearTableCache($name);
 
-        return $this->execute(sprintf('ALTER TABLE %s RENAME TO %s', $this->quoteTableName($name), $this->quoteTableName($newName)));
+        return $this->adapter->execute(sprintf('ALTER TABLE %s RENAME TO %s', $this->quoteTableName($name), $this->quoteTableName($newName)));
     }
 
     /**
@@ -430,7 +430,7 @@ class Schema extends BaseSchema
     public function addColumn($tableName, $columnName, $type,
                               $options = [])
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $options = array_merge(
             array('autoincrement' => null,
@@ -461,14 +461,14 @@ class Schema extends BaseSchema
                        $this->quoteTableName($tableName),
                        $this->quoteColumnName($columnName),
                        $sqltype);
-        $this->execute($sql);
+        $this->adapter->execute($sql);
 
         if (array_key_exists('default', $options)) {
             $sql = sprintf('UPDATE %s SET %s = %s',
                            $this->quoteTableName($tableName),
                            $this->quoteColumnName($columnName),
                            $this->quote($options['default']));
-            $this->execute($sql);
+            $this->adapter->execute($sql);
             $this->changeColumnDefault($tableName, $columnName,
                                        $options['default']);
         }
@@ -493,7 +493,7 @@ class Schema extends BaseSchema
     public function changeColumn($tableName, $columnName, $type,
                                  $options = [])
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $options = array_merge(
             array('autoincrement' => null,
@@ -523,7 +523,7 @@ class Schema extends BaseSchema
                                         $options['precision'],
                                         $options['scale']));
         try {
-            $this->execute($sql);
+            $this->adapter->execute($sql);
         } catch (DbException $e) {
             // This is PostgreSQL 7.x, or the old type could not be coerced to
             // the new type, so we have to use a more arcane way of doing it.
@@ -532,7 +532,7 @@ class Schema extends BaseSchema
                 // work to handle them.
                 $oldType = $this->column($tableName, $columnName)->getType();
 
-                $this->beginDbTransaction();
+                $this->adapter->beginDbTransaction();
 
                 $tmpColumnName = $columnName.'_change_tmp';
                 $this->addColumn($tableName, $tmpColumnName, $type, $options);
@@ -556,13 +556,13 @@ class Schema extends BaseSchema
                                                     $options['precision'],
                                                     $options['scale']));
                 }
-                $this->execute($sql);
+                $this->adapter->execute($sql);
                 $this->removeColumn($tableName, $columnName);
                 $this->renameColumn($tableName, $tmpColumnName, $columnName);
 
-                $this->commitDbTransaction();
+                $this->adapter->commitDbTransaction();
             } catch (DbException $e) {
-                $this->rollbackDbTransaction();
+                $this->adapter->rollbackDbTransaction();
                 throw $e;
             }
         }
@@ -570,25 +570,25 @@ class Schema extends BaseSchema
         if ($options['autoincrement']) {
             $seq_name = $this->defaultSequenceName($tableName, $columnName);
             try {
-                $this->execute('DROP SEQUENCE ' . $seq_name . ' CASCADE');
+                $this->adapter->execute('DROP SEQUENCE ' . $seq_name . ' CASCADE');
             } catch (DbException $e) {}
-            $this->execute('CREATE SEQUENCE ' . $seq_name);
+            $this->adapter->execute('CREATE SEQUENCE ' . $seq_name);
             $this->resetPkSequence($tableName, $columnName, $seq_name);
 
             /* Can't use changeColumnDefault() since it quotes the
              * default value (NEXTVAL is a postgres keyword, not a text
              * value). */
-            $this->_clearTableCache($tableName);
+            $this->clearTableCache($tableName);
             $sql = sprintf('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT NEXTVAL(%s)',
                            $this->quoteTableName($tableName),
                            $this->quoteColumnName($columnName),
                            $this->quoteSequenceName($seq_name));
-            $this->execute($sql);
+            $this->adapter->execute($sql);
             $sql = sprintf('ALTER SEQUENCE %s OWNED BY %s.%s',
                            $seq_name,
                            $this->quoteTableName($tableName),
                            $this->quoteColumnName($columnName));
-            $this->execute($sql);
+            $this->adapter->execute($sql);
         } elseif (array_key_exists('default', $options)) {
             $this->changeColumnDefault($tableName, $columnName,
                                        $options['default']);
@@ -617,12 +617,12 @@ class Schema extends BaseSchema
      */
     public function changeColumnDefault($tableName, $columnName, $default)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s',
                        $this->quoteTableName($tableName),
                        $this->quoteColumnName($columnName),
                        $this->quote($default));
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -630,26 +630,26 @@ class Schema extends BaseSchema
      *
      * @param string $tableName   A table name.
      * @param string $columnName  A column name.
-     * @param boolean $null       Whether NULL values are allowed.
+     * @param bool $null       Whether NULL values are allowed.
      * @param mixed $default      The new default value.
      */
     public function changeColumnNull($tableName, $columnName, $null,
                                      $default = null)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         if (!$null && !is_null($default)) {
             $sql = sprintf('UPDATE %s SET %s = %s WHERE %s IS NULL',
                            $this->quoteTableName($tableName),
                            $this->quoteColumnName($columnName),
                            $this->quote($default),
                            $this->quoteColumnName($columnName));
-            $this->execute($sql);
+            $this->adapter->execute($sql);
         }
         $sql = sprintf('ALTER TABLE %s ALTER %s %s NOT NULL',
                        $this->quoteTableName($tableName),
                        $this->quoteColumnName($columnName),
                        $null ? 'DROP' : 'SET');
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -661,12 +661,12 @@ class Schema extends BaseSchema
      */
     public function renameColumn($tableName, $columnName, $newColumnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf('ALTER TABLE %s RENAME COLUMN %s TO %s',
                        $this->quoteTableName($tableName),
                        $this->quoteColumnName($columnName),
                        $this->quoteColumnName($newColumnName));
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -678,8 +678,8 @@ class Schema extends BaseSchema
      */
     public function removePrimaryKey($tableName)
     {
-        $this->_clearTableCache($tableName);
-        $keyName = $this->selectValue(
+        $this->clearTableCache($tableName);
+        $keyName = $this->adapter->selectValue(
             'SELECT constraint_name
              FROM information_schema.table_constraints
              WHERE table_name = ?
@@ -689,7 +689,7 @@ class Schema extends BaseSchema
             $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT %s CASCADE',
                            $this->quoteTableName($tableName),
                            $this->quoteColumnName($keyName));
-            return $this->execute($sql);
+            return $this->adapter->execute($sql);
         }
     }
 
@@ -705,8 +705,8 @@ class Schema extends BaseSchema
      */
     public function removeIndex($tableName, $options = [])
     {
-        $this->_clearTableCache($tableName);
-        return $this->execute('DROP INDEX ' . $this->indexName($tableName, $options));
+        $this->clearTableCache($tableName);
+        return $this->adapter->execute('DROP INDEX ' . $this->indexName($tableName, $options));
     }
 
     /**
@@ -740,7 +740,7 @@ class Schema extends BaseSchema
             }
         }
 
-        return $this->execute('CREATE DATABASE ' . $this->quoteTableName($name) . $optionString);
+        return $this->adapter->execute('CREATE DATABASE ' . $this->quoteTableName($name) . $optionString);
     }
 
     /**
@@ -750,7 +750,7 @@ class Schema extends BaseSchema
      */
     public function dropDatabase($name)
     {
-        return $this->execute('DROP DATABASE IF EXISTS ' . $this->quoteTableName($name));
+        return $this->adapter->execute('DROP DATABASE IF EXISTS ' . $this->quoteTableName($name));
     }
 
     /**
@@ -760,7 +760,7 @@ class Schema extends BaseSchema
      */
     public function currentDatabase()
     {
-        return $this->selectValue('SELECT current_database()');
+        return $this->adapter->selectValue('SELECT current_database()');
     }
 
     /**
@@ -770,7 +770,7 @@ class Schema extends BaseSchema
      * @param integer $limit      Maximum column length (non decimal type only)
      * @param integer $precision  The number precision (decimal type only).
      * @param integer $scale      The number scaling (decimal columns only).
-     * @param boolean $unsigned   Whether the column is an unsigned number
+     * @param bool $unsigned   Whether the column is an unsigned number
      *                            (non decimal columns only).
      *
      * @return string  The SQL definition. If $type is not one of the
@@ -914,7 +914,7 @@ class Schema extends BaseSchema
      * @param string $lhs    The column or expression to test.
      * @param string $op     The operator.
      * @param string $rhs    The comparison value.
-     * @param boolean $bind  If true, the method returns the query and a list
+     * @param bool $bind  If true, the method returns the query and a list
      *                       of values suitable for binding as an array.
      * @param array $params  Any additional parameters for the operator.
      *
@@ -924,7 +924,7 @@ class Schema extends BaseSchema
     public function buildClause($lhs, $op, $rhs, $bind = false,
                                 $params = [])
     {
-        $lhs = $this->_escapePrepare($lhs);
+        $lhs = $this->escapePrepare($lhs);
         switch ($op) {
         case '|':
         case '&':
@@ -952,13 +952,13 @@ class Schema extends BaseSchema
             if (empty($params['begin'])) {
                 return sprintf($query,
                                $lhs,
-                               $this->_escapePrepare($this->quote('%' . $rhs . '%')));
+                               $this->escapePrepare($this->quote('%' . $rhs . '%')));
             }
             return sprintf('(' . $query . ' OR ' . $query . ')',
                            $lhs,
-                           $this->_escapePrepare($this->quote($rhs . '%')),
+                           $this->escapePrepare($this->quote($rhs . '%')),
                            $lhs,
-                           $this->_escapePrepare($this->quote('% ' . $rhs . '%')));
+                           $this->escapePrepare($this->quote('% ' . $rhs . '%')));
         }
 
         return parent::buildClause($lhs, $op, $rhs, $bind, $params);
@@ -976,7 +976,7 @@ class Schema extends BaseSchema
      */
     public function encoding()
     {
-        return $this->selectValue(
+        return $this->adapter->selectValue(
             'SELECT pg_encoding_to_char(pg_database.encoding) FROM pg_database
              WHERE pg_database.datname LIKE ' . $this->quote($this->currentDatabase()));
     }
@@ -992,8 +992,8 @@ class Schema extends BaseSchema
     public function setSchemaSearchPath($schemaCsv)
     {
         if ($schemaCsv) {
-            $this->execute('SET search_path TO ' . $schemaCsv);
-            $this->_schemaSearchPath = $schemaCsv;
+            $this->adapter->execute('SET search_path TO ' . $schemaCsv);
+            $this->schemaSearchPath = $schemaCsv;
         }
     }
 
@@ -1004,7 +1004,7 @@ class Schema extends BaseSchema
      */
     public function getClientMinMessages()
     {
-        return $this->selectValue('SHOW client_min_messages');
+        return $this->adapter->selectValue('SHOW client_min_messages');
     }
 
     /**
@@ -1016,7 +1016,7 @@ class Schema extends BaseSchema
      */
     public function setClientMinMessages($level)
     {
-        return $this->execute('SET client_min_messages TO ' . $this->quote($level));
+        return $this->adapter->execute('SET client_min_messages TO ' . $this->quote($level));
     }
 
     /**
@@ -1050,7 +1050,7 @@ class Schema extends BaseSchema
      * @param string $sequence   A sequence name. Defaults to the sequence name
      *                           of the existing primary key.
      *
-     * @return integer  The (next) sequence value if a primary key and a
+     * @return int  The (next) sequence value if a primary key and a
      *                  sequence exist.
      */
     public function resetPkSequence($table, $pk = null, $sequence = null)
@@ -1096,13 +1096,14 @@ class Schema extends BaseSchema
                         $quotedTable
                     );
                 }
-                $this->selectValue($sql, 'Reset sequence');
+                $this->adapter->selectValue($sql, 'Reset sequence');
             } else {
-                if ($this->_logger) {
-                    $this->_logger->warn(sprintf('%s has primary key %s with no default sequence', $table, $pk));
+                if ($this->adapter->logger) {
+                    $this->adapter->logger->warn(sprintf('%s has primary key %s with no default sequence', $table, $pk));
                 }
             }
         }
+        return 0;
     }
 
     /**
@@ -1132,7 +1133,7 @@ class Schema extends BaseSchema
             AND attr.attnum   = cons.conkey[1]
             AND cons.contype  = 'p'
             AND dep.refobjid  = '$table'::regclass";
-        $result = $this->selectOne($sql, 'PK and serial sequence');
+        $result = $this->adapter->selectOne($sql, 'PK and serial sequence');
 
         if (!$result) {
             $sql = "
@@ -1142,7 +1143,7 @@ class Schema extends BaseSchema
               LEFT JOIN information_schema.table_constraints AS t
                 ON t.constraint_name = c.constraint_name
               WHERE t.table_name = '$table' AND t.constraint_type = 'PRIMARY KEY';";
-            $result = $this->selectOne($sql, 'PK and custom sequence');
+            $result = $this->adapter->selectOne($sql, 'PK and custom sequence');
         }
 
         if (!$result) {
@@ -1156,18 +1157,18 @@ class Schema extends BaseSchema
     /**
      * Returns the version of the connected PostgreSQL server.
      *
-     * @return integer  Zero padded PostgreSQL version, e.g. 80108 for 8.1.8.
+     * @return int  Zero padded PostgreSQL version, e.g. 80108 for 8.1.8.
      */
     public function postgresqlVersion()
     {
-        if (!$this->_version) {
+        if (!$this->version) {
             try {
-                $this->_version = $this->selectValue('SHOW server_version_num');
+                $this->version = $this->adapter->selectValue('SHOW server_version_num');
             } catch (Exception $e) {
                 return 0;
             }
         }
 
-        return $this->_version;
+        return $this->version;
     }
 }

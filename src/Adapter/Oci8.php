@@ -39,7 +39,7 @@ class Oci8 extends Base
      *
      * @var string
      */
-    protected $_schemaClass = Schema::class;
+    protected $schemaClass = Schema::class;
 
 
     /*#########################################################################
@@ -60,7 +60,7 @@ class Oci8 extends Base
     /**
      * Does this adapter support migrations?
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsMigrations()
     {
@@ -77,38 +77,38 @@ class Oci8 extends Base
      */
     public function connect()
     {
-        if ($this->_active) {
+        if ($this->active) {
             return;
         }
 
-        $this->_checkRequiredConfig(array('username'));
+        $this->checkRequiredConfig(array('username'));
 
-        if (!isset($this->_config['tns']) && empty($this->_config['host'])) {
+        if (!isset($this->config['tns']) && empty($this->config['host'])) {
             throw new DbException('Either a TNS name or a host name must be specified');
         }
 
-        if (isset($this->_config['tns'])) {
-            $connection = $this->_config['tns'];
+        if (isset($this->config['tns'])) {
+            $connection = $this->config['tns'];
         } else {
-            $connection = $this->_config['host'];
-            if (!empty($this->_config['port'])) {
-                $connection .= ':' . $this->_config['port'];
+            $connection = $this->config['host'];
+            if (!empty($this->config['port'])) {
+                $connection .= ':' . $this->config['port'];
             }
-            if (!empty($this->_config['service'])) {
-                $connection .= '/' . $this->_config['service'];
+            if (!empty($this->config['service'])) {
+                $connection .= '/' . $this->config['service'];
             }
-            if (!empty($this->_config['type'])) {
-                $connection .= ':' . $this->_config['type'];
+            if (!empty($this->config['type'])) {
+                $connection .= ':' . $this->config['type'];
             }
-            if (!empty($this->_config['instance'])) {
-                $connection .= '/' . $this->_config['instance'];
+            if (!empty($this->config['instance'])) {
+                $connection .= '/' . $this->config['instance'];
             }
         }
         $oci = oci_connect(
-            $this->_config['username'],
-            isset($this->_config['password']) ? $this->_config['password'] : '',
+            $this->config['username'],
+            isset($this->config['password']) ? $this->config['password'] : '',
             $connection,
-            $this->_oracleCharsetName($this->_config['charset'])
+            $this->oracleCharsetName($this->config['charset'])
         );
         if (!$oci) {
             if ($error = oci_error()) {
@@ -125,8 +125,8 @@ class Oci8 extends Base
             }
         }
 
-        $this->_connection = $oci;
-        $this->_active     = true;
+        $this->connection = $oci;
+        $this->active     = true;
 
         $this->execute("ALTER SESSION SET NLS_DATE_FORMAT = 'YYYY-MM-DD HH24:MI:SS'");
     }
@@ -136,8 +136,8 @@ class Oci8 extends Base
      */
     public function disconnect()
     {
-        if ($this->_connection) {
-            oci_close($this->_connection);
+        if ($this->connection) {
+            oci_close($this->connection);
         }
         parent::disconnect();
     }
@@ -199,7 +199,7 @@ class Oci8 extends Base
         $stmt = $this->execute($sql, $arg1, $arg2);
         $result = oci_fetch_all($stmt, $rows, 0, -1, OCI_FETCHSTATEMENT_BY_ROW);
         if ($result === false) {
-            $this->_handleError($stmt, 'selectAll');
+            $this->handleError($stmt, 'selectAll');
         }
         foreach ($rows as &$row) {
             $row = array_change_key_case($row, CASE_LOWER);
@@ -228,6 +228,7 @@ class Oci8 extends Base
                 CASE_LOWER
             );
         }
+        return [];
     }
 
     /**
@@ -249,7 +250,7 @@ class Oci8 extends Base
             return;
         }
         if (($result = oci_result($stmt, 1)) === false) {
-            $this->_handleError($stmt, 'selectValue');
+            $this->handleError($stmt, 'selectValue');
         }
         return $result;
     }
@@ -273,7 +274,7 @@ class Oci8 extends Base
         $values = [];
         while (oci_fetch($stmt)) {
             if (($result = oci_result($stmt, 1)) === false) {
-                $this->_handleError($stmt, 'selectValues');
+                $this->handleError($stmt, 'selectValues');
             }
             $values[] = $result;
         }
@@ -295,7 +296,7 @@ class Oci8 extends Base
     public function execute($sql, $arg1 = null, $arg2 = null, $lobs = [])
     {
         if (is_array($arg1)) {
-            $query = $this->_replaceParameters($sql, $arg1);
+            $query = $this->replaceParameters($sql, $arg1);
             $name = $arg2;
         } else {
             $name = $arg1;
@@ -306,31 +307,31 @@ class Oci8 extends Base
         $t = new Horde_Support_Timer;
         $t->push();
 
-        $this->_lastQuery = $query;
-        $stmt = @oci_parse($this->_connection, $query);
+        $this->lastQuery = $query;
+        $stmt = @oci_parse($this->connection, $query);
 
         $descriptors = [];
         foreach ($lobs as $name => $lob) {
-            $descriptors[$name] = oci_new_descriptor($this->_connection, OCI_DTYPE_LOB);
+            $descriptors[$name] = oci_new_descriptor($this->connection, OCI_DTYPE_LOB);
             oci_bind_by_name($stmt, ':' . $name, $descriptors[$name], -1, $lob instanceof Text ? OCI_B_CLOB : OCI_B_BLOB);
         }
 
         $flags = $lobs
             ? OCI_DEFAULT
-            : ($this->_transactionStarted
+            : ($this->transactionStarted
                ? OCI_NO_AUTO_COMMIT
                : OCI_COMMIT_ON_SUCCESS
             );
         if (!$stmt ||
             !@oci_execute($stmt, $flags)) {
-            $error = oci_error($stmt ?: $this->_connection);
+            $error = oci_error($stmt ?: $this->connection);
             if ($stmt) {
                 oci_free_statement($stmt);
             }
-            $this->_logInfo($sql, $arg1, $name);
-            $this->_logError($query, 'QUERY FAILED: ' . $error['message']);
+            $this->logInfo($sql, $arg1, $name);
+            $this->logError($query, 'QUERY FAILED: ' . $error['message']);
             throw new DbException(
-                $this->_errorMessage($error),
+                $this->errorMessage($error),
                 $error['code']
             );
         }
@@ -343,11 +344,11 @@ class Oci8 extends Base
             }
         }
         if ($lobs) {
-            oci_commit($this->_connection);
+            oci_commit($this->connection);
         }
 
-        $this->_logInfo($sql, $arg1, $name, $t->pop());
-        $this->_rowCount = oci_num_rows($stmt);
+        $this->logInfo($sql, $arg1, $name, $t->pop());
+        $this->rowCount = oci_num_rows($stmt);
 
         return $stmt;
     }
@@ -366,7 +367,7 @@ class Oci8 extends Base
      *                              manually.
      * @param string $sequenceName  The sequence name.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insert($sql, $arg1 = null, $arg2 = null, $pk = null,
@@ -392,12 +393,12 @@ class Oci8 extends Base
      *                          required if the primary key is inserted
      *                          manually.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
     {
-        list($fields, $blobs, $locators) = $this->_prepareBlobs($fields);
+        list($fields, $blobs, $locators) = $this->prepareBlobs($fields);
 
         $sql = 'INSERT INTO ' . $this->quoteTableName($table) . ' ('
             . implode(
@@ -436,10 +437,10 @@ class Oci8 extends Base
      */
     public function updateBlob($table, $fields, $where = null)
     {
-        list($fields, $blobs, $locators) = $this->_prepareBlobs($fields);
+        list($fields, $blobs, $locators) = $this->prepareBlobs($fields);
 
         if (is_array($where)) {
-            $where = $this->_replaceParameters($where[0], $where[1]);
+            $where = $this->replaceParameters($where[0], $where[1]);
         }
 
         $fnames = [];
@@ -464,7 +465,7 @@ class Oci8 extends Base
 
         $this->execute($sql, null, null, $blobs);
 
-        return $this->_rowCount;
+        return $this->rowCount;
     }
 
     /**
@@ -476,7 +477,7 @@ class Oci8 extends Base
      *
      * @return array  A list of fields, blobs, and locators.
      */
-    protected function _prepareBlobs($fields)
+    protected function prepareBlobs($fields)
     {
         $blobs = $locators = [];
         foreach ($fields as $column => &$field) {
@@ -499,7 +500,7 @@ class Oci8 extends Base
      */
     public function beginDbTransaction()
     {
-        $this->_transactionStarted++;
+        $this->transactionStarted++;
     }
 
     /**
@@ -507,10 +508,10 @@ class Oci8 extends Base
      */
     public function commitDbTransaction()
     {
-        $this->_transactionStarted--;
-        if (!$this->_transactionStarted) {
-            if (!oci_commit($this->_connection)) {
-                $this->_handleError($this->_connection, 'commitDbTransaction');
+        $this->transactionStarted--;
+        if (!$this->transactionStarted) {
+            if (!oci_commit($this->connection)) {
+                $this->handleError($this->connection, 'commitDbTransaction');
             }
         }
     }
@@ -521,14 +522,14 @@ class Oci8 extends Base
      */
     public function rollbackDbTransaction()
     {
-        if (!$this->_transactionStarted) {
+        if (!$this->transactionStarted) {
             return;
         }
 
-        $this->_transactionStarted = 0;
+        $this->transactionStarted = 0;
 
-        if (!oci_rollback($this->_connection)) {
-            $this->_handleError($this->_connection, 'rollbackDbTransaction');
+        if (!oci_rollback($this->connection)) {
+            $this->handleError($this->connection, 'rollbackDbTransaction');
         }
     }
 
@@ -567,7 +568,7 @@ class Oci8 extends Base
      *
      * @return string  Oracle-normalized charset.
      */
-    public function _oracleCharsetName($charset)
+    public function oracleCharsetName($charset)
     {
         return str_replace(
             array(
@@ -635,7 +636,7 @@ class Oci8 extends Base
      *
      * @return string  The formatted error message.
      */
-    protected function _errorMessage($error)
+    protected function errorMessage($error)
     {
         return 'QUERY FAILED: ' . $error['message']
             . "\n\nat offset " . $error['offset']
@@ -651,15 +652,15 @@ class Oci8 extends Base
      *
      * @throws DbException
      */
-    protected function _handleError($resource, $method)
+    protected function handleError($resource, $method)
     {
         $error = oci_error($resource);
-        $this->_logError(
+        $this->logError(
             $error['message'],
             'Horde_Db_Adapter_Oci8::' . $method. '()'
         );
         throw new DbException(
-            $this->_errorMessage($error),
+            $this->errorMessage($error),
             $error['code']
         );
     }

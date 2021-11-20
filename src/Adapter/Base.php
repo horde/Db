@@ -39,6 +39,10 @@ use Horde\Db\Value\Binary;
  * @license    http://www.horde.org/licenses/bsd
  * @package    Db
  * @subpackage Adapter
+ * @method string quoteTableName(string $name)
+ * @method string quoteColumnName(string $name)
+ * @method quote($value, $column = null)
+
  */
 abstract class Base implements Adapter
 {
@@ -47,98 +51,98 @@ abstract class Base implements Adapter
      *
      * @var array
      */
-    protected $_config = [];
+    protected $config = [];
 
     /**
      * DB connection.
      *
      * @var mixed
      */
-    protected $_connection = null;
+    protected $connection = null;
 
     /**
      * Has a transaction been started?
      *
-     * @var integer
+     * @var int
      */
-    protected $_transactionStarted = 0;
+    protected $transactionStarted = 0;
 
     /**
      * The last query sent to the database.
      *
      * @var string
      */
-    protected $_lastQuery;
+    protected $lastQuery;
 
     /**
      * Row count of last action.
      *
-     * @var integer
+     * @var int
      */
-    protected $_rowCount = null;
+    protected $rowCount = null;
 
     /**
      * Runtime of last query.
      *
-     * @var integer
+     * @var int
      */
-    protected $_runtime;
+    protected $runtime;
 
     /**
      * Is connection active?
      *
-     * @var boolean
+     * @var bool
      */
-    protected $_active = null;
+    protected $active = null;
 
     /**
      * Cache object.
      *
      * @var Horde_Cache
      */
-    protected $_cache;
+    protected $cache;
 
     /**
      * Cache prefix.
      *
      * @var string
      */
-    protected $_cachePrefix;
+    protected $cachePrefix;
 
     /**
      * Log object.
      *
      * @var Horde_Log_Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * Schema object.
      *
      * @var Schema
      */
-    protected $_schema = null;
+    protected $schema = null;
 
     /**
      * Schema class to use.
      *
      * @var string
      */
-    protected $_schemaClass = null;
+    protected $schemaClass = null;
 
     /**
      * List of schema methods.
      *
      * @var array
      */
-    protected $_schemaMethods = [];
+    protected $schemaMethods = [];
 
     /**
      * Log query flag
      *
-     * @var  boolean
+     * @var bool
      */
-    protected $_logQueries = false;
+    protected $logQueries = false;
 
 
     /*##########################################################################
@@ -158,19 +162,20 @@ abstract class Base implements Adapter
         /* Can't set cache/logger in constructor - these objects may use DB
          * for storage. Add stubs for now - they have to be manually set
          * later with setCache() and setLogger(). */
-        $this->_cache = new Horde_Support_Stub();
-        $this->_logger = new Horde_Support_Stub();
+        $this->cache = new Horde_Support_Stub();
+        $this->logger = new Horde_Support_Stub();
 
         // Default to UTF-8
         if (!isset($config['charset'])) {
             $config['charset'] = 'UTF-8';
         }
 
-        $this->_config  = $config;
-        $this->_runtime = 0;
+        $this->config  = $config;
+        $this->runtime = 0;
 
-        if (!$this->_schemaClass) {
-            $this->_schemaClass = __CLASS__ . '_Schema';
+        // TODO: This is not really namespace-ready
+        if (!$this->schemaClass) {
+            $this->schemaClass = __CLASS__ . '_Schema';
         }
 
         $this->connect();
@@ -189,7 +194,7 @@ abstract class Base implements Adapter
      */
     public function __sleep()
     {
-        return array_diff(array_keys(get_class_vars(__CLASS__)), array('_active', '_connection'));
+        return array_diff(array_keys(get_class_vars(__CLASS__)), array('active', 'connection'));
     }
 
     /**
@@ -197,7 +202,7 @@ abstract class Base implements Adapter
      */
     public function __wakeup()
     {
-        $this->_schema->setAdapter($this);
+        $this->schema->setAdapter($this);
         $this->connect();
     }
 
@@ -211,7 +216,7 @@ abstract class Base implements Adapter
      */
     public function getOption($option)
     {
-        return isset($this->_config[$option]) ? $this->_config[$option] : null;
+        return isset($this->config[$option]) ? $this->config[$option] : null;
     }
 
     /*##########################################################################
@@ -227,7 +232,7 @@ abstract class Base implements Adapter
      */
     public function setCache(Horde_Cache $cache)
     {
-        $this->_cache = $cache;
+        $this->cache = $cache;
     }
 
     /**
@@ -235,7 +240,7 @@ abstract class Base implements Adapter
      */
     public function getCache()
     {
-        return $this->_cache;
+        return $this->cache;
     }
 
     /**
@@ -251,8 +256,8 @@ abstract class Base implements Adapter
      */
     public function setLogger(Horde_Log_Logger $logger, $log_queries = false)
     {
-        $this->_logger = $logger;
-        $this->_logQueries = $log_queries;
+        $this->logger = $logger;
+        $this->logQueries = $log_queries;
     }
 
     /**
@@ -260,7 +265,7 @@ abstract class Base implements Adapter
      */
     public function getLogger()
     {
-        return $this->_logger;
+        return $this->logger;
     }
 
 
@@ -279,18 +284,18 @@ abstract class Base implements Adapter
      */
     public function __call($method, $args)
     {
-        if (!$this->_schema) {
+        if (!$this->schema) {
             // Create the database-specific (but not adapter specific) schema
             // object.
-            $this->_schema = new $this->_schemaClass($this, array(
-                'cache' => $this->_cache,
-                'logger' => $this->_logger
+            $this->schema = new $this->schemaClass($this, array(
+                'cache' => $this->cache,
+                'logger' => $this->logger
             ));
-            $this->_schemaMethods = array_flip(get_class_methods($this->_schema));
+            $this->schemaMethods = array_flip(get_class_methods($this->schema));
         }
 
-        if (isset($this->_schemaMethods[$method])) {
-            return call_user_func_array(array($this->_schema, $method), $args);
+        if (isset($this->schemaMethods[$method])) {
+            return call_user_func_array(array($this->schema, $method), $args);
         }
 
         $support = new Horde_Support_Backtrace();
@@ -322,7 +327,7 @@ abstract class Base implements Adapter
      * Does this adapter support migrations?  Backend specific, as the
      * abstract adapter always returns +false+.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsMigrations()
     {
@@ -333,7 +338,7 @@ abstract class Base implements Adapter
      * Does this adapter support using DISTINCT within COUNT?  This is +true+
      * for all adapters except sqlite.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsCountDistinct()
     {
@@ -344,7 +349,7 @@ abstract class Base implements Adapter
      * Does this adapter support using INTERVAL statements?  This is +true+
      * for all adapters except sqlite.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsInterval()
     {
@@ -358,7 +363,7 @@ abstract class Base implements Adapter
      * This is false for all adapters but Firebird.
      *
      * @deprecated
-     * @return boolean
+     * @return bool
      */
     public function prefetchPrimaryKey($tableName = null)
     {
@@ -370,21 +375,21 @@ abstract class Base implements Adapter
      *
      * @return string
      */
-    public function getLastQuery()
+    public function getLastQuery(): string
     {
-        return $this->_lastQuery;
+        return $this->lastQuery;
     }
 
     /**
      * Reset the timer
      *
-     * @return integer
+     * @return int
      */
     public function resetRuntime()
     {
-        $this->_runtime = 0;
+        $this->runtime = 0;
 
-        return $this->_runtime;
+        return $this->runtime;
     }
 
     /**
@@ -400,7 +405,7 @@ abstract class Base implements Adapter
      */
     public function cacheWrite($key, $value)
     {
-        $this->_cache->set($this->_cacheKey($key), $value);
+        $this->cache->set($this->cacheKey($key), $value);
     }
 
     /**
@@ -413,14 +418,15 @@ abstract class Base implements Adapter
      *
      * @param string $key  A cache key.
      *
-     * @return string  A value.
+     * @return string|false  A value.
      */
     public function cacheRead($key)
     {
-        return $this->_cache->get($this->_cacheKey($key), 0);
+        return $this->cache->get($this->cacheKey($key), 0);
     }
 
 
+    
     /*##########################################################################
     # Connection Management
     ##########################################################################*/
@@ -428,11 +434,11 @@ abstract class Base implements Adapter
     /**
      * Is the connection active?
      *
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
-        return $this->_active && $this->_connection;
+        return $this->active && $this->connection;
     }
 
     /**
@@ -449,8 +455,8 @@ abstract class Base implements Adapter
      */
     public function disconnect()
     {
-        $this->_connection = null;
-        $this->_active = false;
+        $this->connection = null;
+        $this->active = false;
     }
 
     /**
@@ -462,7 +468,7 @@ abstract class Base implements Adapter
      */
     public function rawConnection()
     {
-        return $this->_connection;
+        return $this->connection;
     }
 
 
@@ -599,7 +605,7 @@ abstract class Base implements Adapter
      *                          required if the primary key is inserted
      *                          manually.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
@@ -622,13 +628,13 @@ abstract class Base implements Adapter
      * @param string $arg2  If $arg1 contains bound parameters, the query
      *                      name.
      *
-     * @return integer  Number of rows affected.
+     * @return int  Number of rows affected.
      * @throws DbException
      */
     public function update($sql, $arg1 = null, $arg2 = null)
     {
         $this->execute($sql, $arg1, $arg2);
-        return $this->_rowCount;
+        return $this->rowCount;
     }
 
     /**
@@ -649,7 +655,7 @@ abstract class Base implements Adapter
     public function updateBlob($table, $fields, $where = null)
     {
         if (is_array($where)) {
-            $where = $this->_replaceParameters($where[0], $where[1]);
+            $where = $this->replaceParameters($where[0], $where[1]);
         }
         $fnames = [];
         foreach (array_keys($fields) as $field) {
@@ -673,23 +679,23 @@ abstract class Base implements Adapter
      * @param string $arg2  If $arg1 contains bound parameters, the query
      *                      name.
      *
-     * @return integer  Number of rows affected.
+     * @return int  Number of rows affected.
      * @throws DbException
      */
     public function delete($sql, $arg1 = null, $arg2 = null)
     {
         $this->execute($sql, $arg1, $arg2);
-        return $this->_rowCount;
+        return $this->rowCount;
     }
 
     /**
      * Check if a transaction has been started.
      *
-     * @return boolean  True if transaction has been started.
+     * @return bool  True if transaction has been started.
      */
     public function transactionStarted()
     {
-        return (bool)$this->_transactionStarted;
+        return (bool)$this->transactionStarted;
     }
 
     /**
@@ -725,12 +731,14 @@ abstract class Base implements Adapter
     /**
      * Appends a locking clause to an SQL statement.
      * This method *modifies* the +sql+ parameter.
+     * 
+     * TODO: BC BREAK Rather return the modified string
      *
      *   # SELECT * FROM suppliers FOR UPDATE
      *   add_lock! 'SELECT * FROM suppliers', :lock => true
      *   add_lock! 'SELECT * FROM suppliers', :lock => ' FOR UPDATE'
      *
-     * @param string &$sql    SQL statment.
+     * @param string $sql    SQL statment.
      * @param array $options  TODO.
      */
     public function addLock(&$sql, array $options = [])
@@ -744,10 +752,10 @@ abstract class Base implements Adapter
      * Inserts the given fixture into the table. Overridden in adapters that
      * require something beyond a simple insert (eg. Oracle).
      *
-     * @param TODO $fixture    TODO
-     * @param TODO $tableName  TODO
+     * @param mixed $fixture    TODO
+     * @param string $tableName  TODO
      *
-     * @return  TODO
+     * @return mixed
      */
     public function insertFixture($fixture, $tableName)
     {
@@ -779,9 +787,9 @@ abstract class Base implements Adapter
      *
      * @throws DbException if a required key is missing.
      */
-    protected function _checkRequiredConfig(array $required)
+    protected function checkRequiredConfig(array $required)
     {
-        $diff = array_diff_key(array_flip($required), $this->_config);
+        $diff = array_diff_key(array_flip($required), $this->config);
         if (!empty($diff)) {
             $msg = 'Required config missing: ' . implode(', ', array_keys($diff));
             throw new DbException($msg);
@@ -793,18 +801,18 @@ abstract class Base implements Adapter
      *
      * @param string $sql         SQL statement.
      * @param array $args         An array of values to bind.
-     * @param boolean $no_binary  If true, do not replace any
+     * @param bool $no_binary  If true, do not replace any
      *                            Horde_Db_Value_Binary values. Used for
      *                            logging purposes.
      *
      * @return string  Modified SQL statement.
      * @throws DbException
      */
-    protected function _replaceParameters($sql, array $args, $no_binary = false)
+    protected function replaceParameters($sql, array $args, $no_binary = false)
     {
         $paramCount = substr_count($sql, '?');
         if (count($args) != $paramCount) {
-            $this->_logError('Parameter count mismatch: ' . $sql, 'Horde_Db_Adapter_Base::_replaceParameters');
+            $this->logError('Parameter count mismatch: ' . $sql, 'Horde_Db_Adapter_Base::_replaceParameters');
             throw new DbException(sprintf('Parameter count mismatch, expecting %d, got %d', $paramCount, count($args)));
         }
 
@@ -831,28 +839,28 @@ abstract class Base implements Adapter
      * @param string $name    Optional queryname.
      * @param float $runtime  Runtime interval.
      */
-    protected function _logInfo($sql, $values, $name = null, $runtime = null)
+    protected function logInfo($sql, $values, $name = null, $runtime = null)
     {
-        if (!$this->_logger || !$this->_logQueries) {
+        if (!$this->logger || !$this->logQueries) {
             return;
         }
 
         if (is_array($values)) {
-            $sql = $this->_replaceParameters($sql, $values, true);
+            $sql = $this->replaceParameters($sql, $values, true);
         }
 
         $name = (empty($name) ? '' : $name)
             . (empty($runtime) ? '' : sprintf(" (%.4fs)", $runtime));
 
-        $this->_logger->debug($this->_formatLogEntry($name, $sql));
+        $this->logger->debug($this->formatLogEntry($name, $sql));
     }
 
-    protected function _logError($error, $name, $runtime = null)
+    protected function logError($error, $name, $runtime = null)
     {
-        if ($this->_logger) {
+        if ($this->logger) {
             $name = (empty($name) ? '' : $name)
                 . (empty($runtime) ? '' : sprintf(" (%.4fs)", $runtime));
-            $this->_logger->err($this->_formatLogEntry($name, $error));
+            $this->logger->err($this->formatLogEntry($name, $error));
         }
     }
 
@@ -864,7 +872,7 @@ abstract class Base implements Adapter
      *
      * @return string  Formatted log entry.
      */
-    protected function _formatLogEntry($message, $sql)
+    protected function formatLogEntry($message, $sql)
     {
         return "SQL $message  \n\t" . wordwrap(preg_replace("/\s+/", ' ', $sql), 70, "\n\t  ", 1);
     }
@@ -876,12 +884,12 @@ abstract class Base implements Adapter
      *
      * @return string  Prefixed cache key.
      */
-    protected function _cacheKey($key)
+    protected function cacheKey($key)
     {
-        if (!isset($this->_cachePrefix)) {
-            $this->_cachePrefix = get_class($this) . hash((version_compare(PHP_VERSION, '5.4', '>=')) ? 'fnv132' : 'sha1', serialize($this->_config));
+        if (!isset($this->cachePrefix)) {
+            $this->cachePrefix = get_class($this) . hash((version_compare(PHP_VERSION, '5.4', '>=')) ? 'fnv132' : 'sha1', serialize($this->config));
         }
 
-        return $this->_cachePrefix . $key;
+        return $this->cachePrefix . $key;
     }
 }

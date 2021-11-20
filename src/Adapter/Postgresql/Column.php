@@ -46,7 +46,7 @@ class Column extends BaseColumn
 
 
     /**
-     * @var integer
+     * @var int
      */
     public static $moneyPrecision = 19;
 
@@ -56,75 +56,75 @@ class Column extends BaseColumn
      * @param   string  $name
      * @param   string  $default
      * @param   string  $sqlType
-     * @param   boolean $null
+     * @param   bool $null
      */
-    public function __construct($name, $default, $sqlType=null, $null=true)
+    public function __construct($name, $default, $sqlType=null, bool $null=true)
     {
-        parent::__construct($name, $this->_extractValueFromDefault($default), $sqlType, $null);
+        parent::__construct($name, $this->extractValueFromDefault($default), $sqlType, $null);
     }
 
     /**
      */
-    protected function _setSimplifiedType()
+    protected function setSimplifiedType()
     {
         switch (true) {
-        case preg_match('/^(?:real|double precision)$/', $this->_sqlType):
+        case preg_match('/^(?:real|double precision)$/', $this->sqlType):
             // Numeric and monetary types
-            $this->_type = 'float';
+            $this->type = 'float';
             return;
-        case preg_match('/^money$/', $this->_sqlType):
+        case preg_match('/^money$/', $this->sqlType):
             // Monetary types
-            $this->_type = 'decimal';
+            $this->type = 'decimal';
             return;
-        case preg_match('/^(?:character varying|bpchar)(?:\(\d+\))?$/', $this->_sqlType):
+        case preg_match('/^(?:character varying|bpchar)(?:\(\d+\))?$/', $this->sqlType):
             // Character types
-            $this->_type = 'string';
+            $this->type = 'string';
             return;
-        case preg_match('/^bytea$/', $this->_sqlType):
+        case preg_match('/^bytea$/', $this->sqlType):
             // Binary data types
-            $this->_type = 'binary';
+            $this->type = 'binary';
             return;
-        case preg_match('/^timestamp with(?:out)? time zone$/', $this->_sqlType):
+        case preg_match('/^timestamp with(?:out)? time zone$/', $this->sqlType):
             // Date/time types
-            $this->_type = 'datetime';
+            $this->type = 'datetime';
             return;
-        case preg_match('/^interval$/', $this->_sqlType):
-            $this->_type = 'string';
+        case preg_match('/^interval$/', $this->sqlType):
+            $this->type = 'string';
             return;
-        case preg_match('/^(?:point|line|lseg|box|"?path"?|polygon|circle)$/', $this->_sqlType):
+        case preg_match('/^(?:point|line|lseg|box|"?path"?|polygon|circle)$/', $this->sqlType):
             // Geometric types
-            $this->_type = 'string';
+            $this->type = 'string';
             return;
-        case preg_match('/^(?:cidr|inet|macaddr)$/', $this->_sqlType):
+        case preg_match('/^(?:cidr|inet|macaddr)$/', $this->sqlType):
             // Network address types
-            $this->_type = 'string';
+            $this->type = 'string';
             return;
-        case preg_match('/^bit(?: varying)?(?:\(\d+\))?$/', $this->_sqlType):
+        case preg_match('/^bit(?: varying)?(?:\(\d+\))?$/', $this->sqlType):
             // Bit strings
-            $this->_type = 'string';
+            $this->type = 'string';
             return;
-        case preg_match('/^xml$/', $this->_sqlType):
+        case preg_match('/^xml$/', $this->sqlType):
             // XML type
-            $this->_type = 'string';
+            $this->type = 'string';
             return;
-        case preg_match('/^\D+\[\]$/', $this->_sqlType):
+        case preg_match('/^\D+\[\]$/', $this->sqlType):
             // Arrays
-            $this->_type = 'string';
+            $this->type = 'string';
             return;
-        case preg_match('/^oid$/', $this->_sqlType):
+        case preg_match('/^oid$/', $this->sqlType):
             // Object identifier types
-            $this->_type = 'integer';
+            $this->type = 'integer';
             return;
         }
 
         // Pass through all types that are not specific to PostgreSQL.
-        parent::_setSimplifiedType();
+        parent::setSimplifiedType();
     }
 
     /**
      * Extracts the value from a PostgreSQL column default definition.
      */
-    protected function _extractValueFromDefault($default)
+    protected function extractValueFromDefault($default)
     {
         switch (true) {
         case preg_match('/\A-?\d+(\.\d*)?\z/', $default):
@@ -136,7 +136,7 @@ class Column extends BaseColumn
         case preg_match('/\AE\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
             // Character types (8.1 formatting)
             /*@TODO fix preg callback*/
-            return preg_replace('/\\(\d\d\d)/', '$1.oct.chr', $matches[1]);
+            return preg_replace('/\\(\d\d\d\)/', '$1.oct.chr', $matches[1]);
         case preg_match('/\A\'(.*)\'::bytea\z/m', $default, $matches):
             // Binary data types
             return $matches[1];
@@ -215,7 +215,7 @@ class Column extends BaseColumn
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractLimit($sqlType)
+    protected function extractLimit($sqlType)
     {
         if (preg_match('/^bigint/i', $sqlType)) {
             return 8;
@@ -223,31 +223,31 @@ class Column extends BaseColumn
         if (preg_match('/^smallint/i', $sqlType)) {
             return 2;
         }
-        return parent::_extractLimit($sqlType);
+        return parent::extractLimit($sqlType);
     }
 
     /**
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractPrecision($sqlType)
+    protected function extractPrecision($sqlType)
     {
         if (preg_match('/^money/', $sqlType)) {
             return self::$moneyPrecision;
         }
-        return parent::_extractPrecision($sqlType);
+        return parent::extractPrecision($sqlType);
     }
 
     /**
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractScale($sqlType)
+    protected function extractScale($sqlType)
     {
         if (preg_match('/^money/', $sqlType)) {
             return 2;
         }
-        return parent::_extractScale($sqlType);
+        return parent::extractScale($sqlType);
     }
 
 }

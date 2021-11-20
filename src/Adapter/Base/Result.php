@@ -33,55 +33,55 @@ abstract class Result implements Iterator
     /**
      * @var Adapter
      */
-    protected $_adapter;
+    protected $adapter;
 
     /**
      * @var string
      */
-    protected $_sql;
+    protected $sql;
 
     /**
      * @var mixed
      */
-    protected $_arg1;
+    protected $arg1;
 
     /**
      * @var string
      */
-    protected $_arg2;
+    protected $arg2;
 
     /**
      * Result resource.
      *
-     * @var resource
+     * @var mixed
      */
-    protected $_result;
+    protected $result;
 
     /**
      * Current row.
      *
      * @var array
      */
-    protected $_current;
+    protected $current;
 
     /**
      * Current offset.
      *
-     * @var integer
+     * @var int
      */
-    protected $_index;
+    protected $index;
 
     /**
      * Are we at the end of the result?
      *
-     * @var boolean
+     * @var bool
      */
-    protected $_eof;
+    protected $eof;
 
     /**
      * Which kind of keys to use for results.
      */
-    protected $_fetchMode = Constants::FETCH_ASSOC;
+    protected $fetchMode = Constants::FETCH_ASSOC;
 
     /**
      * Constructor.
@@ -95,10 +95,10 @@ abstract class Result implements Iterator
      */
     public function __construct($adapter, $sql, $arg1 = null, $arg2 = null)
     {
-        $this->_adapter = $adapter;
-        $this->_sql = $sql;
-        $this->_arg1 = $arg1;
-        $this->_arg2 = $arg2;
+        $this->adapter = $adapter;
+        $this->sql = $sql;
+        $this->arg1 = $arg1;
+        $this->arg2 = $arg2;
     }
 
     /**
@@ -106,8 +106,8 @@ abstract class Result implements Iterator
      */
     public function __destruct()
     {
-        if ($this->_result) {
-            unset($this->_result);
+        if ($this->result) {
+            unset($this->result);
         }
     }
 
@@ -116,16 +116,16 @@ abstract class Result implements Iterator
      */
     public function rewind()
     {
-        if ($this->_result) {
-            unset($this->_result);
+        if ($this->result) {
+            unset($this->result);
         }
-        $this->_current = null;
-        $this->_index = null;
-        $this->_eof = true;
-        $this->_result = $this->_adapter->execute(
-            $this->_sql,
-            $this->_arg1,
-            $this->_arg2
+        $this->current = null;
+        $this->index = null;
+        $this->eof = true;
+        $this->result = $this->adapter->execute(
+            $this->sql,
+            $this->arg1,
+            $this->arg2
         );
 
         $this->next();
@@ -138,10 +138,10 @@ abstract class Result implements Iterator
      */
     public function current()
     {
-        if (is_null($this->_result)) {
+        if (is_null($this->result)) {
             $this->rewind();
         }
-        return $this->_current;
+        return $this->current;
     }
 
     /**
@@ -151,10 +151,10 @@ abstract class Result implements Iterator
      */
     public function key()
     {
-        if (is_null($this->_result)) {
+        if (is_null($this->result)) {
             $this->rewind();
         }
-        return $this->_index;
+        return $this->index;
     }
 
     /**
@@ -165,41 +165,41 @@ abstract class Result implements Iterator
      */
     public function next()
     {
-        if (is_null($this->_result)) {
+        if (is_null($this->result)) {
             $this->rewind();
         }
 
-        if ($this->_result) {
-            $row = $this->_fetchArray();
+        if ($this->result) {
+            $row = $this->fetchArray();
             if (!$row) {
-                $this->_eof = true;
+                $this->eof = true;
             } else {
-                $this->_eof = false;
+                $this->eof = false;
 
-                if (is_null($this->_index)) {
-                    $this->_index = 0;
+                if (is_null($this->index)) {
+                    $this->index = 0;
                 } else {
-                    ++$this->_index;
+                    ++$this->index;
                 }
 
-                $this->_current = $row;
+                $this->current = $row;
             }
         }
 
-        return $this->_current;
+        return $this->current;
     }
 
     /**
      * Implementation of the valid() method for Iterator.
      *
-     * @return boolean  Whether the iteration is valid.
+     * @return bool  Whether the iteration is valid.
      */
     public function valid()
     {
-        if (is_null($this->_result)) {
+        if (is_null($this->result)) {
             $this->rewind();
         }
-        return !$this->_eof;
+        return !$this->eof;
     }
 
     /**
@@ -226,17 +226,17 @@ abstract class Result implements Iterator
      */
     public function setFetchMode($fetchmode)
     {
-        $this->_fetchMode = $fetchmode;
+        $this->fetchMode = $fetchmode;
     }
 
     /**
      * Returns the number of columns in the result set.
      *
-     * @return integer  Number of columns.
+     * @return int  Number of columns.
      */
     public function columnCount()
     {
-        if (is_null($this->_result)) {
+        if (is_null($this->result)) {
             $this->rewind();
         }
         return $this->_columnCount();
@@ -248,12 +248,12 @@ abstract class Result implements Iterator
      * @return array|bool  The next row in the resultset or false if there
      *                        are no more results.
      */
-    abstract protected function _fetchArray();
+    abstract protected function fetchArray();
 
     /**
      * Returns the number of columns in the result set.
      *
-     * @return integer  Number of columns.
+     * @return int  Number of columns.
      */
     abstract protected function _columnCount();
 }

@@ -41,19 +41,19 @@ class Mysqli extends Base
 {
     /**
      * Last auto-generated insert_id
-     * @var integer
+     * @var int
      */
-    protected $_insertId;
+    protected $insertId;
 
     /**
      * @var string
      */
-    protected $_schemaClass = Schema::class;
+    protected $schemaClass = Schema::class;
 
     /**
-     * @var boolean
+     * @var bool
      */
-    protected $_hasMysqliFetchAll = false;
+    protected $hasMysqliFetchAll = false;
 
 
     /*##########################################################################
@@ -120,11 +120,11 @@ class Mysqli extends Base
      */
     public function connect()
     {
-        if ($this->_active) {
+        if ($this->active) {
             return;
         }
 
-        $config = $this->_parseConfig();
+        $config = $this->parseConfig();
 
         if (!empty($config['ssl'])) {
             $mysqli = mysqli_init();
@@ -145,7 +145,7 @@ class Mysqli extends Base
                 MYSQLI_CLIENT_SSL
             );
         } else {
-            $mysqli = new mysqli(
+            $mysqli = new \mysqli(
                 $config['host'],
                 $config['username'],
                 $config['password'],
@@ -164,15 +164,15 @@ class Mysqli extends Base
             $mysqli->options(MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
         }
 
-        $this->_connection = $mysqli;
-        $this->_active     = true;
+        $this->connection = $mysqli;
+        $this->active     = true;
 
         // Set the default charset. http://dev.mysql.com/doc/refman/5.1/en/charset-connection.html
         if (!empty($config['charset'])) {
-            $this->setCharset($config['charset']);
+            $this->schema->setCharset($config['charset']);
         }
 
-        $this->_hasMysqliFetchAll = function_exists('mysqli_fetch_all');
+        $this->hasMysqliFetchAll = function_exists('mysqli_fetch_all');
     }
 
     /**
@@ -180,8 +180,8 @@ class Mysqli extends Base
      */
     public function disconnect()
     {
-        if ($this->_connection) {
-            $this->_connection->close();
+        if ($this->connection) {
+            $this->connection->close();
         }
         parent::disconnect();
     }
@@ -193,8 +193,8 @@ class Mysqli extends Base
      */
     public function isActive()
     {
-        $this->_lastQuery = 'SELECT 1';
-        return isset($this->_connection) && $this->_connection->query('SELECT 1');
+        $this->lastQuery = 'SELECT 1';
+        return isset($this->connection) && $this->connection->query('SELECT 1');
     }
 
 
@@ -211,7 +211,7 @@ class Mysqli extends Base
      */
     public function quoteString($string)
     {
-        return "'".$this->_connection->real_escape_string($string)."'";
+        return "'".$this->connection->real_escape_string($string)."'";
     }
 
 
@@ -244,7 +244,7 @@ class Mysqli extends Base
     public function selectAll($sql, $arg1=null, $arg2=null)
     {
         $result = $this->execute($sql, $arg1, $arg2);
-        if ($this->_hasMysqliFetchAll) {
+        if ($this->hasMysqliFetchAll) {
             return $result->fetch_all(MYSQLI_ASSOC);
         } else {
             $rows = [];
@@ -325,7 +325,7 @@ class Mysqli extends Base
     public function execute($sql, $arg1=null, $arg2=null)
     {
         if (is_array($arg1)) {
-            $query = $this->_replaceParameters($sql, $arg1);
+            $query = $this->replaceParameters($sql, $arg1);
             $name = $arg2;
         } else {
             $name = $arg1;
@@ -336,23 +336,23 @@ class Mysqli extends Base
         $t = new Horde_Support_Timer();
         $t->push();
 
-        $this->_lastQuery = $query;
-        $stmt = $this->_connection->query($query);
+        $this->lastQuery = $query;
+        $stmt = $this->connection->query($query);
         if (!$stmt) {
-            $this->_logInfo($sql, $arg1, $name);
-            $this->_logError($query, 'QUERY FAILED: ' . $this->_connection->error);
+            $this->logInfo($sql, $arg1, $name);
+            $this->logError($query, 'QUERY FAILED: ' . $this->connection->error);
             throw new DbException(
-                'QUERY FAILED: ' . $this->_connection->error . "\n\n" . $query,
-                $this->_errorCode($this->_connection->sqlstate, $this->_connection->errno)
+                'QUERY FAILED: ' . $this->connection->error . "\n\n" . $query,
+                $this->errorCode($this->connection->sqlstate, $this->connection->errno)
             );
         }
 
-        $this->_logInfo($sql, $arg1, $name, $t->pop());
-        //@TODO if ($this->_connection->info) $this->_loginfo($sql, $this->_connection->info);
+        $this->logInfo($sql, $arg1, $name, $t->pop());
+        //@TODO if ($this->connection->info) $this->loginfo($sql, $this->connection->info);
         //@TODO also log warnings? http://php.net/mysqli.warning-count and http://php.net/mysqli.get-warnings
 
-        $this->_rowCount = $this->_connection->affected_rows;
-        $this->_insertId = $this->_connection->insert_id;
+        $this->rowCount = $this->connection->affected_rows;
+        $this->insertId = $this->connection->insert_id;
         return $stmt;
     }
 
@@ -369,7 +369,7 @@ class Mysqli extends Base
     public function insert($sql, $arg1=null, $arg2=null, $pk=null, $idValue=null, $sequenceName=null)
     {
         $this->execute($sql, $arg1, $arg2);
-        return isset($idValue) ? $idValue : $this->_insertId;
+        return isset($idValue) ? $idValue : $this->insertId;
     }
 
     /**
@@ -377,8 +377,8 @@ class Mysqli extends Base
      */
     public function beginDbTransaction()
     {
-        $this->_connection->autocommit(false);
-        $this->_transactionStarted++;
+        $this->connection->autocommit(false);
+        $this->transactionStarted++;
     }
 
     /**
@@ -386,10 +386,10 @@ class Mysqli extends Base
      */
     public function commitDbTransaction()
     {
-        $this->_transactionStarted--;
-        if (!$this->_transactionStarted) {
-            $this->_connection->commit();
-            $this->_connection->autocommit(true);
+        $this->transactionStarted--;
+        if (!$this->transactionStarted) {
+            $this->connection->commit();
+            $this->connection->autocommit(true);
         }
     }
 
@@ -399,13 +399,13 @@ class Mysqli extends Base
      */
     public function rollbackDbTransaction()
     {
-        if (!$this->_transactionStarted) {
+        if (!$this->transactionStarted) {
             return;
         }
 
-        $this->_connection->rollback();
-        $this->_transactionStarted = 0;
-        $this->_connection->autocommit(true);
+        $this->connection->rollback();
+        $this->transactionStarted = 0;
+        $this->connection->autocommit(true);
     }
 
 
@@ -417,10 +417,10 @@ class Mysqli extends Base
      * Return a standard error code
      *
      * @param   string   $sqlstate
-     * @param   integer  $errno
-     * @return  integer
+     * @param   int  $errno
+     * @return  int
      */
-    protected function _errorCode($sqlstate, $errno)
+    protected function errorCode($sqlstate, $errno)
     {
         /*@TODO do something with standard sqlstate vs. MySQL error codes vs. whatever else*/
         return $errno;
@@ -432,34 +432,34 @@ class Mysqli extends Base
      * @throws  DbException
      * @return  array  [host, username, password, dbname, port, socket]
      */
-    protected function _parseConfig()
+    protected function parseConfig()
     {
-        $this->_checkRequiredConfig(array('username'));
+        $this->checkRequiredConfig(array('username'));
 
         $rails2mysqli = array('database' => 'dbname');
         foreach ($rails2mysqli as $from => $to) {
-            if (isset($this->_config[$from])) {
-                $this->_config[$to] = $this->_config[$from];
-                unset($this->_config[$from]);
+            if (isset($this->config[$from])) {
+                $this->config[$to] = $this->config[$from];
+                unset($this->config[$from]);
             }
         }
 
-        if (!empty($this->_config['host']) &&
-            $this->_config['host'] == 'localhost') {
-            $this->_config['host'] = '127.0.0.1';
+        if (!empty($this->config['host']) &&
+            $this->config['host'] == 'localhost') {
+            $this->config['host'] = '127.0.0.1';
         }
 
-        if (!empty($this->_config['host']) && !empty($this->_config['socket'])) {
+        if (!empty($this->config['host']) && !empty($this->config['socket'])) {
             throw new DbException('Can only specify host or socket, not both');
         }
 
-        if (isset($this->_config['port'])) {
-            if (empty($this->_config['host'])) {
+        if (isset($this->config['port'])) {
+            if (empty($this->config['host'])) {
                 throw new DbException('Host is required if port is specified');
             }
         }
 
-        $config = $this->_config;
+        $config = $this->config;
 
         if (!isset($config['host'])) {
             $config['host'] = null;

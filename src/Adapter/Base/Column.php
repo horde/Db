@@ -35,17 +35,17 @@ use Horde_String;
  */
 class Column
 {
-    protected $_name;
-    protected $_type;
-    protected $_null;
-    protected $_limit;
-    protected $_precision;
-    protected $_scale;
-    protected $_unsigned;
-    protected $_default;
-    protected $_sqlType;
-    protected $_isText;
-    protected $_isNumber;
+    protected $name;
+    protected $type;
+    protected $null;
+    protected $limit;
+    protected $precision;
+    protected $scale;
+    protected $unsigned;
+    protected $default;
+    protected $sqlType;
+    protected $isText;
+    protected $isNumber;
 
 
     /*##########################################################################
@@ -57,46 +57,46 @@ class Column
      *
      * @param string $name     The column's name, such as "supplier_id" in
      *                         "supplier_id int(11)".
-     * @param string $default  The type-casted default value, such as "new" in
+     * @param string|null $default  The type-casted default value, such as "new" in
      *                         "sales_stage varchar(20) default 'new'".
-     * @param string $sqlType  Used to extract the column's type, length and
+     * @param string|null $sqlType  Used to extract the column's type, length and
      *                         signed status, if necessary. For example
      *                         "varchar" and "60" in "company_name varchar(60)"
      *                         or "unsigned => true" in "int(10) UNSIGNED".
-     * @param boolean $null    Whether this column allows NULL values.
+     * @param bool $null    Whether this column allows NULL values. optional
      */
-    public function __construct($name, $default, $sqlType = null, $null = true)
+    public function __construct(string $name, string $default = null, string $sqlType = null, bool $null = true)
     {
-        $this->_name      = $name;
-        $this->_sqlType   = $sqlType;
-        $this->_null      = $null;
+        $this->name      = $name;
+        $this->sqlType   = $sqlType;
+        $this->null      = $null;
 
-        $this->_limit     = $this->_extractLimit($sqlType);
-        $this->_precision = $this->_extractPrecision($sqlType);
-        $this->_scale     = $this->_extractScale($sqlType);
-        $this->_unsigned  = $this->_extractUnsigned($sqlType);
+        $this->limit     = $this->extractLimit($sqlType);
+        $this->precision = $this->extractPrecision($sqlType);
+        $this->scale     = $this->extractScale($sqlType);
+        $this->unsigned  = $this->extractUnsigned($sqlType);
 
-        $this->_setSimplifiedType();
-        $this->_isText    = $this->_type == 'text'  || $this->_type == 'string';
-        $this->_isNumber  = $this->_type == 'float' || $this->_type == 'integer' || $this->_type == 'decimal';
+        $this->setSimplifiedType();
+        $this->isText    = $this->type == 'text'  || $this->type == 'string';
+        $this->isNumber  = $this->type == 'float' || $this->type == 'integer' || $this->type == 'decimal';
 
-        $this->_default   = $this->extractDefault($default);
+        $this->default   = $this->extractDefault($default);
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function isText()
     {
-        return $this->_isText;
+        return $this->isText;
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function isNumber()
     {
-        return $this->_isNumber;
+        return $this->isNumber;
     }
 
     /**
@@ -108,7 +108,7 @@ class Column
             return null;
         }
 
-        switch ($this->_type) {
+        switch ($this->type) {
         case 'string':
         case 'text':
             return $value;
@@ -149,7 +149,7 @@ class Column
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -157,7 +157,7 @@ class Column
      */
     public function getDefault()
     {
-        return $this->_default;
+        return $this->default;
     }
 
     /**
@@ -165,7 +165,7 @@ class Column
      */
     public function getType()
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
@@ -173,7 +173,7 @@ class Column
      */
     public function getLimit()
     {
-        return $this->_limit;
+        return $this->limit;
     }
 
     /**
@@ -181,7 +181,7 @@ class Column
      */
     public function precision()
     {
-        return $this->_precision;
+        return $this->precision;
     }
 
     /**
@@ -189,23 +189,23 @@ class Column
      */
     public function scale()
     {
-        return $this->_scale;
+        return $this->scale;
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function isUnsigned()
     {
-        return $this->_unsigned;
+        return $this->unsigned;
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function isNull()
     {
-        return $this->_null;
+        return $this->null;
     }
 
     /**
@@ -213,7 +213,7 @@ class Column
      */
     public function getSqlType()
     {
-        return $this->_sqlType;
+        return $this->sqlType;
     }
 
 
@@ -266,9 +266,9 @@ class Column
 
     /**
      * @param   string  $string
-     * @return  Horde_Date
+     * @return  Horde_Date|null
      */
-    public function stringToDummyTime($value)
+    public function stringToDummyTime(string $string)
     {
         if (empty($string)) {
             return null;
@@ -278,7 +278,7 @@ class Column
 
     /**
      * @param   mixed  $value
-     * @return  boolean
+     * @return  bool
      */
     public function valueToBoolean($value)
     {
@@ -292,7 +292,7 @@ class Column
 
     /**
      * @param   mixed  $value
-     * @return  decimal
+     * @return  float
      */
     public function valueToDecimal($value)
     {
@@ -308,7 +308,7 @@ class Column
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractLimit($sqlType)
+    protected function extractLimit($sqlType)
     {
         if (preg_match("/\((.*)\)/", $sqlType, $matches)) {
             return (int)$matches[1];
@@ -320,7 +320,7 @@ class Column
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractPrecision($sqlType)
+    protected function extractPrecision($sqlType)
     {
         if (preg_match("/^(numeric|decimal|number)\((\d+)(,\d+)?\)/i", $sqlType, $matches)) {
             return (int)$matches[2];
@@ -332,7 +332,7 @@ class Column
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractScale($sqlType)
+    protected function extractScale($sqlType)
     {
         // What's that?
         switch (true) {
@@ -353,48 +353,48 @@ class Column
      * @param   string  $sqlType
      * @return  int
      */
-    protected function _extractUnsigned($sqlType)
+    protected function extractUnsigned($sqlType)
     {
         return (bool)preg_match('/^int.*unsigned/i', $sqlType);
     }
 
     /**
      */
-    protected function _setSimplifiedType()
+    protected function setSimplifiedType()
     {
         switch (true) {
-        case preg_match('/int/i', $this->_sqlType):
-            $this->_type = 'integer';
+        case preg_match('/int/i', $this->sqlType):
+            $this->type = 'integer';
             return;
-        case preg_match('/float|double/i', $this->_sqlType):
-            $this->_type = 'float';
+        case preg_match('/float|double/i', $this->sqlType):
+            $this->type = 'float';
             return;
-        case preg_match('/decimal|numeric|number/i', $this->_sqlType):
-            $this->_type = $this->_scale == 0 ? 'integer' : 'decimal';
+        case preg_match('/decimal|numeric|number/i', $this->sqlType):
+            $this->type = $this->scale == 0 ? 'integer' : 'decimal';
             return;
-        case preg_match('/datetime/i', $this->_sqlType):
-            $this->_type = 'datetime';
+        case preg_match('/datetime/i', $this->sqlType):
+            $this->type = 'datetime';
             return;
-        case preg_match('/timestamp/i', $this->_sqlType):
-            $this->_type = 'timestamp';
+        case preg_match('/timestamp/i', $this->sqlType):
+            $this->type = 'timestamp';
             return;
-        case preg_match('/time/i', $this->_sqlType):
-            $this->_type = 'time';
+        case preg_match('/time/i', $this->sqlType):
+            $this->type = 'time';
             return;
-        case preg_match('/date/i', $this->_sqlType):
-            $this->_type = 'date';
+        case preg_match('/date/i', $this->sqlType):
+            $this->type = 'date';
             return;
-        case preg_match('/clob|text/i', $this->_sqlType):
-            $this->_type = 'text';
+        case preg_match('/clob|text/i', $this->sqlType):
+            $this->type = 'text';
             return;
-        case preg_match('/blob|binary/i', $this->_sqlType):
-            $this->_type = 'binary';
+        case preg_match('/blob|binary/i', $this->sqlType):
+            $this->type = 'binary';
             return;
-        case preg_match('/char|string/i', $this->_sqlType):
-            $this->_type = 'string';
+        case preg_match('/char|string/i', $this->sqlType):
+            $this->type = 'string';
             return;
-        case preg_match('/boolean/i', $this->_sqlType):
-            $this->_type = 'boolean';
+        case preg_match('/boolean/i', $this->sqlType):
+            $this->type = 'boolean';
             return;
         }
     }

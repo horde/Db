@@ -20,6 +20,7 @@ namespace Horde\Db\Adapter\Pdo;
 use Horde\Db\Adapter\Base as BaseAdapter;
 use PDO;
 use PDOException;
+use PDOStatement;
 use Horde\Db\DbException;
 use Horde\Db\Value\Binary;
 use Horde_Support_Timer;
@@ -49,18 +50,18 @@ abstract class Base extends BaseAdapter
      */
     public function connect()
     {
-        if ($this->_active) {
+        if ($this->active) {
             return;
         }
 
-        list($dsn, $user, $pass) = $this->_parseConfig();
+        list($dsn, $user, $pass) = $this->parseConfig();
 
         try {
             $pdo = @new PDO($dsn, $user, $pass);
         } catch (PDOException $e) {
             $msg = 'Could not instantiate PDO. PDOException: '
                 . $e->getMessage();
-            $this->_logError($msg, '');
+            $this->logError($msg, '');
 
             $e2 = new DbException($msg);
             $e2->logged = true;
@@ -70,8 +71,8 @@ abstract class Base extends BaseAdapter
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 
-        $this->_connection = $pdo;
-        $this->_active     = true;
+        $this->connection = $pdo;
+        $this->active     = true;
     }
 
     /**
@@ -81,10 +82,10 @@ abstract class Base extends BaseAdapter
      */
     public function isActive()
     {
-        $this->_lastQuery = $sql = 'SELECT 1';
+        $this->lastQuery = $sql = 'SELECT 1';
         try {
-            return isset($this->_connection) &&
-                $this->_connection->query($sql);
+            return isset($this->connection) &&
+                $this->connection->query($sql);
         } catch (PDOException $e) {
             throw new DbException($e);
         }
@@ -141,7 +142,7 @@ abstract class Base extends BaseAdapter
      * @param mixed  $arg1  Either an array of bound parameters or a query name.
      * @param string $arg2  If $arg1 contains bound parameters, the query name.
      *
-     * @return array|boolean  A record hash or false if no record found.
+     * @return array|bool  A record hash or false if no record found.
      */
     public function selectOne($sql, $arg1 = null, $arg2 = null)
     {
@@ -220,7 +221,7 @@ abstract class Base extends BaseAdapter
     /**
      * Executes the SQL statement in the context of this connection.
      *
-     * @deprecated  Deprecated for external usage. Use select() instead.
+     * @internal  Deprecated for external usage. Use select() instead.
      *
      * @param string $sql   SQL statement.
      * @param mixed $arg1   Either an array of bound parameters or a query
@@ -234,7 +235,7 @@ abstract class Base extends BaseAdapter
     public function execute($sql, $arg1 = null, $arg2 = null)
     {
         if (is_array($arg1)) {
-            $query = $this->_replaceParameters($sql, $arg1);
+            $query = $this->replaceParameters($sql, $arg1);
             $name = $arg2;
         } else {
             $name = $arg1;
@@ -246,16 +247,16 @@ abstract class Base extends BaseAdapter
         $t->push();
 
         try {
-            $this->_lastQuery = $query;
-            $stmt = $this->_connection->query($query);
+            $this->lastQuery = $query;
+            $stmt = $this->connection->query($query);
         } catch (PDOException $e) {
-            $this->_logInfo($sql, $arg1, $name);
-            $this->_logError($query, 'QUERY FAILED: ' . $e->getMessage());
+            $this->logInfo($sql, $arg1, $name);
+            $this->logError($query, 'QUERY FAILED: ' . $e->getMessage());
             throw new DbException($e);
         }
 
-        $this->_logInfo($sql, $arg1, $name, $t->pop());
-        $this->_rowCount = $stmt ? $stmt->rowCount() : 0;
+        $this->logInfo($sql, $arg1, $name, $t->pop());
+        $this->rowCount = $stmt ? $stmt->rowCount() : 0;
 
         return $stmt;
     }
@@ -273,18 +274,18 @@ abstract class Base extends BaseAdapter
      *
      * @throws  DbException
      */
-    protected function _executePrepared($sql, $values, $binary_values)
+    protected function executePrepared($sql, $values, $binary_values)
     {
-        $query = $this->_replaceParameters($sql, $values);
+        $query = $this->replaceParameters($sql, $values);
         try {
-            $stmt = $this->_connection->prepare($query);
+            $stmt = $this->connection->prepare($query);
             foreach ($binary_values as $key => $bvalue) {
                 rewind($bvalue);
                 $stmt->bindParam(':binary' . $key, $bvalue, PDO::PARAM_LOB);
             }
         } catch (PDOException $e) {
-            $this->_logInfo($sql, $values, null);
-            $this->_logError($sql, 'QUERY FAILED: ' . $e->getMessage());
+            $this->logInfo($sql, $values, null);
+            $this->logError($sql, 'QUERY FAILED: ' . $e->getMessage());
             throw new DbException($e);
         }
 
@@ -292,19 +293,19 @@ abstract class Base extends BaseAdapter
         $t->push();
 
         try {
-            $this->_lastQuery = $sql;
+            $this->lastQuery = $sql;
             $stmt->execute();
         } catch (PDOException $e) {
-            $this->_logInfo($sql, $values, null);
-            $this->_logError($sql, 'QUERY FAILED: ' . $e->getMessage());
+            $this->logInfo($sql, $values, null);
+            $this->logError($sql, 'QUERY FAILED: ' . $e->getMessage());
             throw new DbException($e);
         }
 
         $t = new Horde_Support_Timer();
         $t->push();
 
-        $this->_logInfo($sql, $values, null, $t->pop());
-        $this->_rowCount = $stmt->rowCount();
+        $this->logInfo($sql, $values, null, $t->pop());
+        $this->rowCount = $stmt->rowCount();
     }
 
     /**
@@ -321,7 +322,7 @@ abstract class Base extends BaseAdapter
      *                          required if the primary key is inserted
      *                          manually.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
@@ -346,12 +347,12 @@ abstract class Base extends BaseAdapter
         );
 
         if ($binary_cnt > 0) {
-            $this->_executePrepared($query, $values, $binary);
+            $this->executePrepared($query, $values, $binary);
 
             try {
                 return $idValue
                     ? $idValue
-                    : $this->_connection->lastInsertId(null);
+                    : $this->connection->lastInsertId(null);
             } catch (PDOException $e) {
                 throw new DbException($e);
             }
@@ -378,7 +379,7 @@ abstract class Base extends BaseAdapter
     public function updateBlob($table, $fields, $where = null)
     {
         if (is_array($where)) {
-            $where = $this->_replaceParameters($where[0], $where[1]);
+            $where = $this->replaceParameters($where[0], $where[1]);
         }
 
         $values = $binary_values = $fnames = [];
@@ -402,8 +403,8 @@ abstract class Base extends BaseAdapter
         );
 
         if ($binary_cnt > 0) {
-            $this->_executePrepared($query, $values, $binary_values);
-            return $this->_rowCount;
+            $this->executePrepared($query, $values, $binary_values);
+            return $this->rowCount;
         }
 
         return $this->update($query, $fields);
@@ -424,7 +425,7 @@ abstract class Base extends BaseAdapter
      *                              manually.
      * @param string $sequenceName  The sequence name.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insert(
@@ -440,7 +441,7 @@ abstract class Base extends BaseAdapter
         try {
             return $idValue
                 ? $idValue
-                : $this->_connection->lastInsertId($sequenceName);
+                : $this->connection->lastInsertId($sequenceName);
         } catch (PDOException $e) {
             throw new DbException($e);
         }
@@ -451,14 +452,14 @@ abstract class Base extends BaseAdapter
      */
     public function beginDbTransaction()
     {
-        if (!$this->_transactionStarted) {
+        if (!$this->transactionStarted) {
             try {
-                $this->_connection->beginTransaction();
+                $this->connection->beginTransaction();
             } catch (PDOException $e) {
                 throw new DbException($e);
             }
         }
-        $this->_transactionStarted++;
+        $this->transactionStarted++;
     }
 
     /**
@@ -466,10 +467,10 @@ abstract class Base extends BaseAdapter
      */
     public function commitDbTransaction()
     {
-        $this->_transactionStarted--;
-        if (!$this->_transactionStarted) {
+        $this->transactionStarted--;
+        if (!$this->transactionStarted) {
             try {
-                $this->_connection->commit();
+                $this->connection->commit();
             } catch (PDOException $e) {
                 throw new DbException($e);
             }
@@ -482,16 +483,16 @@ abstract class Base extends BaseAdapter
      */
     public function rollbackDbTransaction()
     {
-        if (!$this->_transactionStarted) {
+        if (!$this->transactionStarted) {
             return;
         }
 
         try {
-            $this->_connection->rollBack();
+            $this->connection->rollBack();
         } catch (PDOException $e) {
             throw new DbException($e);
         }
-        $this->_transactionStarted = 0;
+        $this->transactionStarted = 0;
     }
 
 
@@ -509,7 +510,7 @@ abstract class Base extends BaseAdapter
     public function quoteString($string)
     {
         try {
-            return $this->_connection->quote($string);
+            return $this->connection->quote($string);
         } catch (PDOException $e) {
             throw new DbException($e);
         }
@@ -520,7 +521,7 @@ abstract class Base extends BaseAdapter
     # Protected
     ##########################################################################*/
 
-    protected function _normalizeConfig($params)
+    protected function normalizeConfig($params)
     {
         // Normalize config parameters to what PDO expects.
         $normalize = array('database' => 'dbname',
@@ -536,9 +537,9 @@ abstract class Base extends BaseAdapter
         return $params;
     }
 
-    protected function _buildDsnString($params)
+    protected function buildDsnString($params)
     {
-        $dsn = $this->_config['adapter'] . ':';
+        $dsn = $this->config['adapter'] . ':';
         foreach ($params as $k => $v) {
             if (strlen($v)) {
                 $dsn .= "$k=$v;";
@@ -553,17 +554,17 @@ abstract class Base extends BaseAdapter
      * @throws  DbException
      * @return  array  [dsn, username, password]
      */
-    protected function _parseConfig()
+    protected function parseConfig()
     {
-        $this->_checkRequiredConfig(array('adapter', 'username'));
+        $this->checkRequiredConfig(array('adapter', 'username'));
 
         // try an empty password if it's not set.
-        if (!isset($this->_config['password'])) {
-            $this->_config['password'] = '';
+        if (!isset($this->config['password'])) {
+            $this->config['password'] = '';
         }
 
         // collect options to build PDO Data Source Name (DSN) string
-        $dsnOpts = $this->_config;
+        $dsnOpts = $this->config;
         unset(
             $dsnOpts['adapter'],
             $dsnOpts['username'],
@@ -577,8 +578,8 @@ abstract class Base extends BaseAdapter
 
         // return DSN and user/pass for connection
         return array(
-            $this->_buildDsnString($this->_normalizeConfig($dsnOpts)),
-            $this->_config['username'],
-            $this->_config['password']);
+            $this->buildDsnString($this->normalizeConfig($dsnOpts)),
+            $this->config['username'],
+            $this->config['password']);
     }
 }

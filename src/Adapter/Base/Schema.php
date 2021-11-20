@@ -42,15 +42,17 @@ use Horde_String;
  * @license    http://www.horde.org/licenses/bsd
  * @package    Db
  * @subpackage Adapter
+ * 
+ * @method cacheWrite($key, $value)
  */
 abstract class Schema
 {
     /**
-     * A Horde_Db_Adapter instance.
+     * A Horde\Db\Adapter instance.
      *
-     * @var Base
+     * @var Adapter
      */
-    protected $_adapter = null;
+    protected $adapter = null;
 
     /**
      * List of public methods supported by the attached adapter.
@@ -59,7 +61,7 @@ abstract class Schema
      *
      * @var array
      */
-    protected $_adapterMethods = [];
+    protected $adapterMethods = [];
 
 
     /*##########################################################################
@@ -77,14 +79,16 @@ abstract class Schema
     }
 
     /**
-     * Setter for a Horde_Db_Adapter instance.
+     * Setter for a Horde\Db\Adapter instance.
+     * 
+     * This is mostly for the __wakeup call, maybe we should rethink this
      *
-     * @param Adapter $adapter  A Horde_Db_Adapter instance.
+     * @param Adapter $adapter  A Horde\Db\Adapter instance.
      */
     public function setAdapter(Adapter $adapter)
     {
-        $this->_adapter = $adapter;
-        $this->_adapterMethods = array_flip(get_class_methods($adapter));
+        $this->adapter = $adapter;
+        $this->adapterMethods = array_flip(get_class_methods($adapter));
     }
 
 
@@ -103,7 +107,7 @@ abstract class Schema
      *                         signed status, if necessary. For example
      *                         "varchar" and "60" in "company_name varchar(60)"
      *                         or "unsigned => true" in "int(10) UNSIGNED".
-     * @param boolean $null    Whether this column allows NULL values.
+     * @param bool $null    Whether this column allows NULL values.
      *
      * @return Column  A column object.
      */
@@ -149,8 +153,8 @@ abstract class Schema
      *
      * @param string  $table    The table the index is on.
      * @param string  $name     The index's name.
-     * @param boolean $primary  Is this a primary key?
-     * @param boolean $unique   Is this a unique index?
+     * @param bool $primary  Is this a primary key?
+     * @param bool $unique   Is this a unique index?
      * @param array   $columns  The columns this index covers.
      *
      * @return Index  An index object.
@@ -196,27 +200,28 @@ abstract class Schema
      */
     public function __call($method, $args)
     {
-        if (isset($this->_adapterMethods[$method])) {
-            return call_user_func_array(array($this->_adapter, $method), $args);
+        if (isset($this->adapterMethods[$method])) {
+            return call_user_func_array(array($this->adapter, $method), $args);
         }
 
         throw new BadMethodCallException('Call to undeclared method "' . $method . '"');
     }
 
     /**
-     * Delegates access to $_cache and $_logger to the adapter object.
+     * Delegates access to $cache and $logger to the adapter object.
      *
-     * @param string $key  Property name. Only '_cache' and '_logger' are
+     * @param string $key  Property name. Only 'cache' and 'logger' are
      *                     supported.
      *
      * @return object|null  The request property object.
      */
     public function __get($key)
     {
-        if ($key == '_cache' || $key == '_logger') {
+        if ($key == 'cache' || $key == 'logger') {
             $getter = 'get' . Horde_String::ucfirst(substr($key, 1));
-            return $this->_adapter->$getter();
+            return $this->adapter->$getter();
         }
+        return null;
     }
 
 
@@ -245,7 +250,7 @@ abstract class Schema
         }
 
         if ($value instanceof Value) {
-            return $value->quote($this->_adapter);
+            return $value->quote($this->adapter);
         }
 
         $type = isset($column) ? $column->getType() : null;
@@ -261,7 +266,7 @@ abstract class Schema
         } elseif (is_int($value)) {
             return $value;
         } elseif ($value instanceof DateTime || $value instanceof Horde_Date) {
-            return $this->_adapter->quoteString($type == 'integer'
+            return $this->adapter->quoteString($type == 'integer'
                                                 ? $value->format('U')
                                                 : $value->format('Y-m-d H:i:s'));
         } elseif ($type == 'integer') {
@@ -269,7 +274,7 @@ abstract class Schema
         } elseif ($type == 'float') {
             return sprintf('%F', $value);
         } else {
-            return $this->_adapter->quoteString($value);
+            return $this->adapter->quoteString($value);
         }
     }
 
@@ -376,7 +381,7 @@ abstract class Schema
     /**
      * Returns the maximum length a table alias can have.
      *
-     * @return integer  The maximum table alias length.
+     * @return int  The maximum table alias length.
      */
     public function tableAliasLength()
     {
@@ -404,12 +409,12 @@ abstract class Schema
     abstract public function tables();
 
     /**
-     * Returns a Horde_Db_Adapter_Base_Table object for a table.
+     * Returns a Horde\Db\Adapter\Base\Table object for a table.
      *
      * @param string $tableName  A table name.
      * @param string $name       (can be removed?)
      *
-     * @return Horde_Db_Adapter_Base_Table  A table object.
+     * @return Table  A table object.
      */
     public function table($tableName, $name = null)
     {
@@ -427,7 +432,7 @@ abstract class Schema
      * @param string $tableName  A table name.
      * @param string $name       (can be removed?)
      *
-     * @return Horde_Db_Adapter_Base_Index  The primary key index object.
+     * @return Index  The primary key index object.
      */
     abstract public function primaryKey($tableName, $name = null);
 
@@ -589,7 +594,7 @@ abstract class Schema
 
         // Drop previous table.
         if (isset($options['force'])) {
-            $this->dropTable($tableDefinition->getName(), $options);
+            $this->dropTable($tableDefinition->getName());
         }
 
         $temp = !empty($options['temporary']) ? 'TEMPORARY' : null;
@@ -602,7 +607,7 @@ abstract class Schema
             $opts
         );
 
-        $this->execute($sql);
+        $this->adapter->execute($sql);
     }
 
     /**
@@ -620,8 +625,8 @@ abstract class Schema
      */
     public function dropTable($name)
     {
-        $this->_clearTableCache($name);
-        return $this->execute('DROP TABLE ' . $this->quoteTableName($name));
+        $this->clearTableCache($name);
+        return $this->adapter->execute('DROP TABLE ' . $this->quoteTableName($name));
     }
 
     /**
@@ -640,7 +645,7 @@ abstract class Schema
         $type,
         $options = []
     ) {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $options = array_merge(
             array('limit'     => null,
@@ -664,7 +669,7 @@ abstract class Schema
         );
         $sql = $this->addColumnOptions($sql, $options);
 
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -675,13 +680,13 @@ abstract class Schema
      */
     public function removeColumn($tableName, $columnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf(
             'ALTER TABLE %s DROP %s',
             $this->quoteTableName($tableName),
             $this->quoteColumnName($columnName)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -727,14 +732,14 @@ abstract class Schema
      */
     public function addPrimaryKey($tableName, $columns)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $columns = (array)$columns;
         $sql = sprintf(
             'ALTER TABLE %s ADD PRIMARY KEY (%s)',
             $this->quoteTableName($tableName),
             implode(', ', $columns)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -803,7 +808,7 @@ abstract class Schema
      */
     public function addIndex($tableName, $columnName, $options = [])
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $columnNames = (array)$columnName;
         $indexName = empty($options['name'])
@@ -820,7 +825,7 @@ abstract class Schema
             $this->quoteTableName($tableName),
             implode(', ', $columnNames)
         );
-        $this->execute($sql);
+        $this->adapter->execute($sql);
 
         return $indexName;
     }
@@ -859,7 +864,7 @@ abstract class Schema
      */
     public function removeIndex($tableName, $options = [])
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $index = $this->indexName($tableName, $options);
         $sql = sprintf(
@@ -868,7 +873,7 @@ abstract class Schema
             $this->quoteTableName($tableName)
         );
 
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -935,7 +940,7 @@ abstract class Schema
      * @param integer $limit      Maximum column length (non decimal type only)
      * @param integer $precision  The number precision (decimal type only).
      * @param integer $scale      The number scaling (decimal columns only).
-     * @param boolean $unsigned   Whether the column is an unsigned number
+     * @param bool $unsigned   Whether the column is an unsigned number
      *                            (non decimal columns only).
      *
      * @return string  The SQL definition. If $type is not one of the
@@ -1095,7 +1100,7 @@ abstract class Schema
      * @param string $lhs    The column or expression to test.
      * @param string $op     The operator.
      * @param string $rhs    The comparison value.
-     * @param boolean $bind  If true, the method returns the query and a list
+     * @param bool $bind  If true, the method returns the query and a list
      *                       of values suitable for binding as an array.
      * @param array $params  Any additional parameters for the operator.
      *
@@ -1109,7 +1114,7 @@ abstract class Schema
         $bind = false,
         $params = []
     ) {
-        $lhs = $this->_escapePrepare($lhs);
+        $lhs = $this->escapePrepare($lhs);
         switch ($op) {
         case '|':
         case '&':
@@ -1168,22 +1173,22 @@ abstract class Schema
                 return sprintf(
                     $query,
                     $lhs,
-                    $this->_escapePrepare($this->quote('%' . $rhs . '%'))
+                    $this->escapePrepare($this->quote('%' . $rhs . '%'))
                 );
             }
             return sprintf(
                 '(' . $query . ' OR ' . $query . ')',
                 $lhs,
-                $this->_escapePrepare($this->quote($rhs . '%')),
+                $this->escapePrepare($this->quote($rhs . '%')),
                 $lhs,
-                $this->_escapePrepare($this->quote('% ' . $rhs . '%'))
+                $this->escapePrepare($this->quote('% ' . $rhs . '%'))
             );
 
         default:
             if ($bind) {
-                return array($lhs . ' ' . $this->_escapePrepare($op) . ' ?', array($rhs));
+                return array($lhs . ' ' . $this->escapePrepare($op) . ' ?', array($rhs));
             }
-            return $lhs . ' ' . $this->_escapePrepare($op . ' ' . $this->quote($rhs));
+            return $lhs . ' ' . $this->escapePrepare($op . ' ' . $this->quote($rhs));
         }
     }
 
@@ -1195,7 +1200,7 @@ abstract class Schema
      *
      * @return string  The correctly escaped string.
      */
-    protected function _escapePrepare($query)
+    protected function escapePrepare($query)
     {
         return preg_replace('/[?!&]/', '\\\\$0', $query);
     }
@@ -1210,9 +1215,9 @@ abstract class Schema
      *
      * @param string $tableName  A table name.
      */
-    protected function _clearTableCache($tableName)
+    protected function clearTableCache($tableName)
     {
-        $this->cacheWrite('tables/columns/' . $tableName, '');
-        $this->cacheWrite('tables/indexes/' . $tableName, '');
+        $this->adapter->cacheWrite('tables/columns/' . $tableName, '');
+        $this->adapter->cacheWrite('tables/indexes/' . $tableName, '');
     }
 }

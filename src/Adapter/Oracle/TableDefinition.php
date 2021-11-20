@@ -29,7 +29,7 @@ use Horde\Db\Adapter\Base\TableDefinition as BaseTableDefinition;
  */
 class TableDefinition extends BaseTableDefinition
 {
-    protected $_createTrigger = false;
+    protected $createTrigger = false;
 
     /**
      * Adds a new column to the table definition.
@@ -63,7 +63,7 @@ class TableDefinition extends BaseTableDefinition
         parent::column($name, $type, $options);
 
         if ($type == 'autoincrementKey') {
-            $this->_createTrigger = $name;
+            $this->createTrigger = $name;
         }
 
         return $this;
@@ -75,8 +75,8 @@ class TableDefinition extends BaseTableDefinition
     public function end()
     {
         parent::end();
-        if ($this->_createTrigger) {
-            $this->_base->createAutoincrementTrigger($this->_name, $this->_createTrigger);
+        if ($this->createTrigger) {
+            $this->base->createAutoincrementTrigger($this->name, $this->createTrigger);
         }
     }
 }

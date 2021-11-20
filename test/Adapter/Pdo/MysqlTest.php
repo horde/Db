@@ -76,6 +76,6 @@ class MysqlTest extends MysqlBase
 
     public function testAdapterName()
     {
-        $this->assertEquals('PDO_MySQL', $this->_conn->adapterName());
+        $this->assertEquals('PDO_MySQL', $this->conn->adapterName());
     }
 }

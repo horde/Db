@@ -15,6 +15,7 @@
 namespace Horde\Db\Test\Migration;
 
 use Horde\Test\TestCase;
+use Horde\Db\Adapter;
 use Horde\Db\Adapter\Pdo\Sqlite;
 use Horde\Db\Migration\Migrator;
 use Horde\Db\DbException;
@@ -32,17 +33,18 @@ use Exception;
  */
 class MigratorTest extends TestCase
 {
+    protected Adapter $conn;
     public function setUp(): void
     {
         try {
-            $this->_conn = new Sqlite(array(
+            $this->conn = new Sqlite(array(
                 'dbname' => ':memory:',
             ));
         } catch (DbException $e) {
             $this->markTestSkipped('The sqlite adapter is not available');
         }
 
-        $table = $this->_conn->createTable('users');
+        $table = $this->conn->createTable('users');
         $table->column('company_id', 'integer', array('limit' => 11));
         $table->column('name', 'string', array('limit' => 255, 'default' => ''));
         $table->column('first_name', 'string', array('limit' => 40, 'default' => ''));
@@ -58,10 +60,10 @@ class MigratorTest extends TestCase
     public function testInitializeSchemaInformation()
     {
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
 
         $sql = "SELECT version FROM schema_info";
-        $this->assertEquals(0, $this->_conn->selectValue($sql));
+        $this->assertEquals(0, $this->conn->selectValue($sql));
     }
 
     public function testMigrator()
@@ -72,23 +74,23 @@ class MigratorTest extends TestCase
         $this->assertFalse(in_array('last_name', $columns));
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
 
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
         $migrator->up();
         $this->assertEquals(3, $migrator->getCurrentVersion());
 
         $columns = $this->_columnNames('users');
         $this->assertTrue(in_array('last_name', $columns));
 
-        $this->_conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 02:22:23')");
-        $reminder = (object)$this->_conn->selectOne('SELECT * FROM reminders');
+        $this->conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 02:22:23')");
+        $reminder = (object)$this->conn->selectOne('SELECT * FROM reminders');
         $this->assertEquals('hello world', $reminder->content);
 
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
         $migrator->down();
         $this->assertEquals(0, $migrator->getCurrentVersion());
 
@@ -96,7 +98,7 @@ class MigratorTest extends TestCase
         $this->assertFalse(in_array('last_name', $columns));
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
     }
 
@@ -105,11 +107,11 @@ class MigratorTest extends TestCase
         $this->expectException(DbException::class);
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
 
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
         $migrator->up(1);
         $this->assertEquals(1, $migrator->getCurrentVersion());
 
@@ -117,21 +119,21 @@ class MigratorTest extends TestCase
         $this->assertTrue(in_array('last_name', $columns));
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
 
         $migrator->up(2);
         $this->assertEquals(2, $migrator->getCurrentVersion());
 
-        $this->_conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 02:22:23')");
-        $reminder = (object)$this->_conn->selectOne('SELECT * FROM reminders');
+        $this->conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 02:22:23')");
+        $reminder = (object)$this->conn->selectOne('SELECT * FROM reminders');
         $this->assertEquals('hello world', $reminder->content);
     }
 
     public function testOneDown()
     {
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
 
         $migrator->up();
         $migrator->down(1);
@@ -143,7 +145,7 @@ class MigratorTest extends TestCase
     public function testOneUpOneDown()
     {
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
 
         $migrator->up(1);
         $migrator->down(0);
@@ -157,7 +159,7 @@ class MigratorTest extends TestCase
         $this->expectException(DbException::class);
 
         $dir = dirname(__DIR__).'/fixtures/migrations/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
 
         $migrator->up(1);
         $migrator->down(0);
@@ -166,16 +168,16 @@ class MigratorTest extends TestCase
         $this->assertFalse(in_array('last_name', $columns));
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
 
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
         $migrator->up();
 
         $columns = $this->_columnNames('users');
         $this->assertTrue(in_array('last_name', $columns));
 
-        $this->_conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 02:22:23')");
-        $reminder = (object)$this->_conn->selectOne('SELECT * FROM reminders');
+        $this->conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 02:22:23')");
+        $reminder = (object)$this->conn->selectOne('SELECT * FROM reminders');
         $this->assertEquals('hello world', $reminder->content);
     }
 
@@ -183,7 +185,7 @@ class MigratorTest extends TestCase
     {
         $this->expectException(DbException::class);
         $dir = dirname(__DIR__).'/fixtures/migrations_with_duplicate/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
         $migrator->up();
     }
 
@@ -192,7 +194,7 @@ class MigratorTest extends TestCase
         $this->expectException(DbException::class);
 
         $dir = dirname(__DIR__).'/fixtures/migrations_with_missing_versions/';
-        $migrator = new Migrator($this->_conn, null, array('migrationsPath' => $dir));
+        $migrator = new Migrator($this->conn, null, array('migrationsPath' => $dir));
         $migrator->migrate(500);
         $this->assertEquals(4, $migrator->getCurrentVersion());
 
@@ -200,7 +202,7 @@ class MigratorTest extends TestCase
         $this->assertEquals(2, $migrator->getCurrentVersion());
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
 
         $columns = $this->_columnNames('users');
@@ -210,7 +212,7 @@ class MigratorTest extends TestCase
     protected function _columnNames($tableName)
     {
         $columns = array();
-        foreach ($this->_conn->columns($tableName) as $c) {
+        foreach ($this->conn->columns($tableName) as $c) {
             $columns[] = $c->getName();
         }
         return $columns;

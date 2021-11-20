@@ -29,38 +29,38 @@ use SplFileObject;
  */
 class StatementParser implements Iterator
 {
-    protected $_count = 0;
-    protected $_currentStatement;
-    protected $_file;
+    protected $count = 0;
+    protected $currentStatement;
+    protected $file;
 
     public function __construct($file)
     {
         if (is_string($file)) {
             $file = new SplFileObject($file, 'r');
         }
-        $this->_file = $file;
+        $this->file = $file;
     }
 
     public function current()
     {
-        if (is_null($this->_currentStatement)) {
+        if (is_null($this->currentStatement)) {
             $this->rewind();
         }
-        return $this->_currentStatement;
+        return $this->currentStatement;
     }
 
     public function key()
     {
-        if (is_null($this->_currentStatement)) {
+        if (is_null($this->currentStatement)) {
             $this->rewind();
         }
-        return $this->_count;
+        return $this->count;
     }
 
     public function next()
     {
-        if ($statement = $this->_getNextStatement()) {
-            $this->_count++;
+        if ($statement = $this->getNextStatement()) {
+            $this->count++;
             return $statement;
         }
         return null;
@@ -68,15 +68,15 @@ class StatementParser implements Iterator
 
     public function rewind()
     {
-        $this->_count = 0;
-        $this->_currentStatement = null;
-        $this->_file->rewind();
+        $this->count = 0;
+        $this->currentStatement = null;
+        $this->file->rewind();
         $this->next();
     }
 
     public function valid()
     {
-        return !$this->_file->eof() && $this->_file->isReadable();
+        return !$this->file->eof() && $this->file->isReadable();
     }
 
     /**
@@ -85,28 +85,28 @@ class StatementParser implements Iterator
      *
      * @return string The next SQL statement in the file.
      */
-    protected function _getNextStatement()
+    protected function getNextStatement()
     {
-        $this->_currentStatement = '';
-        while (!$this->_file->eof()) {
-            $line = $this->_file->fgets();
+        $this->currentStatement = '';
+        while (!$this->file->eof()) {
+            $line = $this->file->fgets();
             if (!trim($line)) {
                 continue;
             }
-            if (!$this->_currentStatement && substr($line, 0, 2) == '--') {
+            if (!$this->currentStatement && substr($line, 0, 2) == '--') {
                 continue;
             }
 
             $trimmedline = rtrim($line);
             if (substr($trimmedline, -1) == ';') {
                 // Leave off the ending ;
-                $this->_currentStatement .= substr($trimmedline, 0, -1);
-                return $this->_currentStatement;
+                $this->currentStatement .= substr($trimmedline, 0, -1);
+                return $this->currentStatement;
             }
 
-            $this->_currentStatement .= $line;
+            $this->currentStatement .= $line;
         }
 
-        return $this->_currentStatement;
+        return $this->currentStatement;
     }
 }

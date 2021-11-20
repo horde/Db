@@ -42,7 +42,7 @@ class Column extends BaseColumn
      * @param string $default     Type-casted default value, such as "new"
      *                            in "sales_stage varchar(20) default 'new'".
      * @param string $sqlType     Column type.
-     * @param boolean $null       Whether this column allows NULL values.
+     * @param bool $null       Whether this column allows NULL values.
      * @param integer $length     Column width.
      * @param integer $precision  Precision for NUMBER and FLOAT columns.
      * @param integer $scale      Number of digits to the right of the decimal
@@ -58,19 +58,19 @@ class Column extends BaseColumn
         $scale = null
     )
     {
-        $this->_name      = $name;
-        $this->_sqlType   = Horde_String::lower($sqlType);
-        $this->_null      = $null;
+        $this->name      = $name;
+        $this->sqlType   = Horde_String::lower($sqlType);
+        $this->null      = $null;
 
-        $this->_limit     = $length;
-        $this->_precision = $precision;
-        $this->_scale     = $scale;
+        $this->limit     = $length;
+        $this->precision = $precision;
+        $this->scale     = $scale;
 
-        $this->_setSimplifiedType();
-        $this->_isText    = $this->_type == 'text'  || $this->_type == 'string';
-        $this->_isNumber  = $this->_type == 'float' || $this->_type == 'integer' || $this->_type == 'decimal';
+        $this->setSimplifiedType();
+        $this->isText    = $this->type == 'text'  || $this->type == 'string';
+        $this->isNumber  = $this->type == 'float' || $this->type == 'integer' || $this->type == 'decimal';
 
-        $this->_default   = $this->typeCast($default);
+        $this->default   = $this->typeCast($default);
     }
 
 
@@ -98,13 +98,13 @@ class Column extends BaseColumn
 
     /**
      */
-    protected function _setSimplifiedType()
+    protected function setSimplifiedType()
     {
-        if (Horde_String::lower($this->_sqlType) == 'number' &&
-            $this->_precision == 1) {
-            $this->_type = 'boolean';
+        if (Horde_String::lower($this->sqlType) == 'number' &&
+            $this->precision == 1) {
+            $this->type = 'boolean';
             return;
         }
-        parent::_setSimplifiedType();
+        parent::setSimplifiedType();
     }
 }

@@ -39,7 +39,7 @@ class Pgsql extends Base
     /**
      * @var string
      */
-    protected $_schemaClass = PostgresqlSchema::class;
+    protected $schemaClass = PostgresqlSchema::class;
 
     /**
      * @return  string
@@ -66,12 +66,12 @@ class Pgsql extends Base
         // Temporarily set the client message level above error to prevent unintentional
         // error messages in the logs when working on a PostgreSQL database server that
         // does not support standard conforming strings.
-        $clientMinMessagesOld = $this->getClientMinMessages();
-        $this->setClientMinMessages('panic');
+        $clientMinMessagesOld = $this->schema->getClientMinMessages();
+        $this->schema->setClientMinMessages('panic');
 
         $hasSupport = $this->selectValue('SHOW standard_conforming_strings');
 
-        $this->setClientMinMessages($clientMinMessageOld);
+        $this->schema->setClientMinMessages($clientMinMessagesOld);
         return $hasSupport;
     }
 
@@ -92,20 +92,20 @@ class Pgsql extends Base
      */
     public function connect()
     {
-        if ($this->_active) {
+        if ($this->active) {
             return;
         }
 
         parent::connect();
 
-        $this->_lastQuery = $sql = "SET datestyle TO 'iso'";
-        $retval = $this->_connection->exec($sql);
+        $this->lastQuery = $sql = "SET datestyle TO 'iso'";
+        $retval = $this->connection->exec($sql);
         if ($retval === false) {
-            $error = $this->_connection->errorInfo();
+            $error = $this->connection->errorInfo();
             throw new DbException($error[2]);
         }
 
-        $this->_configureConnection();
+        $this->configureConnection();
     }
 
 
@@ -127,7 +127,7 @@ class Pgsql extends Base
      *                              manually.
      * @param string $sequenceName  The sequence name.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insert(
@@ -144,17 +144,17 @@ class Pgsql extends Base
 
         // Try an insert with 'returning id'
         if (!$pk) {
-            list($pk, $sequenceName) = $this->pkAndSequenceFor($table);
+            list($pk, $sequenceName) = $this->schema->pkAndSequenceFor($table);
         }
         if ($pk) {
             $id = $this->selectValue($sql . ' RETURNING ' . $this->quoteColumnName($pk), $arg1, $arg2);
-            $this->resetPkSequence($table, $pk, $sequenceName);
+            $this->schema->resetPkSequence($table, $pk, $sequenceName);
             return $id;
         }
 
         // If neither pk nor sequence name is given, look them up.
         if (!($pk || $sequenceName)) {
-            list($pk, $sequenceName) = $this->pkAndSequenceFor($table);
+            list($pk, $sequenceName) = $this->schema->pkAndSequenceFor($table);
         }
 
         // Otherwise, insert then grab last_insert_id.
@@ -167,10 +167,11 @@ class Pgsql extends Base
         // Don't fetch last insert id for a table without a pk.
         if ($pk &&
             ($sequenceName ||
-             $sequenceName = $this->defaultSequenceName($table, $pk))) {
-            $this->resetPkSequence($table, $pk, $sequenceName);
-            return $this->_lastInsertId($table, $sequenceName);
+             $sequenceName = $this->schema->defaultSequenceName($table, $pk))) {
+            $this->schema->resetPkSequence($table, $pk, $sequenceName);
+            return $this->lastInsertId($table, $sequenceName);
         }
+        return 0;
     }
 
     /**
@@ -203,47 +204,48 @@ class Pgsql extends Base
      * @throws  DbException
      * @return  array  [dsn, username, password]
      */
-    protected function _parseConfig()
+    protected function parseConfig()
     {
-        $this->_config['adapter'] = 'pgsql';
+        $this->config['adapter'] = 'pgsql';
 
-        if (!empty($this->_config['socket']) && !empty($this->_config['host'])) {
+        if (!empty($this->config['socket']) && !empty($this->config['host'])) {
             throw new DbException('Can only specify host or socket, not both');
         }
 
         // PDO for PostgreSQL does not accept a socket argument
         // in the connection string; the location can be set via the
         // "host" argument instead.
-        if (!empty($this->_config['socket'])) {
-            $this->_config['host'] = $this->_config['socket'];
-            unset($this->_config['socket']);
+        if (!empty($this->config['socket'])) {
+            $this->config['host'] = $this->config['socket'];
+            unset($this->config['socket']);
         }
 
-        return parent::_parseConfig();
+        return parent::parseConfig();
     }
 
     /**
      * Configures the encoding, verbosity, and schema search path of the connection.
      * This is called by connect() and should not be called manually.
      */
-    protected function _configureConnection()
+    protected function configureConnection()
     {
-        if (!empty($this->_config['charset'])) {
-            $this->_lastQuery = $sql = 'SET client_encoding TO '.$this->quoteString($this->_config['charset']);
+        if (!empty($this->config['charset'])) {
+            $this->lastQuery = $sql = 'SET client_encoding TO '.$this->quoteString($this->config['charset']);
             $this->execute($sql);
         }
 
-        if (!empty($this->_config['client_min_messages'])) {
-            $this->setClientMinMessages($this->_config['client_min_messages']);
+        if (!empty($this->config['client_min_messages'])) {
+            $this->schema->setClientMinMessages($this->config['client_min_messages']);
         }
-        $this->setSchemaSearchPath(!empty($this->_config['schema_search_path']) || !empty($this->_config['schema_order']));
+        $this->schema->setSchemaSearchPath(!empty($this->config['schema_search_path']) || !empty($this->config['schema_order']));
     }
 
     /**
      * @TODO
      */
-    protected function _selectRaw($sql, $arg1=null, $arg2=null)
+    protected function selectRaw($sql, $arg1=null, $arg2=null)
     {
+        $rows = [];
         $result = $this->execute($sql, $arg1, $arg2);
         if (!$result) {
             return [];
@@ -289,8 +291,8 @@ class Pgsql extends Base
      *
      * @todo Remove unused $table parameter.
      */
-    protected function _lastInsertId($table, $sequenceName)
+    protected function lastInsertId($table, $sequenceName)
     {
-        return (int)$this->selectValue('SELECT currval('.$this->quoteSequenceName($sequenceName).')');
+        return (int)$this->selectValue('SELECT currval('.$this->schema->quoteSequenceName($sequenceName).')');
     }
 }

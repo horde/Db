@@ -18,7 +18,7 @@
 
 namespace Horde\Db\Adapter\Mysqli;
 
-use Horde\Db\Adapter\Pdo\Base\Result as BaseResult;
+use Horde\Db\Adapter\Base\Result as BaseResult;
 use Horde\Db\Constants;
 
 /**
@@ -43,7 +43,7 @@ class Result extends BaseResult
      *
      * @var array
      */
-    protected $_map = array(
+    protected $map = array(
         Constants::FETCH_ASSOC => MYSQLI_ASSOC,
         Constants::FETCH_NUM   => MYSQLI_NUM,
         Constants::FETCH_BOTH  => MYSQLI_BOTH
@@ -55,18 +55,18 @@ class Result extends BaseResult
      * @return array|boolean  The next row in the resultset or false if there
      *                        are no more results.
      */
-    protected function _fetchArray()
+    protected function fetchArray()
     {
-        return $this->_result->fetch_array($this->_map[$this->_fetchMode]);
+        return $this->result->fetch_array($this->map[$this->fetchMode]);
     }
 
     /**
      * Returns the number of columns in the result set.
      *
-     * @return integer  Number of columns.
+     * @return int  Number of columns.
      */
     protected function _columnCount()
     {
-        return $this->_result->field_count;
+        return $this->result->field_count;
     }
 }

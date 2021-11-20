@@ -39,7 +39,7 @@ class Base
 {
     /**
      * The migration version
-     * @var integer
+     * @var int
      */
     public $version = null;
 
@@ -47,13 +47,13 @@ class Base
      * The logger
      * @var Horde_Log_Logger
      */
-    protected $_logger;
+    protected $logger;
 
     /**
      * Database connection adapter
      * @var BaseAdapter
      */
-    protected $_connection;
+    protected $connection;
 
 
     /*##########################################################################
@@ -64,7 +64,7 @@ class Base
      */
     public function __construct(Adapter $connection, $version = null)
     {
-        $this->_connection = $connection;
+        $this->connection = $connection;
         $this->version = $version;
     }
 
@@ -97,7 +97,8 @@ class Base
         // benchmark method call
         $t = new Horde_Support_Timer();
         $t->push();
-        $result = call_user_func_array(array($this->_connection, $method), $args);
+
+        $result = call_user_func_array(array($this->connection, $method), $args);
         $time = $t->pop();
 
         // print stats
@@ -157,8 +158,8 @@ class Base
      */
     public function log($text = '')
     {
-        if ($this->_logger) {
-            $this->_logger->info($text);
+        if ($this->logger) {
+            $this->logger->info($text);
         }
     }
 
@@ -167,7 +168,7 @@ class Base
      */
     public function setLogger($logger)
     {
-        $this->_logger = $logger;
+        $this->logger = $logger;
     }
 
     /**

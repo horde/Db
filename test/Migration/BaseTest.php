@@ -15,9 +15,12 @@
 namespace Horde\Db\Test\Migration;
 
 use PHPUnit\Framework\TestCase;
+use Horde\Db\Adapter;
 use Horde\Db\Adapter\Pdo\Sqlite;
 use Horde\Db\Migration\Base as BaseMigration;
 use Horde\Db\DbException;
+use WeNeedReminders1;
+use GiveMeBigNumbers;
 
 require_once dirname(__DIR__) . '/fixtures/migrations/1_users_have_last_names1.php';
 require_once dirname(__DIR__) . '/fixtures/migrations/2_we_need_reminders1.php';
@@ -35,17 +38,18 @@ require_once dirname(__DIR__) . '/fixtures/migrations_with_decimal/1_give_me_big
  */
 class BaseTest extends TestCase
 {
+    protected Adapter $conn;
     public function setUp(): void
     {
         try {
-            $this->_conn = new Sqlite(array(
+            $this->conn = new Sqlite(array(
                 'dbname' => ':memory:',
             ));
         } catch (DbException $e) {
             $this->markTestSkipped('The sqlite adapter is not available');
         }
 
-        $table = $this->_conn->createTable('users');
+        $table = $this->conn->createTable('users');
         $table->column('company_id', 'integer', array('limit' => 11));
         $table->column('name', 'string', array('limit' => 255, 'default' => ''));
         $table->column('first_name', 'string', array('limit' => 40, 'default' => ''));
@@ -60,43 +64,43 @@ class BaseTest extends TestCase
 
     public function testChangeColumnWithNilDefault()
     {
-        $this->_conn->addColumn('users', 'contributor', 'boolean', array('default' => true));
-        $users = $this->_conn->table('users');
+        $this->conn->addColumn('users', 'contributor', 'boolean', array('default' => true));
+        $users = $this->conn->table('users');
         $this->assertTrue($users->contributor->getDefault());
 
         // changeColumn() throws exception on error
-        $this->_conn->changeColumn('users', 'contributor', 'boolean', array('default' => null));
+        $this->conn->changeColumn('users', 'contributor', 'boolean', array('default' => null));
 
-        $users = $this->_conn->table('users');
+        $users = $this->conn->table('users');
         $this->assertNull($users->contributor->getDefault());
     }
 
     public function testChangeColumnWithNewDefault()
     {
-        $this->_conn->addColumn('users', 'administrator', 'boolean', array('default' => true));
-        $users = $this->_conn->table('users');
+        $this->conn->addColumn('users', 'administrator', 'boolean', array('default' => true));
+        $users = $this->conn->table('users');
         $this->assertTrue($users->administrator->getDefault());
 
         // changeColumn() throws exception on error
-        $this->_conn->changeColumn('users', 'administrator', 'boolean', array('default' => false));
+        $this->conn->changeColumn('users', 'administrator', 'boolean', array('default' => false));
 
-        $users = $this->_conn->table('users');
+        $users = $this->conn->table('users');
         $this->assertFalse($users->administrator->getDefault());
     }
 
     public function testChangeColumnDefault()
     {
-        $this->_conn->changeColumnDefault('users', 'first_name', 'Tester');
+        $this->conn->changeColumnDefault('users', 'first_name', 'Tester');
 
-        $users = $this->_conn->table('users');
+        $users = $this->conn->table('users');
         $this->assertEquals('Tester', $users->first_name->getDefault());
     }
 
     public function testChangeColumnDefaultToNull()
     {
-        $this->_conn->changeColumnDefault('users', 'first_name', null);
+        $this->conn->changeColumnDefault('users', 'first_name', null);
 
-        $users = $this->_conn->table('users');
+        $users = $this->conn->table('users');
         $this->assertNull($users->first_name->getDefault());
     }
 
@@ -105,21 +109,21 @@ class BaseTest extends TestCase
         $this->expectException(DbException::class);
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
 
-        $m = new WeNeedReminders1($this->_conn);
+        $m = new WeNeedReminders1($this->conn);
         $m->up();
 
-        $this->_conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 11:10:01')");
+        $this->conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 11:10:01')");
 
-        $reminder = (object)$this->_conn->selectOne('SELECT * FROM reminders');
+        $reminder = (object)$this->conn->selectOne('SELECT * FROM reminders');
         $this->assertEquals('hello world', $reminder->content);
 
         $m->down();
         $e = null;
 
-        $this->_conn->selectValues("SELECT * FROM reminders");
+        $this->conn->selectValues("SELECT * FROM reminders");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
     }
 
@@ -128,15 +132,15 @@ class BaseTest extends TestCase
         $this->expectException(DbException::class);
 
         $e = null;
-        $this->_conn->selectValues("SELECT * FROM big_numbers");
+        $this->conn->selectValues("SELECT * FROM big_numbers");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
 
-        $m = new GiveMeBigNumbers($this->_conn);
+        $m = new GiveMeBigNumbers($this->conn);
         $m->up();
 
-        $this->_conn->insert('INSERT INTO big_numbers (bank_balance, big_bank_balance, world_population, my_house_population, value_of_e) VALUES (1586.43, 1000234000567.95, 6000000000, 3, 2.7182818284590452353602875)');
+        $this->conn->insert('INSERT INTO big_numbers (bank_balance, big_bank_balance, world_population, my_house_population, value_of_e) VALUES (1586.43, 1000234000567.95, 6000000000, 3, 2.7182818284590452353602875)');
 
-        $b = (object)$this->_conn->selectOne('SELECT * FROM big_numbers');
+        $b = (object)$this->conn->selectOne('SELECT * FROM big_numbers');
         $this->assertNotNull($b->bank_balance);
         $this->assertNotNull($b->big_bank_balance);
         $this->assertNotNull($b->world_population);
@@ -146,25 +150,25 @@ class BaseTest extends TestCase
         $m->down();
         $e = null;
 
-        $this->_conn->selectValues("SELECT * FROM big_numbers");
+        $this->conn->selectValues("SELECT * FROM big_numbers");
         $this->assertInstanceOf('Horde_Db_Exception', $e);
     }
 
     public function testAutoincrement()
     {
-        $t = $this->_conn->createTable('imp_sentmail', array('autoincrementKey' => array('sentmail_id')));
+        $t = $this->conn->createTable('imp_sentmail', array('autoincrementKey' => array('sentmail_id')));
         $t->column('sentmail_id', 'bigint', array('null' => false));
         $t->column('sentmail_foo', 'string');
         $t->end();
-        $migration = new BaseMigration($this->_conn, null);
+        $migration = new BaseMigration($this->conn, null);
         $migration->changeColumn('imp_sentmail', 'sentmail_id', 'autoincrementKey');
-        $columns = $this->_conn->columns('imp_sentmail');
+        $columns = $this->conn->columns('imp_sentmail');
         $this->assertEquals(2, count($columns));
         $this->assertTrue(isset($columns['sentmail_id']));
         $this->assertEquals(
             array('sentmail_id'),
-            $this->_conn->primaryKey('imp_sentmail')->columns
+            $this->conn->primaryKey('imp_sentmail')->columns
         );
-        $this->_conn->insert('INSERT INTO imp_sentmail (sentmail_foo) VALUES (?)', array('bar'));
+        $this->conn->insert('INSERT INTO imp_sentmail (sentmail_foo) VALUES (?)', array('bar'));
     }
 }

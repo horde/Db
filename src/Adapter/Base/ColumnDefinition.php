@@ -34,16 +34,16 @@ use Exception;
  */
 class ColumnDefinition
 {
-    protected $_base;
-    protected $_name;
-    protected $_type;
-    protected $_limit;
-    protected $_precision;
-    protected $_scale;
-    protected $_unsigned;
-    protected $_default;
-    protected $_null;
-    protected $_autoincrement;
+    protected $base;
+    protected $name;
+    protected $type;
+    protected $limit;
+    protected $precision;
+    protected $scale;
+    protected $unsigned;
+    protected $default;
+    protected $null;
+    protected $autoincrement;
 
     /**
      * Constructor.
@@ -61,18 +61,18 @@ class ColumnDefinition
         $autoincrement = null
     ) {
         // Protected
-        $this->_base      = $base;
+        $this->base      = $base;
 
         // Public
-        $this->_name          = $name;
-        $this->_type          = $type;
-        $this->_limit         = $limit;
-        $this->_precision     = $precision;
-        $this->_scale         = $scale;
-        $this->_unsigned      = $unsigned;
-        $this->_default       = $default;
-        $this->_null          = $null;
-        $this->_autoincrement = $autoincrement;
+        $this->name          = $name;
+        $this->type          = $type;
+        $this->limit         = $limit;
+        $this->precision     = $precision;
+        $this->scale         = $scale;
+        $this->unsigned      = $unsigned;
+        $this->default       = $default;
+        $this->null          = $null;
+        $this->autoincrement = $autoincrement;
     }
 
 
@@ -85,9 +85,9 @@ class ColumnDefinition
      */
     public function toSql()
     {
-        $sql = $this->_base->quoteColumnName($this->_name) . ' ' . $this->getSqlType();
-        return $this->_addColumnOptions($sql, array('null'     => $this->_null,
-                                                    'default'  => $this->_default));
+        $sql = $this->base->quoteColumnName($this->name) . ' ' . $this->getSqlType();
+        return $this->addColumnOptions($sql, array('null'     => $this->null,
+                                                    'default'  => $this->default));
     }
 
     /**
@@ -108,7 +108,7 @@ class ColumnDefinition
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -116,7 +116,7 @@ class ColumnDefinition
      */
     public function getDefault()
     {
-        return $this->_default;
+        return $this->default;
     }
 
     /**
@@ -124,7 +124,7 @@ class ColumnDefinition
      */
     public function getType()
     {
-        return $this->_type;
+        return $this->type;
     }
 
     /**
@@ -133,9 +133,9 @@ class ColumnDefinition
     public function getSqlType()
     {
         try {
-            return $this->_base->typeToSql($this->_type, $this->_limit, $this->_precision, $this->_scale, $this->_unsigned);
+            return $this->base->typeToSql($this->type, $this->limit, $this->precision, $this->scale, $this->unsigned);
         } catch (Exception $e) {
-            return $this->_type;
+            return $this->type;
         }
     }
 
@@ -144,7 +144,7 @@ class ColumnDefinition
      */
     public function getLimit()
     {
-        return $this->_limit;
+        return $this->limit;
     }
 
     /**
@@ -152,7 +152,7 @@ class ColumnDefinition
      */
     public function precision()
     {
-        return $this->_precision;
+        return $this->precision;
     }
 
     /**
@@ -160,15 +160,15 @@ class ColumnDefinition
      */
     public function scale()
     {
-        return $this->_scale;
+        return $this->scale;
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function isUnsigned()
     {
-        return $this->_unsigned;
+        return $this->unsigned;
     }
 
     /**
@@ -176,87 +176,87 @@ class ColumnDefinition
      */
     public function isNull()
     {
-        return $this->_null;
+        return $this->null;
     }
 
     /**
-     * @return  boolean
+     * @return  bool
      */
     public function isAutoIncrement()
     {
-        return $this->_autoincrement;
+        return $this->autoincrement;
     }
 
     /**
-     * @param   string
+     * @param string $name
      */
-    public function setName($name)
+    public function setName(string $name): void
     {
-        $this->_name = $name;
+        $this->name = $name;
     }
 
     /**
-     * @param  string
+     * @param string $default
      */
-    public function setDefault($default)
+    public function setDefault(string $default): void
     {
-        $this->_default = $default;
+        $this->default = $default;
     }
 
     /**
-     * @param  string
+     * @param string $type
      */
-    public function setType($type)
+    public function setType(string $type): void
     {
-        $this->_type = $type;
+        $this->type = $type;
     }
 
     /**
-     * @param  int
+     * @param int $limit
      */
-    public function setLimit($limit)
+    public function setLimit(int $limit): void
     {
-        $this->_limit = $limit;
+        $this->limit = $limit;
     }
 
     /**
-     * @param  int
+     * @param int $precision
      */
-    public function setPrecision($precision)
+    public function setPrecision($precision): void
     {
-        $this->_precision = $precision;
+        $this->precision = $precision;
     }
 
     /**
-     * @param  int
+     * @param int $scale
      */
-    public function setScale($scale)
+    public function setScale($scale): void
     {
-        $this->_scale = $scale;
+        $this->scale = $scale;
     }
 
     /**
-     * @param  boolean
+     * @param bool $unsigned
      */
-    public function setUnsigned($unsigned)
+    public function setUnsigned($unsigned): void
     {
-        $this->_unsigned = $unsigned;
+        $this->unsigned = $unsigned;
     }
 
     /**
-     * @param  boolean
+     * @param bool $null
      */
-    public function setNull($null)
+    public function setNull(bool $null): void
     {
-        $this->_null = $null;
+        $this->null = $null;
     }
 
     /**
-     * @param  boolean
+     * @param bool $autoincrement
      */
-    public function setAutoIncrement($autoincrement)
+    public function setAutoIncrement(bool $autoincrement): void
     {
-        $this->_autoincrement = $autoincrement;
+        $this->autoincrement = $autoincrement;
     }
 
 
@@ -268,9 +268,9 @@ class ColumnDefinition
      * @param   string  $sql
      * @param   array   $options
      */
-    protected function _addColumnOptions($sql, $options)
+    protected function addColumnOptions($sql, $options)
     {
-        return $this->_base->addColumnOptions(
+        return $this->base->addColumnOptions(
             $sql,
             array_merge($options, array('column' => $this))
         );

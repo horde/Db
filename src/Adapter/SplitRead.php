@@ -44,16 +44,16 @@ class SplitRead implements Adapter
      *
      * @var Adapter
      */
-    private $_read;
+    private $read;
 
     /**
      * The write adapter
      *
      * @var Adapter
      */
-    private $_write;
+    private $write;
 
-    private $_lastQuery;
+    private $lastQuery;
 
     /**
      * Const'r
@@ -63,8 +63,8 @@ class SplitRead implements Adapter
      */
     public function __construct(Adapter $read, Adapter $write)
     {
-        $this->_read = $read;
-        $this->_write = $write;
+        $this->read = $read;
+        $this->write = $write;
     }
 
     /**
@@ -75,8 +75,8 @@ class SplitRead implements Adapter
      */
     public function __call($method, $args)
     {
-        $result = call_user_func_array(array($this->_write, $method), $args);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = call_user_func_array(array($this->write, $method), $args);
+        $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
 
@@ -94,22 +94,22 @@ class SplitRead implements Adapter
     /**
      * Does this adapter support migrations?
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsMigrations()
     {
-        return $this->_write->supportsMigrations();
+        return $this->write->supportsMigrations();
     }
 
     /**
      * Does this adapter support using DISTINCT within COUNT?  This is +true+
      * for all adapters except sqlite.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsCountDistinct()
     {
-        return $this->_read->supportsCountDistinct();
+        return $this->read->supportsCountDistinct();
     }
 
     /**
@@ -118,11 +118,11 @@ class SplitRead implements Adapter
      * is called before each insert to set the record's primary key.
      * This is false for all adapters but Firebird.
      *
-     * @return boolean
+     * @return bool
      */
     public function prefetchPrimaryKey($tableName = null)
     {
-        return $this->_write->prefetchPrimaryKey($tableName);
+        return $this->write->prefetchPrimaryKey($tableName);
     }
 
     /*##########################################################################
@@ -136,18 +136,18 @@ class SplitRead implements Adapter
      */
     public function connect()
     {
-        $this->_write->connect();
-        $this->_read->connect();
+        $this->write->connect();
+        $this->read->connect();
     }
 
     /**
      * Is the connection active?
      *
-     * @return boolean
+     * @return bool
      */
     public function isActive()
     {
-        return ($this->_read->isActive() && $this->_write->isActive());
+        return ($this->read->isActive() && $this->write->isActive());
     }
 
     /**
@@ -164,8 +164,8 @@ class SplitRead implements Adapter
      */
     public function disconnect()
     {
-        $this->_read->disconnect();
-        $this->_write->disconnect();
+        $this->read->disconnect();
+        $this->write->disconnect();
     }
 
     /**
@@ -177,7 +177,7 @@ class SplitRead implements Adapter
      */
     public function rawConnection()
     {
-        return $this->_write->rawConnection();
+        return $this->write->rawConnection();
     }
 
 
@@ -193,7 +193,7 @@ class SplitRead implements Adapter
      */
     public function quoteString($string)
     {
-        return $this->_read->quoteString($string);
+        return $this->read->quoteString($string);
     }
 
 
@@ -216,8 +216,8 @@ class SplitRead implements Adapter
      */
     public function select($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_read->select($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_read->getLastQuery();
+        $result = $this->read->select($sql, $arg1, $arg2);
+        $this->lastQuery = $this->read->getLastQuery();
         return $result;
     }
 
@@ -236,8 +236,8 @@ class SplitRead implements Adapter
      */
     public function selectAll($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_read->selectAll($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_read->getLastQuery();
+        $result = $this->read->selectAll($sql, $arg1, $arg2);
+        $this->lastQuery = $this->read->getLastQuery();
         return $result;
     }
 
@@ -256,8 +256,8 @@ class SplitRead implements Adapter
      */
     public function selectOne($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_read->selectOne($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_read->getLastQuery();
+        $result = $this->read->selectOne($sql, $arg1, $arg2);
+        $this->lastQuery = $this->read->getLastQuery();
         return $result;
     }
 
@@ -275,8 +275,8 @@ class SplitRead implements Adapter
      */
     public function selectValue($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_read->selectValue($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_read->getLastQuery();
+        $result = $this->read->selectValue($sql, $arg1, $arg2);
+        $this->lastQuery = $this->read->getLastQuery();
         return $result;
     }
 
@@ -295,8 +295,8 @@ class SplitRead implements Adapter
      */
     public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_read->selectValues($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_read->getLastQuery();
+        $result = $this->read->selectValues($sql, $arg1, $arg2);
+        $this->lastQuery = $this->read->getLastQuery();
         return $result;
     }
 
@@ -317,8 +317,8 @@ class SplitRead implements Adapter
      */
     public function selectAssoc($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_read->selectAssoc($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_read->getLastQuery();
+        $result = $this->read->selectAssoc($sql, $arg1, $arg2);
+        $this->lastQuery = $this->read->getLastQuery();
         return $result;
     }
 
@@ -337,12 +337,12 @@ class SplitRead implements Adapter
     public function execute($sql, $arg1 = null, $arg2 = null)
     {
         // Can't assume this will always be a read action, use _write.
-        $result = $this->_write->execute($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->execute($sql, $arg1, $arg2);
+        $this->lastQuery = $this->write->getLastQuery();
 
         // Once doing writes, keep using the write backend even for reads
         // at least during the same request, to help against stale data.
-        $this->_read = $this->_write;
+        $this->read = $this->write;
 
         return $result;
     }
@@ -359,7 +359,7 @@ class SplitRead implements Adapter
      * @param mixed  $idValue       TODO
      * @param string $sequenceName  TODO
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insert(
@@ -371,12 +371,12 @@ class SplitRead implements Adapter
         $sequenceName = null
     )
     {
-        $result = $this->_write->insert($sql, $arg1, $arg2, $pk, $idValue, $sequenceName);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->insert($sql, $arg1, $arg2, $pk, $idValue, $sequenceName);
+        $this->lastQuery = $this->write->getLastQuery();
 
         // Once doing writes, keep using the write backend even for reads
         // at least during the same request, to help against stale data.
-        $this->_read = $this->_write;
+        $this->read = $this->write;
 
         return $result;
     }
@@ -395,17 +395,17 @@ class SplitRead implements Adapter
      *                          required if the primary key is inserted
      *                          manually.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
     {
-        $result = $this->_write->insertBlob($table, $fields, $pk, $idValue);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->insertBlob($table, $fields, $pk, $idValue);
+        $this->lastQuery = $this->write->getLastQuery();
 
         // Once doing writes, keep using the write backend even for reads
         // at least during the same request, to help against stale data.
-        $this->_read = $this->_write;
+        $this->read = $this->write;
 
         return $result;
     }
@@ -419,17 +419,17 @@ class SplitRead implements Adapter
      * @param string $arg2  If $arg1 contains bound parameters, the query
      *                      name.
      *
-     * @return integer  Number of rows affected.
+     * @return int  Number of rows affected.
      * @throws DbException
      */
     public function update($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_write->update($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->update($sql, $arg1, $arg2);
+        $this->lastQuery = $this->write->getLastQuery();
 
         // Once doing writes, keep using the write backend even for reads
         // at least during the same request, to help against stale data.
-        $this->_read = $this->_write;
+        $this->read = $this->write;
 
         return $result;
     }
@@ -448,12 +448,12 @@ class SplitRead implements Adapter
      */
     public function updateBlob($table, $fields, $where = '')
     {
-        $result = $this->_write->updateBlob($table, $fields, $where);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->updateBlob($table, $fields, $where);
+        $this->lastQuery = $this->write->getLastQuery();
 
         // Once doing writes, keep using the write backend even for reads
         // at least during the same request, to help against stale data.
-        $this->_read = $this->_write;
+        $this->read = $this->write;
 
         return $result;
     }
@@ -467,17 +467,17 @@ class SplitRead implements Adapter
      * @param string $arg2  If $arg1 contains bound parameters, the query
      *                      name.
      *
-     * @return integer  Number of rows affected.
+     * @return int  Number of rows affected.
      * @throws DbException
      */
     public function delete($sql, $arg1 = null, $arg2 = null)
     {
-        $result = $this->_write->delete($sql, $arg1, $arg2);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->delete($sql, $arg1, $arg2);
+        $this->lastQuery = $this->write->getLastQuery();
 
         // Once doing writes, keep using the write backend even for reads
         // at least during the same request, to help against stale data.
-        $this->_read = $this->_write;
+        $this->read = $this->write;
 
         return $result;
     }
@@ -485,12 +485,12 @@ class SplitRead implements Adapter
     /**
      * Check if a transaction has been started.
      *
-     * @return boolean  True if transaction has been started.
+     * @return bool  True if transaction has been started.
      */
     public function transactionStarted()
     {
-        $result = $this->_write->transactionStarted();
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->transactionStarted();
+        $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
     /**
@@ -498,8 +498,8 @@ class SplitRead implements Adapter
      */
     public function beginDbTransaction()
     {
-        $result = $this->_write->beginDbTransaction();
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->beginDbTransaction();
+        $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
 
@@ -508,8 +508,8 @@ class SplitRead implements Adapter
      */
     public function commitDbTransaction()
     {
-        $result = $this->_write->commitDbTransaction();
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->commitDbTransaction();
+        $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
 
@@ -519,8 +519,8 @@ class SplitRead implements Adapter
      */
     public function rollbackDbTransaction()
     {
-        $result = $this->_write->rollbackDbTransaction();
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->write->rollbackDbTransaction();
+        $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
 
@@ -534,25 +534,75 @@ class SplitRead implements Adapter
      */
     public function addLimitOffset($sql, $options)
     {
-        $result = $this->_read->addLimitOffset($sql, $options);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $result = $this->read->addLimitOffset($sql, $options);
+        $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
 
     /**
      * Appends a locking clause to an SQL statement.
      * This method *modifies* the +sql+ parameter.
+     * 
+     * TODO: BC Break refactor to return changed string
      *
      *   # SELECT * FROM suppliers FOR UPDATE
      *   add_lock! 'SELECT * FROM suppliers', :lock => true
      *   add_lock! 'SELECT * FROM suppliers', :lock => ' FOR UPDATE'
      *
-     * @param string &$sql    SQL statment.
+     * @param string $sql    SQL statment.
      * @param array $options  TODO.
      */
     public function addLock(&$sql, array $options = [])
     {
-        $this->_write->addLock($sql, $options);
-        $this->_lastQuery = $this->_write->getLastQuery();
+        $this->write->addLock($sql, $options);
+        $this->lastQuery = $this->write->getLastQuery();
     }
+
+    public function getLastQuery(): string
+    {
+        return $this->lastQuery;
+    }
+
+    /**
+     * Writes values to the cache handler.
+     *
+     * The key is automatically prefixed to avoid collisions when using
+     * different adapters or different configurations.
+     *
+     * Implementing this for the split adapter makes limited sense but it
+     * makes the relation between the Adapter interface and the Base adapter
+     * less of a hassle.
+     *
+     * @since Horde_Db 2.1.0
+     *
+     * @param string $key    A cache key.
+     * @param string $value  A value.
+     */
+    public function cacheWrite(string $key, string $value)
+    {
+        // No use in writing a cache for the write adapter
+        $this->read->cacheWrite($key, $value);
+    }
+
+    /**
+     * Reads values from the cache handler.
+     *
+     * The key is automatically prefixed to avoid collisions when using
+     * different adapters or different configurations.
+     * 
+     * Implementing this for the split adapter makes limited sense but it
+     * makes the relation between the Adapter interface and the Base adapter
+     * less of a hassle.
+     *
+     * @since Horde_Db 2.1.0
+     *
+     * @param string $key  A cache key.
+     *
+     * @return string|false  A value.
+     */
+    public function cacheRead($key)
+    {
+        return $this->read->cacheRead($key);
+    }
+
 }

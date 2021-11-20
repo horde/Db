@@ -49,7 +49,7 @@ interface Adapter extends \Horde_Db_Adapter
      * Does this adapter support migrations?  Backend specific, as the
      * abstract adapter always returns +false+.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsMigrations();
 
@@ -57,7 +57,7 @@ interface Adapter extends \Horde_Db_Adapter
      * Does this adapter support using DISTINCT within COUNT?  This is +true+
      * for all adapters except sqlite.
      *
-     * @return boolean
+     * @return bool
      */
     public function supportsCountDistinct();
 
@@ -67,7 +67,7 @@ interface Adapter extends \Horde_Db_Adapter
      * is called before each insert to set the record's primary key.
      * This is false for all adapters but Firebird.
      *
-     * @return boolean
+     * @return bool
      */
     public function prefetchPrimaryKey($tableName = null);
 
@@ -84,7 +84,7 @@ interface Adapter extends \Horde_Db_Adapter
     /**
      * Is the connection active?
      *
-     * @return boolean
+     * @return bool
      */
     public function isActive();
 
@@ -219,7 +219,7 @@ interface Adapter extends \Horde_Db_Adapter
     /**
      * Executes the SQL statement in the context of this connection.
      *
-     * @deprecated  Deprecated for external usage. Use select() instead.
+     * @internal  Deprecated for external usage. Use select() instead.
      *
      * @param string $sql   SQL statement.
      * @param mixed $arg1   Either an array of bound parameters or a query
@@ -246,7 +246,7 @@ interface Adapter extends \Horde_Db_Adapter
      *                              manually.
      * @param string $sequenceName  The sequence name.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insert(
@@ -272,7 +272,7 @@ interface Adapter extends \Horde_Db_Adapter
      *                          required if the primary key is inserted
      *                          manually.
      *
-     * @return integer  Last inserted ID.
+     * @return int  Last inserted ID.
      * @throws DbException
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null);
@@ -286,7 +286,7 @@ interface Adapter extends \Horde_Db_Adapter
      * @param string $arg2  If $arg1 contains bound parameters, the query
      *                      name.
      *
-     * @return integer  Number of rows affected.
+     * @return int  Number of rows affected.
      * @throws DbException
      */
     public function update($sql, $arg1 = null, $arg2 = null);
@@ -314,7 +314,7 @@ interface Adapter extends \Horde_Db_Adapter
      * @param string $arg2  If $arg1 contains bound parameters, the query
      *                      name.
      *
-     * @return integer  Number of rows affected.
+     * @return int  Number of rows affected.
      * @throws DbException
      */
     public function delete($sql, $arg1 = null, $arg2 = null);
@@ -322,7 +322,7 @@ interface Adapter extends \Horde_Db_Adapter
     /**
      * Check if a transaction has been started.
      *
-     * @return boolean  True if transaction has been started.
+     * @return bool  True if transaction has been started.
      */
     public function transactionStarted();
 
@@ -364,4 +364,33 @@ interface Adapter extends \Horde_Db_Adapter
      * @param array $options  TODO.
      */
     public function addLock(&$sql, array $options = []);
+
+    public function getLastQuery(): string;
+
+    /**
+     * Writes values to the cache handler.
+     *
+     * The key is automatically prefixed to avoid collisions when using
+     * different adapters or different configurations.
+     *
+     * @since Horde_Db 2.1.0
+     *
+     * @param string $key    A cache key.
+     * @param string $value  A value.
+     */
+    public function cacheWrite(string $key, string $value);
+
+    /**
+     * Reads values from the cache handler.
+     *
+     * The key is automatically prefixed to avoid collisions when using
+     * different adapters or different configurations.
+     *
+     * @since Horde_Db 2.1.0
+     *
+     * @param string $key  A cache key.
+     *
+     * @return string|false  A value.
+     */
+    public function cacheRead($key);
 }

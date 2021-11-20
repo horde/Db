@@ -45,7 +45,7 @@ class Schema extends BaseSchema
      * @param string $default     Type-casted default value, such as "new"
      *                            in "sales_stage varchar(20) default 'new'".
      * @param string $sqlType     Column type.
-     * @param boolean $null       Whether this column allows NULL values.
+     * @param bool $null       Whether this column allows NULL values.
      * @param integer $length     Column width.
      * @param integer $precision  Precision for NUMBER and FLOAT columns.
      * @param integer $scale      Number of digits to the right of the decimal
@@ -175,7 +175,7 @@ class Schema extends BaseSchema
     /**
      * Returns the maximum length a table alias can have.
      *
-     * @return integer  The maximum table alias length.
+     * @return int  The maximum table alias length.
      */
     public function tableAliasLength()
     {
@@ -191,7 +191,7 @@ class Schema extends BaseSchema
      */
     public function tableAliasFor($tableName)
     {
-        return parent::tableAliasFor($this->_truncate($tableName));
+        return parent::tableAliasFor($this->truncate($tableName));
     }
 
     /**
@@ -203,7 +203,7 @@ class Schema extends BaseSchema
     {
         return array_map(
             array('Horde_String', 'lower'),
-            $this->selectValues('SELECT table_name FROM USER_TABLES')
+            $this->adapter->selectValues('SELECT table_name FROM USER_TABLES')
         );
     }
 
@@ -225,22 +225,22 @@ class Schema extends BaseSchema
             array()
         );
 
-        $rows = @unserialize($this->cacheRead("tables/primarykeys/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/primarykeys/$tableName"));
 
         if (!$rows) {
-            $constraint = $this->selectOne(
+            $constraint = $this->adapter->selectOne(
                 'SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE TABLE_NAME = ? AND CONSTRAINT_TYPE = \'P\'',
                 array(Horde_String::upper($tableName)),
                 $name
             );
             if ($constraint['constraint_name']) {
                 $pk->name = $constraint['constraint_name'];
-                $rows = $this->selectValues(
+                $rows = $this->adapter->selectValues(
                     'SELECT DISTINCT COLUMN_NAME FROM USER_CONS_COLUMNS WHERE CONSTRAINT_NAME = ?',
                     array($constraint['constraint_name'])
                 );
                 $rows = array_map(array('Horde_String', 'lower'), $rows);
-                $this->cacheWrite("tables/primarykeys/$tableName", serialize($rows));
+                $this->adapter->cacheWrite("tables/primarykeys/$tableName", serialize($rows));
             } else {
                 $rows = [];
             }
@@ -261,16 +261,16 @@ class Schema extends BaseSchema
      */
     public function indexes($tableName, $name = null)
     {
-        $rows = @unserialize($this->cacheRead("tables/indexes/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/indexes/$tableName"));
 
         if (!$rows) {
-            $rows = $this->selectAll(
+            $rows = $this->adapter->selectAll(
                 'SELECT INDEX_NAME, UNIQUENESS FROM USER_INDEXES WHERE TABLE_NAME = ? AND INDEX_NAME NOT IN (SELECT INDEX_NAME FROM USER_LOBS)',
                 array(Horde_String::upper($tableName)),
                 $name
             );
 
-            $this->cacheWrite("tables/indexes/$tableName", serialize($rows));
+            $this->adapter->cacheWrite("tables/indexes/$tableName", serialize($rows));
         }
 
         $indexes = [];
@@ -280,7 +280,7 @@ class Schema extends BaseSchema
             if ($row['index_name'] == $primary->name) {
                 continue;
             }
-            $columns = $this->selectValues(
+            $columns = $this->adapter->selectValues(
                 'SELECT DISTINCT COLUMN_NAME FROM USER_IND_COLUMNS WHERE INDEX_NAME = ?',
                 array($row['index_name'])
             );
@@ -306,16 +306,16 @@ class Schema extends BaseSchema
      */
     public function columns($tableName, $name = null)
     {
-        $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
+        $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
         if (!$rows) {
-            $rows = $this->selectAll(
+            $rows = $this->adapter->selectAll(
                 'SELECT COLUMN_NAME, DATA_DEFAULT, DATA_TYPE, NULLABLE, DATA_LENGTH, DATA_PRECISION, DATA_SCALE FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ?',
                 array(Horde_String::upper($tableName)),
                 $name
             );
 
-            $this->cacheWrite("tables/columns/$tableName", serialize($rows));
+            $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
         // Create columns from rows.
@@ -344,8 +344,8 @@ class Schema extends BaseSchema
      */
     public function renameTable($name, $newName)
     {
-        $this->_clearTableCache($name);
-        return $this->execute(
+        $this->clearTableCache($name);
+        return $this->adapter->execute(
             sprintf(
                 'ALTER TABLE %s RENAME TO %s',
                 $this->quoteTableName($name),
@@ -382,7 +382,7 @@ class Schema extends BaseSchema
         $options = []
     )
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $options = array_merge(
             array('limit'     => null,
@@ -408,7 +408,7 @@ class Schema extends BaseSchema
             $sql
         );
 
-        $this->execute($sql);
+        $this->adapter->execute($sql);
 
         if ($type == 'autoincrementKey') {
             $this->createAutoincrementTrigger($tableName, $columnName);
@@ -423,14 +423,14 @@ class Schema extends BaseSchema
      */
     public function removeColumn($tableName, $columnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf(
             'ALTER TABLE %s DROP COLUMN %s',
             $this->quoteTableName($tableName),
             $this->quoteColumnName($columnName)
         );
         $this->removeAutoincrementTrigger($tableName, $columnName);
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -516,7 +516,7 @@ class Schema extends BaseSchema
                     $this->quoteTableName($tableName),
                     $sql
                 );
-                $this->execute($sql);
+                $this->adapter->execute($sql);
             }
         } else {
             /* Jump through some more hoops because MODIFY fails if it contains
@@ -528,12 +528,12 @@ class Schema extends BaseSchema
             }
         }
 
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         if ($type == 'binary' && $column->getType() != 'binary') {
-            $this->beginDbTransaction();
+            $this->adapter->beginDbTransaction();
             $this->addColumn($tableName, $columnName . '_tmp', $type, $options);
-            $this->execute('
+            $this->adapter->execute('
 CREATE OR REPLACE FUNCTION CLOB_TO_BLOB (p_clob CLOB) RETURN BLOB
 AS
     l_blob          BLOB;
@@ -557,14 +557,14 @@ BEGIN
     RETURN l_blob;
 END;
             ');
-            $this->update(sprintf(
+            $this->adapter->update(sprintf(
                 'UPDATE %s SET %s = CLOB_TO_BLOB(%s) WHERE %s IS NOT NULL',
                 $this->quoteTableName($tableName),
                 $this->quoteColumnName($columnName . '_tmp'),
                 $this->quoteColumnName($columnName),
                 $this->quoteColumnName($columnName)
             ));
-            $this->update(sprintf(
+            $this->adapter->update(sprintf(
                 'UPDATE %s SET %s = NULL WHERE %s IS NULL',
                 $this->quoteTableName($tableName),
                 $this->quoteColumnName($columnName . '_tmp'),
@@ -572,13 +572,13 @@ END;
             ));
             $this->removeColumn($tableName, $columnName);
             $this->renameColumn($tableName, $columnName . '_tmp', $columnName);
-            $this->commitDbTransaction();
+            $this->adapter->commitDbTransaction();
             return;
         }
         if ($type != 'binary' && $column->getType() == 'binary') {
-            $this->beginDbTransaction();
+            $this->adapter->beginDbTransaction();
             $this->addColumn($tableName, $columnName . '_tmp', $type, $options);
-            $this->update(sprintf(
+            $this->adapter->update(sprintf(
                 'UPDATE %s SET %s = UTL_RAW.CAST_TO_VARCHAR2(%s)',
                 $this->quoteTableName($tableName),
                 $this->quoteColumnName($columnName . '_tmp'),
@@ -586,13 +586,13 @@ END;
             ));
             $this->removeColumn($tableName, $columnName);
             $this->renameColumn($tableName, $columnName . '_tmp', $columnName);
-            $this->commitDbTransaction();
+            $this->adapter->commitDbTransaction();
             return;
         }
         if ($type == 'text' && $column->getType() != 'text') {
-            $this->beginDbTransaction();
+            $this->adapter->beginDbTransaction();
             $this->addColumn($tableName, $columnName . '_tmp', $type, $options);
-            $this->update(sprintf(
+            $this->adapter->update(sprintf(
                 'UPDATE %s SET %s = TO_CLOB(%s)',
                 $this->quoteTableName($tableName),
                 $this->quoteColumnName($columnName . '_tmp'),
@@ -600,13 +600,13 @@ END;
             ));
             $this->removeColumn($tableName, $columnName);
             $this->renameColumn($tableName, $columnName . '_tmp', $columnName);
-            $this->commitDbTransaction();
+            $this->adapter->commitDbTransaction();
             return;
         }
         if ($type != 'text' && $column->getType() == 'text') {
-            $this->beginDbTransaction();
+            $this->adapter->beginDbTransaction();
             $this->addColumn($tableName, $columnName . '_tmp', $type, $options);
-            $this->update(sprintf(
+            $this->adapter->update(sprintf(
                 'UPDATE %s SET %s = DBMS_LOB.SUBSTR(%s, 4000)',
                 $this->quoteTableName($tableName),
                 $this->quoteColumnName($columnName . '_tmp'),
@@ -614,7 +614,7 @@ END;
             ));
             $this->removeColumn($tableName, $columnName);
             $this->renameColumn($tableName, $columnName . '_tmp', $columnName);
-            $this->commitDbTransaction();
+            $this->adapter->commitDbTransaction();
             return;
         }
 
@@ -627,7 +627,7 @@ END;
             $sql
         );
 
-        $this->execute($sql);
+        $this->adapter->execute($sql);
 
         if ($type == 'autoincrementKey') {
             $this->createAutoincrementTrigger($tableName, $columnName);
@@ -647,21 +647,21 @@ END;
         // Build the table that holds the last autoincremented value. Used for
         // example for returning the ID from last INSERT.
         $id = $tableName . '_' . $columnName;
-        if (!$this->selectValue('SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = \'HORDE_DB_AUTOINCREMENT\'')) {
-            $this->execute('CREATE TABLE horde_db_autoincrement (id INTEGER)');
-            $this->execute('INSERT INTO horde_db_autoincrement (id) VALUES (0)');
+        if (!$this->adapter->selectValue('SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = \'HORDE_DB_AUTOINCREMENT\'')) {
+            $this->adapter->execute('CREATE TABLE horde_db_autoincrement (id INTEGER)');
+            $this->adapter->execute('INSERT INTO horde_db_autoincrement (id) VALUES (0)');
         }
 
         // Create a sequence that automatically increments when queried with
         // .NEXTVAL.
-        $sequence = $this->_truncate($id . '_seq');
+        $sequence = $this->truncate($id . '_seq');
         $sql = sprintf(
             'CREATE SEQUENCE %s',
             $sequence
         );
         // See if the column already has values, to start the sequence at a
         // higher value.
-        $max = $this->selectValue(
+        $max = $this->adapter->selectValue(
             sprintf(
                 'SELECT MAX(%s) FROM %s',
                 $this->quoteColumnName($columnName),
@@ -671,13 +671,13 @@ END;
         if ($max) {
             $sql .= ' MINVALUE ' . ($max + 1);
         }
-        $this->execute($sql);
+        $this->adapter->execute($sql);
 
         // Create the actual trigger that inserts the next value from the
         // sequence into the autoincrementKey column when inserting a row.
-        $this->execute(sprintf(
+        $this->adapter->execute(sprintf(
             'CREATE OR REPLACE TRIGGER %s BEFORE INSERT ON %s FOR EACH ROW DECLARE increment INTEGER; BEGIN SELECT %s.NEXTVAL INTO :NEW.%s FROM dual; SELECT %s.CURRVAL INTO increment FROM dual; UPDATE horde_db_autoincrement SET id = increment; END;',
-            $this->_truncate($id . '_trig'),
+            $this->truncate($id . '_trig'),
             $tableName,
             $sequence,
             $columnName,
@@ -703,16 +703,16 @@ END;
             (!$columnName || $pk->columns[0] == $columnName)) {
             $prefix = $tableName . '_' . $pk->columns[0];
             try {
-                $this->execute(sprintf(
+                $this->adapter->execute(sprintf(
                     'DROP SEQUENCE %s',
-                    $this->quoteColumnName($this->_truncate($prefix . '_seq'))
+                    $this->quoteColumnName($this->truncate($prefix . '_seq'))
                 ));
             } catch (DbException $e) {
             }
             try {
-                $this->execute(sprintf(
+                $this->adapter->execute(sprintf(
                     'DROP TRIGGER %s',
-                    $this->quoteColumnName($this->_truncate($prefix . '_trig'))
+                    $this->quoteColumnName($this->truncate($prefix . '_trig'))
                 ));
             } catch (DbException $e) {
             }
@@ -731,14 +731,14 @@ END;
      */
     public function changeColumnDefault($tableName, $columnName, $default)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf(
             'ALTER TABLE %s MODIFY (%s DEFAULT %s)',
             $this->quoteTableName($tableName),
             $this->quoteColumnName($columnName),
             $this->quote($default)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -750,14 +750,14 @@ END;
      */
     public function renameColumn($tableName, $columnName, $newColumnName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf(
             'ALTER TABLE %s RENAME COLUMN %s TO %s',
             $this->quoteTableName($tableName),
             $this->quoteColumnName($columnName),
             $this->quoteColumnName($newColumnName)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -769,12 +769,12 @@ END;
      */
     public function removePrimaryKey($tableName)
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
         $sql = sprintf(
             'ALTER TABLE %s DROP PRIMARY KEY',
             $this->quoteTableName($tableName)
         );
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -787,7 +787,7 @@ END;
      */
     public function removeIndex($tableName, $options = [])
     {
-        $this->_clearTableCache($tableName);
+        $this->clearTableCache($tableName);
 
         $index = $this->indexName($tableName, $options);
         $sql = sprintf(
@@ -795,7 +795,7 @@ END;
             $this->quoteColumnName($index)
         );
 
-        return $this->execute($sql);
+        return $this->adapter->execute($sql);
     }
 
     /**
@@ -817,9 +817,9 @@ END;
             return $index;
         }
         if (isset($options['name']) && $index == $options['name']) {
-            return $this->_truncate($index);
+            return $this->truncate($index);
         }
-        return substr('ind_' . $this->_truncate($tableName, 15) . '_' . hash('crc32', $index), 0, 30);
+        return substr('ind_' . $this->truncate($tableName, 15) . '_' . hash('crc32', $index), 0, 30);
     }
 
     /**
@@ -830,7 +830,7 @@ END;
      */
     public function createDatabase($name, $options = [])
     {
-        return $this->execute(sprintf('CREATE DATABASE %s', $this->quoteTableName($name)));
+        return $this->adapter->execute(sprintf('CREATE DATABASE %s', $this->quoteTableName($name)));
     }
 
     /**
@@ -843,7 +843,7 @@ END;
         if ($this->currentDatabase() != $name) {
             throw new DbException('Oracle can only drop the current database');
         }
-        return $this->execute('DROP DATABASE');
+        return $this->adapter->execute('DROP DATABASE');
     }
 
     /**
@@ -853,7 +853,7 @@ END;
      */
     public function currentDatabase()
     {
-        return $this->selectValue("SELECT SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA') FROM DUAL");
+        return $this->adapter->selectValue("SELECT SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA') FROM DUAL");
     }
 
     /**
@@ -901,7 +901,7 @@ END;
      * @param string $lhs    The column or expression to test.
      * @param string $op     The operator.
      * @param string $rhs    The comparison value.
-     * @param boolean $bind  If true, the method returns the query and a list
+     * @param bool $bind  If true, the method returns the query and a list
      *                       of values suitable for binding as an array.
      * @param array $params  Any additional parameters for the operator.
      *
@@ -916,7 +916,7 @@ END;
         $params = []
     )
     {
-        $lhs = $this->_escapePrepare($lhs);
+        $lhs = $this->escapePrepare($lhs);
         switch ($op) {
         case '|':
             if ($bind) {
@@ -943,10 +943,10 @@ END;
      *
      * @param string $tableName  A table name.
      */
-    protected function _clearTableCache($tableName)
+    protected function clearTableCache($tableName)
     {
-        parent::_clearTableCache($tableName);
-        $this->cacheWrite('tables/primarykeys/' . $tableName, '');
+        parent::clearTableCache($tableName);
+        $this->adapter->cacheWrite('tables/primarykeys/' . $tableName, '');
     }
 
     /**
@@ -960,7 +960,7 @@ END;
      *
      * @return string  The truncated identifier.
      */
-    protected function _truncate($name, $length = 30)
+    protected function truncate($name, $length = 30)
     {
         if (strlen($name) > $length) {
             $name = implode(

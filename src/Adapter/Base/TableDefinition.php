@@ -39,13 +39,13 @@ use Horde\Db\DbException;
  */
 class TableDefinition implements ArrayAccess, IteratorAggregate
 {
-    protected $_name    = null;
-    protected $_base    = null;
-    protected $_options = null;
-    protected $_columns = null;
-    protected $_primaryKey = null;
+    protected $name    = null;
+    protected $base    = null;
+    protected array $options = [];
+    protected $columns = null;
+    protected $primaryKey = null;
 
-    protected $_columntypes = array('string', 'text', 'integer', 'float',
+    protected $columntypes = array('string', 'text', 'integer', 'float',
         'datetime', 'timestamp', 'time', 'date', 'binary', 'boolean');
 
     /**
@@ -55,12 +55,12 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      * @param Schema $base
      * @param array $options
      */
-    public function __construct($name, $base, $options = [])
+    public function __construct($name, $base, array $options = [])
     {
-        $this->_name    = $name;
-        $this->_base    = $base;
-        $this->_options = $options;
-        $this->_columns = [];
+        $this->name    = $name;
+        $this->base    = $base;
+        $this->options = $options;
+        $this->columns = [];
     }
 
     /**
@@ -68,7 +68,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -76,7 +76,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function getOptions()
     {
-        return $this->_options;
+        return $this->options;
     }
 
     /**
@@ -88,7 +88,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
             $this->column($name, 'autoincrementKey');
         }
 
-        $this->_primaryKey = $name;
+        $this->primaryKey = $name;
     }
 
     /**
@@ -134,7 +134,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function column($name, $type, $options = [])
     {
-        if ($name == $this->_primaryKey) {
+        if ($name == $this->primaryKey) {
             throw new LogicException($name . ' has already been added as a primary key');
         }
 
@@ -149,8 +149,8 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
             $options
         );
 
-        $column = $this->_base->makeColumnDefinition(
-            $this->_base,
+        $column = $this->base->makeColumnDefinition(
+            $this->base,
             $name,
             $type,
             $options['limit'],
@@ -162,7 +162,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
             $options['autoincrement']
         );
 
-        $this[$name] ? $this[$name] = $column : $this->_columns[] = $column;
+        $this[$name] ? $this[$name] = $column : $this->columns[] = $column;
 
         return $this;
     }
@@ -208,7 +208,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function __call($method, $arguments)
     {
-        if (!in_array($method, $this->_columntypes)) {
+        if (!in_array($method, $this->columntypes)) {
             throw new BadMethodCallException('Call to undeclared method "' . $method . '"');
         }
         if (count($arguments) > 0 && count($arguments) < 3) {
@@ -226,7 +226,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function end()
     {
-        $this->_base->endTable($this);
+        $this->base->endTable($this);
     }
 
     /**
@@ -239,16 +239,16 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
     public function toSql()
     {
         $cols = [];
-        foreach ($this->_columns as $col) {
+        foreach ($this->columns as $col) {
             $cols[] = $col->toSql();
         }
         $sql = '  ' . implode(", \n  ", $cols);
 
         // Specify composite primary keys as well
-        if (is_array($this->_primaryKey)) {
+        if (is_array($this->primaryKey)) {
             $pk = [];
-            foreach ($this->_primaryKey as $pkColumn) {
-                $pk[] = $this->_base->quoteColumnName($pkColumn);
+            foreach ($this->primaryKey as $pkColumn) {
+                $pk[] = $this->base->quoteColumnName($pkColumn);
             }
             $sql .= ", \n  PRIMARY KEY(" . implode(', ', $pk) . ')';
         }
@@ -270,11 +270,11 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      * ArrayAccess: Check if the given offset exists
      *
      * @param   int     $offset
-     * @return  boolean
+     * @return  bool
      */
     public function offsetExists($offset)
     {
-        foreach ($this->_columns as $column) {
+        foreach ($this->columns as $column) {
             if ($column->getName() == $offset) {
                 return true;
             }
@@ -293,7 +293,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
         if (!$this->offsetExists($offset)) {
             return null;
         }
-        foreach ($this->_columns as $column) {
+        foreach ($this->columns as $column) {
             if ($column->getName() == $offset) {
                 return $column;
             }
@@ -310,9 +310,9 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function offsetSet($offset, $value)
     {
-        foreach ($this->_columns as $key=>$column) {
+        foreach ($this->columns as $key=>$column) {
             if ($column->getName() == $offset) {
-                $this->_columns[$key] = $value;
+                $this->columns[$key] = $value;
             }
         }
     }
@@ -324,9 +324,9 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function offsetUnset($offset)
     {
-        foreach ($this->_columns as $key=>$column) {
+        foreach ($this->columns as $key=>$column) {
             if ($column->getName() == $offset) {
-                unset($this->_columns[$key]);
+                unset($this->columns[$key]);
             }
         }
     }
@@ -338,7 +338,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
 
     public function getIterator()
     {
-        return new ArrayIterator($this->_columns);
+        return new ArrayIterator($this->columns);
     }
 
 
@@ -349,8 +349,8 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
     /**
      * Get the types
      */
-    protected function _native()
+    protected function native()
     {
-        return $this->_base->nativeDatabaseTypes();
+        return $this->base->nativeDatabaseTypes();
     }
 }

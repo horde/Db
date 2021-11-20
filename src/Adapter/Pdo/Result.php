@@ -37,7 +37,7 @@ class Result extends BaseResult
      *
      * @var array
      */
-    protected $_map = array(
+    protected $map = array(
         Constants::FETCH_ASSOC => PDO::FETCH_ASSOC,
         Constants::FETCH_NUM   => PDO::FETCH_NUM,
         Constants::FETCH_BOTH  => PDO::FETCH_BOTH
@@ -49,10 +49,10 @@ class Result extends BaseResult
      * @return array|boolean  The next row in the resultset or false if there
      *                        are no more results.
      */
-    protected function _fetchArray()
+    protected function fetchArray()
     {
         try {
-            return $this->_result->fetch($this->_map[$this->_fetchMode]);
+            return $this->result->fetch($this->map[$this->fetchMode]);
         } catch (PDOException $e) {
             throw new DbException($e);
         }
@@ -61,12 +61,12 @@ class Result extends BaseResult
     /**
      * Returns the number of columns in the result set.
      *
-     * @return integer  Number of columns.
+     * @return int  Number of columns.
      */
     protected function _columnCount()
     {
         try {
-            return $this->_result->columnCount();
+            return $this->result->columnCount();
         } catch (PDOException $e) {
             throw new DbException($e);
         }

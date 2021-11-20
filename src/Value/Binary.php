@@ -22,8 +22,8 @@ use \Horde\Db\Adapter;
  * @copyright 2006-2021 Horde LLC
  * @license   http://www.horde.org/licenses/bsd
  * @package   Db
- * @property  $value  The binary value as a string. @since Horde_Db 2.1.0
- * @property  $stream  The binary value as a stream. @since Horde_Db 2.4.0
+ * @property  string $value  The binary value as a string. @since Horde_Db 2.1.0
+ * @property  resource $stream  The binary value as a stream. @since Horde_Db 2.4.0
  */
 class Binary extends Lob
 {

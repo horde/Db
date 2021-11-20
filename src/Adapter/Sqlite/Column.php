@@ -36,7 +36,7 @@ class Column extends BaseColumn
     {
         $default = parent::extractDefault($default);
         if ($this->isText()) {
-            $default = $this->_unquote($default);
+            $default = $this->unquote($default);
         }
         return $default;
     }
@@ -76,7 +76,7 @@ class Column extends BaseColumn
      *
      * @return string
      */
-    protected function _unquote($string)
+    protected function unquote($string)
     {
         $first = substr($string, 0, 1);
         if ($first == "'" || $first == '"') {

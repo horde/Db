@@ -54,7 +54,7 @@ class Index
     /**
      * Is this a primary key?
      *
-     * @var boolean
+     * @var bool
      */
     public $primary;
 

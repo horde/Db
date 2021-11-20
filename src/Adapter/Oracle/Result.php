@@ -35,7 +35,7 @@ class Result extends BaseResult
      *
      * @var array
      */
-    protected $_map = array(
+    protected $map = array(
         Constants::FETCH_ASSOC => OCI_ASSOC,
         Constants::FETCH_NUM   => OCI_NUM,
         Constants::FETCH_BOTH  => OCI_BOTH
@@ -44,14 +44,14 @@ class Result extends BaseResult
     /**
      * Returns a row from a resultset.
      *
-     * @return array|boolean  The next row in the resultset or false if there
+     * @return array|bool  The next row in the resultset or false if there
      *                        are no more results.
      */
-    protected function _fetchArray()
+    protected function fetchArray()
     {
         $array = oci_fetch_array(
-            $this->_result,
-            $this->_map[$this->_fetchMode] | OCI_RETURN_NULLS
+            $this->result,
+            $this->map[$this->fetchMode] | OCI_RETURN_NULLS
         );
         if ($array) {
             $array = array_change_key_case($array, CASE_LOWER);
@@ -62,10 +62,10 @@ class Result extends BaseResult
     /**
      * Returns the number of columns in the result set.
      *
-     * @return integer  Number of columns.
+     * @return int  Number of columns.
      */
     protected function _columnCount()
     {
-        return oci_num_fields($this->_result);
+        return oci_num_fields($this->result);
     }
 }

@@ -23,6 +23,7 @@ use Horde\Test\TestCase;
 use Horde\Db\Adapter\Pdo\Pgsql;
 use Horde_Cache;
 use Horde_Cache_Storage_Mock;
+use Exception;
 
 /**
  * @author     Mike Naberezny <mike@maintainable.com>
@@ -85,22 +86,22 @@ class PgsqlTest extends TestBase
 
     public function testAdapterName()
     {
-        $this->assertEquals('PDO_PostgreSQL', $this->_conn->adapterName());
+        $this->assertEquals('PDO_PostgreSQL', $this->conn->adapterName());
     }
 
     public function testSupportsMigrations()
     {
-        $this->assertTrue($this->_conn->supportsMigrations());
+        $this->assertTrue($this->conn->supportsMigrations());
     }
 
     public function testSupportsCountDistinct()
     {
-        $this->assertTrue($this->_conn->supportsCountDistinct());
+        $this->assertTrue($this->conn->supportsCountDistinct());
     }
 
     public function testSupportsInterval()
     {
-        $this->assertTrue($this->_conn->supportsInterval());
+        $this->assertTrue($this->conn->supportsInterval());
     }
 
 
@@ -110,45 +111,45 @@ class PgsqlTest extends TestBase
 
     public function testQuoteNull()
     {
-        $this->assertEquals('NULL', $this->_conn->quote(null));
+        $this->assertEquals('NULL', $this->conn->quote(null));
     }
 
     public function testQuoteTrue()
     {
-        $this->assertEquals("'t'", $this->_conn->quote(true));
+        $this->assertEquals("'t'", $this->conn->quote(true));
     }
 
     public function testQuoteFalse()
     {
-        $this->assertEquals("'f'", $this->_conn->quote(false));
+        $this->assertEquals("'f'", $this->conn->quote(false));
     }
 
     public function testQuoteInteger()
     {
-        $this->assertEquals('42', $this->_conn->quote(42));
+        $this->assertEquals('42', $this->conn->quote(42));
     }
 
     public function testQuoteFloat()
     {
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.2', $this->conn->quote(42.2));
         setlocale(LC_NUMERIC, 'de_DE.UTF-8');
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.2', $this->conn->quote(42.2));
     }
 
     public function testQuoteString()
     {
-        $this->assertEquals("'my string'", $this->_conn->quote('my string'));
+        $this->assertEquals("'my string'", $this->conn->quote('my string'));
     }
 
     public function testQuoteDirtyString()
     {
-        $this->assertEquals("'derek''s string'", $this->_conn->quote('derek\'s string'));
+        $this->assertEquals("'derek''s string'", $this->conn->quote('derek\'s string'));
     }
 
     public function testQuoteColumnName()
     {
         $col = new Column('age', 'NULL', 'int(11)');
-        $this->assertEquals('1', $this->_conn->quote(true, $col));
+        $this->assertEquals('1', $this->conn->quote(true, $col));
     }
 
 
@@ -158,13 +159,13 @@ class PgsqlTest extends TestBase
 
     public function testNativeDatabaseTypes()
     {
-        $types = $this->_conn->nativeDatabaseTypes();
+        $types = $this->conn->nativeDatabaseTypes();
         $this->assertEquals(array('name' => 'integer', 'limit' => null), $types['integer']);
     }
 
     public function testTableAliasLength()
     {
-        $len = $this->_conn->tableAliasLength();
+        $len = $this->conn->tableAliasLength();
         $this->assertGreaterThanOrEqual(63, $len);
     }
 
@@ -187,26 +188,26 @@ class PgsqlTest extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('boolean', $beforeChange->getSqlType());
 
-        $this->_conn->changeColumn('sports', 'is_college', 'string');
+        $this->conn->changeColumn('sports', 'is_college', 'string');
 
         $afterChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('character varying(255)', $afterChange->getSqlType());
 
-        $table = $this->_conn->createTable('text_to_binary');
+        $table = $this->conn->createTable('text_to_binary');
         $table->column('data', 'text');
         $table->end();
-        $this->_conn->insert(
+        $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
             array("foo")
         );
 
-        $this->_conn->changeColumn('text_to_binary', 'data', 'binary');
+        $this->conn->changeColumn('text_to_binary', 'data', 'binary');
 
         $afterChange = $this->_getColumn('text_to_binary', 'data');
         $this->assertEquals('bytea', $afterChange->getSqlType());
         $this->assertEquals(
             "foo",
-            stream_get_contents($this->_conn->selectValue('SELECT data FROM text_to_binary'))
+            stream_get_contents($this->conn->selectValue('SELECT data FROM text_to_binary'))
         );
     }
 
@@ -216,7 +217,7 @@ class PgsqlTest extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('boolean', $beforeChange->getSqlType());
 
-        $this->_conn->changeColumn(
+        $this->conn->changeColumn(
             'sports',
             'is_college',
             'string',
@@ -233,7 +234,7 @@ class PgsqlTest extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('boolean', $beforeChange->getSqlType());
 
-        $this->_conn->changeColumn(
+        $this->conn->changeColumn(
             'sports',
             'is_college',
             'decimal',
@@ -248,7 +249,7 @@ class PgsqlTest extends TestBase
     {
         $this->_createTestUsersTable();
 
-        $this->_conn->renameColumn('users', 'first_name', 'nick_name');
+        $this->conn->renameColumn('users', 'first_name', 'nick_name');
         $this->assertTrue(in_array('nick_name', $this->_columnNames('users')));
 
         $this->_createTestTable('sports');
@@ -256,7 +257,7 @@ class PgsqlTest extends TestBase
         $beforeChange = $this->_getColumn('sports', 'is_college');
         $this->assertEquals('boolean', $beforeChange->getSqlType());
 
-        $this->_conn->renameColumn('sports', 'is_college', 'is_renamed');
+        $this->conn->renameColumn('sports', 'is_college', 'is_renamed');
 
         $afterChange = $this->_getColumn('sports', 'is_renamed');
         $this->assertEquals('boolean', $afterChange->getSqlType());
@@ -264,100 +265,100 @@ class PgsqlTest extends TestBase
 
     public function testTypeToSqlTypePrimaryKey()
     {
-        $result = $this->_conn->typeToSql('autoincrementKey');
+        $result = $this->conn->typeToSql('autoincrementKey');
         $this->assertEquals('serial primary key', $result);
     }
 
     public function testTypeToSqlTypeString()
     {
-        $result = $this->_conn->typeToSql('string');
+        $result = $this->conn->typeToSql('string');
         $this->assertEquals('character varying(255)', $result);
     }
 
     public function testTypeToSqlTypeText()
     {
-        $result = $this->_conn->typeToSql('text');
+        $result = $this->conn->typeToSql('text');
         $this->assertEquals('text', $result);
     }
 
     public function testTypeToSqlTypeBinary()
     {
-        $result = $this->_conn->typeToSql('binary');
+        $result = $this->conn->typeToSql('binary');
         $this->assertEquals('bytea', $result);
     }
 
     public function testTypeToSqlTypeFloat()
     {
-        $result = $this->_conn->typeToSql('float');
+        $result = $this->conn->typeToSql('float');
         $this->assertEquals('float', $result);
     }
 
     public function testTypeToSqlTypeDatetime()
     {
-        $result = $this->_conn->typeToSql('datetime');
+        $result = $this->conn->typeToSql('datetime');
         $this->assertEquals('timestamp', $result);
     }
 
     public function testTypeToSqlTypeTimestamp()
     {
-        $result = $this->_conn->typeToSql('timestamp');
+        $result = $this->conn->typeToSql('timestamp');
         $this->assertEquals('timestamp', $result);
     }
 
     public function testTypeToSqlInt()
     {
-        $result = $this->_conn->typeToSql('integer');
+        $result = $this->conn->typeToSql('integer');
         $this->assertEquals('integer', $result);
     }
 
     public function testTypeToSqlIntLimit()
     {
-        $result = $this->_conn->typeToSql('integer', '1');
+        $result = $this->conn->typeToSql('integer', '1');
         $this->assertEquals('smallint', $result);
     }
 
     public function testTypeToSqlDecimalPrecision()
     {
-        $result = $this->_conn->typeToSql('decimal', null, '5');
+        $result = $this->conn->typeToSql('decimal', null, '5');
         $this->assertEquals('decimal(5)', $result);
     }
 
     public function testTypeToSqlDecimalScale()
     {
-        $result = $this->_conn->typeToSql('decimal', null, '5', '2');
+        $result = $this->conn->typeToSql('decimal', null, '5', '2');
         $this->assertEquals('decimal(5, 2)', $result);
     }
 
     public function testTypeToSqlBoolean()
     {
-        $result = $this->_conn->typeToSql('boolean');
+        $result = $this->conn->typeToSql('boolean');
         $this->assertEquals('boolean', $result);
     }
 
     public function testAddColumnOptions()
     {
-        $result = $this->_conn->addColumnOptions("test", array());
+        $result = $this->conn->addColumnOptions("test", array());
         $this->assertEquals("test", $result);
     }
 
     public function testAddColumnOptionsDefault()
     {
         $options = array('default' => '0');
-        $result = $this->_conn->addColumnOptions("test", $options);
+        $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test DEFAULT '0'", $result);
     }
 
     public function testAddColumnOptionsNull()
     {
         $options = array('null' => true);
-        $result = $this->_conn->addColumnOptions("test", $options);
+        $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test", $result);
     }
 
     public function testAddColumnOptionsNotNull()
     {
         $options = array('null' => false);
-        $result = $this->_conn->addColumnOptions("test", $options);
+        $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test NOT NULL", $result);
     }
 
@@ -365,20 +366,20 @@ class PgsqlTest extends TestBase
     {
         $this->assertEquals(
             'INTERVAL \'1 DAY \'',
-            $this->_conn->interval('1 DAY', '')
+            $this->conn->interval('1 DAY', '')
         );
     }
 
     public function testModifyDate()
     {
-        $modifiedDate = $this->_conn->modifyDate('mystart', '+', 1, 'DAY');
+        $modifiedDate = $this->conn->modifyDate('mystart', '+', 1, 'DAY');
         $this->assertEquals('mystart + INTERVAL \'1 DAY\'', $modifiedDate);
 
-        $t = $this->_conn->createTable('dates');
+        $t = $this->conn->createTable('dates');
         $t->column('mystart', 'datetime');
         $t->column('myend', 'datetime');
         $t->end();
-        $this->_conn->insert(
+        $this->conn->insert(
             'INSERT INTO dates (mystart, myend) VALUES (?, ?)',
             array(
                 '2011-12-10 00:00:00',
@@ -387,7 +388,7 @@ class PgsqlTest extends TestBase
         );
         $this->assertEquals(
             1,
-            $this->_conn->selectValue('SELECT COUNT(*) FROM dates WHERE '
+            $this->conn->selectValue('SELECT COUNT(*) FROM dates WHERE '
                                       . $modifiedDate . ' = myend')
         );
     }
@@ -396,71 +397,71 @@ class PgsqlTest extends TestBase
     {
         $this->assertEquals(
             "CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) & 2) ELSE 0 END",
-            $this->_conn->buildClause('bitmap', '&', 2)
+            $this->conn->buildClause('bitmap', '&', 2)
         );
         $this->assertEquals(
             array("CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) & ?) ELSE 0 END", array(2)),
-            $this->_conn->buildClause('bitmap', '&', 2, true)
+            $this->conn->buildClause('bitmap', '&', 2, true)
         );
 
         $this->assertEquals(
             "CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) | 2) ELSE 0 END",
-            $this->_conn->buildClause('bitmap', '|', 2)
+            $this->conn->buildClause('bitmap', '|', 2)
         );
         $this->assertEquals(
             array("CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) | ?) ELSE 0 END", array(2)),
-            $this->_conn->buildClause('bitmap', '|', 2, true)
+            $this->conn->buildClause('bitmap', '|', 2, true)
         );
 
         $this->assertEquals(
             "name ILIKE '%search%'",
-            $this->_conn->buildClause('name', 'LIKE', "search")
+            $this->conn->buildClause('name', 'LIKE', "search")
         );
         $this->assertEquals(
             array("name ILIKE ?", array('%search%')),
-            $this->_conn->buildClause('name', 'LIKE', "search", true)
+            $this->conn->buildClause('name', 'LIKE', "search", true)
         );
         $this->assertEquals(
             "name ILIKE '%search\&replace\?%'",
-            $this->_conn->buildClause('name', 'LIKE', "search&replace?")
+            $this->conn->buildClause('name', 'LIKE', "search&replace?")
         );
         $this->assertEquals(
             array("name ILIKE ?", array('%search&replace?%')),
-            $this->_conn->buildClause('name', 'LIKE', "search&replace?", true)
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", true)
         );
         $this->assertEquals(
             "(name ILIKE 'search\&replace\?%' OR name ILIKE '% search\&replace\?%')",
-            $this->_conn->buildClause('name', 'LIKE', "search&replace?", false, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, array('begin' => true))
         );
         $this->assertEquals(
             array("(name ILIKE ? OR name ILIKE ?)",
                   array('search&replace?%', '% search&replace?%')),
-            $this->_conn->buildClause('name', 'LIKE', "search&replace?", true, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, array('begin' => true))
         );
 
         $this->assertEquals(
             'value = 2',
-            $this->_conn->buildClause('value', '=', 2)
+            $this->conn->buildClause('value', '=', 2)
         );
         $this->assertEquals(
             array('value = ?', array(2)),
-            $this->_conn->buildClause('value', '=', 2, true)
+            $this->conn->buildClause('value', '=', 2, true)
         );
         $this->assertEquals(
             "value = 'foo'",
-            $this->_conn->buildClause('value', '=', 'foo')
+            $this->conn->buildClause('value', '=', 'foo')
         );
         $this->assertEquals(
             array('value = ?', array('foo')),
-            $this->_conn->buildClause('value', '=', 'foo', true)
+            $this->conn->buildClause('value', '=', 'foo', true)
         );
         $this->assertEquals(
             "value = 'foo\?bar'",
-            $this->_conn->buildClause('value', '=', 'foo?bar')
+            $this->conn->buildClause('value', '=', 'foo?bar')
         );
         $this->assertEquals(
             array('value = ?', array('foo?bar')),
-            $this->_conn->buildClause('value', '=', 'foo?bar', true)
+            $this->conn->buildClause('value', '=', 'foo?bar', true)
         );
     }
 
@@ -479,7 +480,7 @@ class PgsqlTest extends TestBase
             // make sure table was created
             $sql = "INSERT INTO $name
                     VALUES (1, 'mlb', 'f')";
-            $this->_conn->insert($sql);
+            $this->conn->insert($sql);
         } catch (Exception $e) {
         }
     }
