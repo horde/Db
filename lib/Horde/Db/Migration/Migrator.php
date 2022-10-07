@@ -50,6 +50,9 @@ class Horde_Db_Migration_Migrator
      */
     protected $_schemaTableName = 'schema_info';
 
+    protected $_logger;
+    protected $_connection;
+    protected $_inflector;
     /**
      * Constructor.
      *

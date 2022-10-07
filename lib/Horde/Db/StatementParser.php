@@ -26,6 +26,7 @@ class Horde_Db_StatementParser implements Iterator
 {
     protected $_count = 0;
     protected $_currentStatement;
+    protected $_file;
 
     public function __construct($file)
     {
@@ -35,6 +36,7 @@ class Horde_Db_StatementParser implements Iterator
         $this->_file = $file;
     }
 
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if (is_null($this->_currentStatement)) {
@@ -43,6 +45,7 @@ class Horde_Db_StatementParser implements Iterator
         return $this->_currentStatement;
     }
 
+    #[\ReturnTypeWillChange]
     public function key()
     {
         if (is_null($this->_currentStatement)) {
@@ -51,6 +54,7 @@ class Horde_Db_StatementParser implements Iterator
         return $this->_count;
     }
 
+    #[\ReturnTypeWillChange]
     public function next()
     {
         if ($statement = $this->_getNextStatement()) {
@@ -60,6 +64,7 @@ class Horde_Db_StatementParser implements Iterator
         return null;
     }
 
+    #[\ReturnTypeWillChange]
     public function rewind()
     {
         $this->_count = 0;

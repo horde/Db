@@ -257,6 +257,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param   int     $offset
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         foreach ($this->_columns as $column) {
@@ -271,6 +272,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param   int     $offset
      * @return  object  {@link {@Horde_Db_Adapter_Base_ColumnDefinition}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         if (!$this->offsetExists($offset)) {
@@ -282,6 +284,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
                 return $column;
             }
         }
+        return null;
     }
 
     /**
@@ -290,6 +293,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param   int     $offset
      * @param   mixed   $value
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         foreach ($this->_columns as $key=>$column) {
@@ -304,6 +308,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      *
      * @param   int     $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         foreach ($this->_columns as $key=>$column) {
@@ -318,7 +323,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
     # IteratorAggregate
     ##########################################################################*/
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->_columns);
     }

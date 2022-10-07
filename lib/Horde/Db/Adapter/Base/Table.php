@@ -153,6 +153,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      * @param   int     $offset
      * @return  boolean
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return isset($this->_columns[$offset]);
@@ -164,6 +165,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      * @param   int     $offset
      * @return  object  {@link {@Horde_Db_Adapter_Base_ColumnDefinition}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->getColumn($offset);
@@ -175,6 +177,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      * @param   int     $offset
      * @param   mixed   $value
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
     }
@@ -184,6 +187,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      *
      * @param   int     $offset
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
     }
@@ -193,7 +197,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
     # IteratorAggregate
     ##########################################################################*/
 
-    public function getIterator()
+    public function getIterator(): Traversable
     {
         return new ArrayIterator($this->_columns);
     }

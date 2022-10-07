@@ -47,6 +47,7 @@ class Horde_Db_Adapter_SplitRead implements Horde_Db_Adapter
      */
     private $_write;
 
+    protected $_lastQuery;
     /**
      * Const'r
      *
