@@ -1,4 +1,5 @@
 {
+    "minimum-stability": "dev",
     "name": "horde/db",
     "description": "Database abstraction library",
     "type": "library",
