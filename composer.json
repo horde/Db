@@ -21,11 +21,11 @@
             "role": "lead"
         }
     ],
-    "time": "2021-11-19",
+    "time": "2022-10-08",
     "repositories": [
         {
             "type": "composer",
-            "url": "https://horde-satis.maintaina.com/"
+            "url": "https://horde-satis.maintaina.com"
         }
     ],
     "require": {
@@ -66,5 +66,9 @@
     "bin": [
         "bin/horde-db-migrate-component"
     ],
-    "minimum-stability": "dev"
+    "config": {
+        "allow-plugins": {
+            "horde/horde-installer-plugin": true
+        }
+    }
 }

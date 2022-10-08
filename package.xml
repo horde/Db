@@ -23,7 +23,7 @@
   <email>chuck@horde.org</email>
   <active>no</active>
  </lead>
- <date>2021-03-13</date>
+ <date>2022-10-08</date>
  <version>
   <release>3.0.0alpha4</release>
   <api>3.0.0alpha1</api>
@@ -34,10 +34,18 @@
  </stability>
  <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
  <notes>
-* 
+* [rla] Improved PHP 8.1 compatibility.
+* |+
  </notes>
  <contents>
   <dir baseinstalldir="/" name="/">
+   <dir name=".github">
+    <dir name="workflows">
+     <file name="ci.yml" role="php" />
+     <file name="phpdoc.yml" role="php" />
+     <file name="update-satis.yml" role="php" />
+    </dir> <!-- /.github/workflows -->
+   </dir> <!-- /.github -->
    <dir name="bin">
     <file name="horde-db-migrate-component" role="script">
      <tasks:replace from="/usr/bin/env php" to="php_bin" type="pear-config" />
@@ -120,81 +128,137 @@
      <file name="Db.php" role="php" />
     </dir> <!-- /lib/Horde -->
    </dir> <!-- /lib -->
+   <dir name="src">
+    <dir name="Adapter">
+     <dir name="Base">
+      <file name="Column.php" role="php" />
+      <file name="ColumnDefinition.php" role="php" />
+      <file name="Index.php" role="php" />
+      <file name="Result.php" role="php" />
+      <file name="Schema.php" role="php" />
+      <file name="Table.php" role="php" />
+      <file name="TableDefinition.php" role="php" />
+     </dir> <!-- /src/Adapter/Base -->
+     <dir name="Mysql">
+      <file name="Column.php" role="php" />
+      <file name="Schema.php" role="php" />
+     </dir> <!-- /src/Adapter/Mysql -->
+     <dir name="Mysqli">
+      <file name="Result.php" role="php" />
+     </dir> <!-- /src/Adapter/Mysqli -->
+     <dir name="Oracle">
+      <file name="Column.php" role="php" />
+      <file name="Result.php" role="php" />
+      <file name="Schema.php" role="php" />
+      <file name="TableDefinition.php" role="php" />
+     </dir> <!-- /src/Adapter/Oracle -->
+     <dir name="Pdo">
+      <file name="Base.php" role="php" />
+      <file name="Mysql.php" role="php" />
+      <file name="Pgsql.php" role="php" />
+      <file name="Result.php" role="php" />
+      <file name="Sqlite.php" role="php" />
+     </dir> <!-- /src/Adapter/Pdo -->
+     <dir name="Postgresql">
+      <file name="Column.php" role="php" />
+      <file name="Schema.php" role="php" />
+     </dir> <!-- /src/Adapter/Postgresql -->
+     <dir name="Sqlite">
+      <file name="Column.php" role="php" />
+      <file name="Schema.php" role="php" />
+     </dir> <!-- /src/Adapter/Sqlite -->
+     <file name="Base.php" role="php" />
+     <file name="Mysqli.php" role="php" />
+     <file name="Oci8.php" role="php" />
+     <file name="SplitRead.php" role="php" />
+    </dir> <!-- /src/Adapter -->
+    <dir name="Migration">
+     <file name="Base.php" role="php" />
+     <file name="MigrationException.php" role="php" />
+     <file name="Migrator.php" role="php" />
+    </dir> <!-- /src/Migration -->
+    <dir name="Value">
+     <file name="Binary.php" role="php" />
+     <file name="Lob.php" role="php" />
+     <file name="Text.php" role="php" />
+    </dir> <!-- /src/Value -->
+    <file name="Adapter.php" role="php" />
+    <file name="Constants.php" role="php" />
+    <file name="DbException.php" role="php" />
+    <file name="SearchParser.php" role="php" />
+    <file name="StatementParser.php" role="php" />
+    <file name="Value.php" role="php" />
+   </dir> <!-- /src -->
    <dir name="test">
-    <dir name="Horde">
-     <dir name="Db">
-      <dir name="Adapter">
-       <dir name="Mysql">
-        <file name="ColumnDefinition.php" role="test" />
-        <file name="ColumnTest.php" role="test" />
-        <file name="TestTableDefinition.php" role="test" />
-       </dir> <!-- /test/Horde/Db/Adapter/Mysql -->
-       <dir name="Oracle">
-        <file name="ColumnDefinition.php" role="test" />
-        <file name="ColumnTest.php" role="test" />
-        <file name="TestTableDefinition.php" role="test" />
-       </dir> <!-- /test/Horde/Db/Adapter/Oracle -->
-       <dir name="Pdo">
-        <file name="MysqlTest.php" role="test" />
-        <file name="PgsqlTest.php" role="test" />
-        <file name="SqliteTest.php" role="test" />
-       </dir> <!-- /test/Horde/Db/Adapter/Pdo -->
-       <dir name="Postgresql">
-        <file name="ColumnDefinition.php" role="test" />
-        <file name="ColumnTest.php" role="test" />
-        <file name="TestTableDefinition.php" role="test" />
-       </dir> <!-- /test/Horde/Db/Adapter/Postgresql -->
-       <dir name="Sqlite">
-        <file name="ColumnDefinition.php" role="test" />
-        <file name="ColumnTest.php" role="test" />
-        <file name="TestTableDefinition.php" role="test" />
-       </dir> <!-- /test/Horde/Db/Adapter/Sqlite -->
-       <file name="ColumnBase.php" role="test" />
-       <file name="conf.php.dist" role="test" />
-       <file name="MysqlBase.php" role="test" />
-       <file name="MysqliTest.php" role="test" />
-       <file name="MysqlTest.php" role="test" />
-       <file name="Oci8Test.php" role="test" />
-       <file name="TestBase.php" role="test" />
-       <file name="TestTableDefinition.php" role="test" />
-      </dir> <!-- /test/Horde/Db/Adapter -->
-      <dir name="fixtures">
-       <dir name="charsets">
-        <file name="cp1257.txt" role="test" />
-        <file name="utf8.txt" role="test" />
-       </dir> <!-- /test/Horde/Db/fixtures/charsets -->
-       <dir name="migrations">
-        <file name="1_users_have_last_names1.php" role="test" />
-        <file name="2_we_need_reminders1.php" role="test" />
-        <file name="3_innocent_jointable1.php" role="test" />
-       </dir> <!-- /test/Horde/Db/fixtures/migrations -->
-       <dir name="migrations_with_decimal">
-        <file name="1_give_me_big_numbers.php" role="test" />
-       </dir> <!-- /test/Horde/Db/fixtures/migrations_with_decimal -->
-       <dir name="migrations_with_duplicate">
-        <file name="1_users_have_last_names2.php" role="test" />
-        <file name="2_we_need_reminders2.php" role="test" />
-        <file name="3_foo.php" role="test" />
-        <file name="3_innocent_jointable2.php" role="test" />
-       </dir> <!-- /test/Horde/Db/fixtures/migrations_with_duplicate -->
-       <dir name="migrations_with_missing_versions">
-        <file name="1_users_have_last_names3.php" role="test" />
-        <file name="3_we_need_reminders.php" role="test" />
-        <file name="4_innocent_jointable3.php" role="test" />
-        <file name="1000_users_have_middle_names.php" role="test" />
-       </dir> <!-- /test/Horde/Db/fixtures/migrations_with_missing_versions -->
-       <file name="drop_create_table.sql" role="test" />
-       <file name="unit_tests.sql" role="test" />
-      </dir> <!-- /test/Horde/Db/fixtures -->
-      <dir name="Migration">
-       <file name="BaseTest.php" role="test" />
-       <file name="MigratorTest.php" role="test" />
-      </dir> <!-- /test/Horde/Db/Migration -->
-      <file name="AllTests.php" role="test" />
-      <file name="bootstrap.php" role="test" />
-      <file name="StatementParserTest.php" role="test" />
-     </dir> <!-- /test/Horde/Db -->
-    </dir> <!-- /test/Horde -->
+    <dir name="Adapter">
+     <dir name="Mysql">
+      <file name="ColumnDefinition.php" role="test" />
+      <file name="ColumnTest.php" role="test" />
+      <file name="TestTableDefinition.php" role="test" />
+     </dir> <!-- /test/Adapter/Mysql -->
+     <dir name="Oracle">
+      <file name="ColumnDefinition.php" role="test" />
+      <file name="ColumnTest.php" role="test" />
+      <file name="TestTableDefinition.php" role="test" />
+     </dir> <!-- /test/Adapter/Oracle -->
+     <dir name="Pdo">
+      <file name="MysqlTest.php" role="test" />
+      <file name="PgsqlTest.php" role="test" />
+      <file name="SqliteTest.php" role="test" />
+     </dir> <!-- /test/Adapter/Pdo -->
+     <dir name="Postgresql">
+      <file name="ColumnDefinition.php" role="test" />
+      <file name="ColumnTest.php" role="test" />
+      <file name="TestTableDefinition.php" role="test" />
+     </dir> <!-- /test/Adapter/Postgresql -->
+     <dir name="Sqlite">
+      <file name="ColumnDefinition.php" role="test" />
+      <file name="ColumnTest.php" role="test" />
+      <file name="TestTableDefinition.php" role="test" />
+     </dir> <!-- /test/Adapter/Sqlite -->
+     <file name="ColumnBase.php" role="test" />
+     <file name="conf.php.dist" role="test" />
+     <file name="MysqlBase.php" role="test" />
+     <file name="MysqliTest.php" role="test" />
+     <file name="Oci8Test.php" role="test" />
+     <file name="TestBase.php" role="test" />
+     <file name="TestTableDefinition.php" role="test" />
+    </dir> <!-- /test/Adapter -->
+    <dir name="fixtures">
+     <dir name="charsets">
+      <file name="cp1257.txt" role="test" />
+      <file name="utf8.txt" role="test" />
+     </dir> <!-- /test/fixtures/charsets -->
+     <dir name="migrations">
+      <file name="1_users_have_last_names1.php" role="test" />
+      <file name="2_we_need_reminders1.php" role="test" />
+      <file name="3_innocent_jointable1.php" role="test" />
+     </dir> <!-- /test/fixtures/migrations -->
+     <dir name="migrations_with_decimal">
+      <file name="1_give_me_big_numbers.php" role="test" />
+     </dir> <!-- /test/fixtures/migrations_with_decimal -->
+     <dir name="migrations_with_duplicate">
+      <file name="1_users_have_last_names2.php" role="test" />
+      <file name="2_we_need_reminders2.php" role="test" />
+      <file name="3_foo.php" role="test" />
+      <file name="3_innocent_jointable2.php" role="test" />
+     </dir> <!-- /test/fixtures/migrations_with_duplicate -->
+     <dir name="migrations_with_missing_versions">
+      <file name="1_users_have_last_names3.php" role="test" />
+      <file name="3_we_need_reminders.php" role="test" />
+      <file name="4_innocent_jointable3.php" role="test" />
+      <file name="1000_users_have_middle_names.php" role="test" />
+     </dir> <!-- /test/fixtures/migrations_with_missing_versions -->
+     <file name="drop_create_table.sql" role="test" />
+     <file name="unit_tests.sql" role="test" />
+    </dir> <!-- /test/fixtures -->
+    <dir name="Migration">
+     <file name="BaseTest.php" role="test" />
+     <file name="MigratorTest.php" role="test" />
+    </dir> <!-- /test/Migration -->
+    <file name="AllTests.php" role="test" />
+    <file name="bootstrap.php" role="test" />
+    <file name="StatementParserTest.php" role="test" />
    </dir> <!-- /test -->
    <file name="LICENSE" role="doc" />
    <file name="README" role="doc" />
@@ -203,9 +267,9 @@
  <dependencies>
   <required>
    <php>
-    <min>7.0.0</min>
-    <max>8.0.0alpha1</max>
-    <exclude>8.0.0alpha1</exclude>
+    <min>7.4.0</min>
+    <max>9.0.0alpha1</max>
+    <exclude>9.0.0alpha1</exclude>
    </php>
    <pearinstaller>
     <min>1.7.0</min>
@@ -228,6 +292,9 @@
  </dependencies>
  <phprelease>
   <filelist>
+   <install as="workflows/ci.yml" name=".github/workflows/ci.yml" />
+   <install as="workflows/phpdoc.yml" name=".github/workflows/phpdoc.yml" />
+   <install as="workflows/update-satis.yml" name=".github/workflows/update-satis.yml" />
    <install as="horde-db-migrate-component" name="bin/horde-db-migrate-component" />
    <install as="CHANGES" name="doc/Horde/Db/CHANGES" />
    <install as="README_TESTING.rst" name="doc/Horde/Db/README_TESTING.rst" />
@@ -276,97 +343,91 @@
    <install as="Horde/Db/Value/Text.php" name="lib/Horde/Db/Value/Text.php" />
    <install as="LICENSE" name="LICENSE" />
    <install as="README" name="README" />
-   <install as="Horde/Db/Adapter/ColumnBase.php" name="test/Horde/Db/Adapter/ColumnBase.php" />
-   <install as="Horde/Db/Adapter/conf.php.dist" name="test/Horde/Db/Adapter/conf.php.dist" />
-   <install as="Horde/Db/Adapter/Mysql/ColumnDefinition.php" name="test/Horde/Db/Adapter/Mysql/ColumnDefinition.php" />
-   <install as="Horde/Db/Adapter/Mysql/ColumnTest.php" name="test/Horde/Db/Adapter/Mysql/ColumnTest.php" />
-   <install as="Horde/Db/Adapter/Mysql/TestTableDefinition.php" name="test/Horde/Db/Adapter/Mysql/TestTableDefinition.php" />
-   <install as="Horde/Db/Adapter/MysqlBase.php" name="test/Horde/Db/Adapter/MysqlBase.php" />
-   <install as="Horde/Db/Adapter/MysqliTest.php" name="test/Horde/Db/Adapter/MysqliTest.php" />
-   <install as="Horde/Db/Adapter/MysqlTest.php" name="test/Horde/Db/Adapter/MysqlTest.php" />
-   <install as="Horde/Db/Adapter/Oci8Test.php" name="test/Horde/Db/Adapter/Oci8Test.php" />
-   <install as="Horde/Db/Adapter/Oracle/ColumnDefinition.php" name="test/Horde/Db/Adapter/Oracle/ColumnDefinition.php" />
-   <install as="Horde/Db/Adapter/Oracle/ColumnTest.php" name="test/Horde/Db/Adapter/Oracle/ColumnTest.php" />
-   <install as="Horde/Db/Adapter/Oracle/TestTableDefinition.php" name="test/Horde/Db/Adapter/Oracle/TestTableDefinition.php" />
-   <install as="Horde/Db/Adapter/Pdo/MysqlTest.php" name="test/Horde/Db/Adapter/Pdo/MysqlTest.php" />
-   <install as="Horde/Db/Adapter/Pdo/PgsqlTest.php" name="test/Horde/Db/Adapter/Pdo/PgsqlTest.php" />
-   <install as="Horde/Db/Adapter/Pdo/SqliteTest.php" name="test/Horde/Db/Adapter/Pdo/SqliteTest.php" />
-   <install as="Horde/Db/Adapter/Postgresql/ColumnDefinition.php" name="test/Horde/Db/Adapter/Postgresql/ColumnDefinition.php" />
-   <install as="Horde/Db/Adapter/Postgresql/ColumnTest.php" name="test/Horde/Db/Adapter/Postgresql/ColumnTest.php" />
-   <install as="Horde/Db/Adapter/Postgresql/TestTableDefinition.php" name="test/Horde/Db/Adapter/Postgresql/TestTableDefinition.php" />
-   <install as="Horde/Db/Adapter/Sqlite/ColumnDefinition.php" name="test/Horde/Db/Adapter/Sqlite/ColumnDefinition.php" />
-   <install as="Horde/Db/Adapter/Sqlite/ColumnTest.php" name="test/Horde/Db/Adapter/Sqlite/ColumnTest.php" />
-   <install as="Horde/Db/Adapter/Sqlite/TestTableDefinition.php" name="test/Horde/Db/Adapter/Sqlite/TestTableDefinition.php" />
-   <install as="Horde/Db/Adapter/TestBase.php" name="test/Horde/Db/Adapter/TestBase.php" />
-   <install as="Horde/Db/Adapter/TestTableDefinition.php" name="test/Horde/Db/Adapter/TestTableDefinition.php" />
-   <install as="Horde/Db/AllTests.php" name="test/Horde/Db/AllTests.php" />
-   <install as="Horde/Db/bootstrap.php" name="test/Horde/Db/bootstrap.php" />
-   <install as="Horde/Db/fixtures/charsets/cp1257.txt" name="test/Horde/Db/fixtures/charsets/cp1257.txt" />
-   <install as="Horde/Db/fixtures/charsets/utf8.txt" name="test/Horde/Db/fixtures/charsets/utf8.txt" />
-   <install as="Horde/Db/fixtures/drop_create_table.sql" name="test/Horde/Db/fixtures/drop_create_table.sql" />
-   <install as="Horde/Db/fixtures/migrations/1_users_have_last_names1.php" name="test/Horde/Db/fixtures/migrations/1_users_have_last_names1.php" />
-   <install as="Horde/Db/fixtures/migrations/2_we_need_reminders1.php" name="test/Horde/Db/fixtures/migrations/2_we_need_reminders1.php" />
-   <install as="Horde/Db/fixtures/migrations/3_innocent_jointable1.php" name="test/Horde/Db/fixtures/migrations/3_innocent_jointable1.php" />
-   <install as="Horde/Db/fixtures/migrations_with_decimal/1_give_me_big_numbers.php" name="test/Horde/Db/fixtures/migrations_with_decimal/1_give_me_big_numbers.php" />
-   <install as="Horde/Db/fixtures/migrations_with_duplicate/1_users_have_last_names2.php" name="test/Horde/Db/fixtures/migrations_with_duplicate/1_users_have_last_names2.php" />
-   <install as="Horde/Db/fixtures/migrations_with_duplicate/2_we_need_reminders2.php" name="test/Horde/Db/fixtures/migrations_with_duplicate/2_we_need_reminders2.php" />
-   <install as="Horde/Db/fixtures/migrations_with_duplicate/3_foo.php" name="test/Horde/Db/fixtures/migrations_with_duplicate/3_foo.php" />
-   <install as="Horde/Db/fixtures/migrations_with_duplicate/3_innocent_jointable2.php" name="test/Horde/Db/fixtures/migrations_with_duplicate/3_innocent_jointable2.php" />
-   <install as="Horde/Db/fixtures/migrations_with_missing_versions/1_users_have_last_names3.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/1_users_have_last_names3.php" />
-   <install as="Horde/Db/fixtures/migrations_with_missing_versions/3_we_need_reminders.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/3_we_need_reminders.php" />
-   <install as="Horde/Db/fixtures/migrations_with_missing_versions/4_innocent_jointable3.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/4_innocent_jointable3.php" />
-   <install as="Horde/Db/fixtures/migrations_with_missing_versions/1000_users_have_middle_names.php" name="test/Horde/Db/fixtures/migrations_with_missing_versions/1000_users_have_middle_names.php" />
-   <install as="Horde/Db/fixtures/unit_tests.sql" name="test/Horde/Db/fixtures/unit_tests.sql" />
-   <install as="Horde/Db/Migration/BaseTest.php" name="test/Horde/Db/Migration/BaseTest.php" />
-   <install as="Horde/Db/Migration/MigratorTest.php" name="test/Horde/Db/Migration/MigratorTest.php" />
-   <install as="Horde/Db/StatementParserTest.php" name="test/Horde/Db/StatementParserTest.php" />
+   <install as="Adapter.php" name="src/Adapter.php" />
+   <install as="Adapter/Base.php" name="src/Adapter/Base.php" />
+   <install as="Adapter/Base/Column.php" name="src/Adapter/Base/Column.php" />
+   <install as="Adapter/Base/ColumnDefinition.php" name="src/Adapter/Base/ColumnDefinition.php" />
+   <install as="Adapter/Base/Index.php" name="src/Adapter/Base/Index.php" />
+   <install as="Adapter/Base/Result.php" name="src/Adapter/Base/Result.php" />
+   <install as="Adapter/Base/Schema.php" name="src/Adapter/Base/Schema.php" />
+   <install as="Adapter/Base/Table.php" name="src/Adapter/Base/Table.php" />
+   <install as="Adapter/Base/TableDefinition.php" name="src/Adapter/Base/TableDefinition.php" />
+   <install as="Adapter/Mysql/Column.php" name="src/Adapter/Mysql/Column.php" />
+   <install as="Adapter/Mysql/Schema.php" name="src/Adapter/Mysql/Schema.php" />
+   <install as="Adapter/Mysqli.php" name="src/Adapter/Mysqli.php" />
+   <install as="Adapter/Mysqli/Result.php" name="src/Adapter/Mysqli/Result.php" />
+   <install as="Adapter/Oci8.php" name="src/Adapter/Oci8.php" />
+   <install as="Adapter/Oracle/Column.php" name="src/Adapter/Oracle/Column.php" />
+   <install as="Adapter/Oracle/Result.php" name="src/Adapter/Oracle/Result.php" />
+   <install as="Adapter/Oracle/Schema.php" name="src/Adapter/Oracle/Schema.php" />
+   <install as="Adapter/Oracle/TableDefinition.php" name="src/Adapter/Oracle/TableDefinition.php" />
+   <install as="Adapter/Pdo/Base.php" name="src/Adapter/Pdo/Base.php" />
+   <install as="Adapter/Pdo/Mysql.php" name="src/Adapter/Pdo/Mysql.php" />
+   <install as="Adapter/Pdo/Pgsql.php" name="src/Adapter/Pdo/Pgsql.php" />
+   <install as="Adapter/Pdo/Result.php" name="src/Adapter/Pdo/Result.php" />
+   <install as="Adapter/Pdo/Sqlite.php" name="src/Adapter/Pdo/Sqlite.php" />
+   <install as="Adapter/Postgresql/Column.php" name="src/Adapter/Postgresql/Column.php" />
+   <install as="Adapter/Postgresql/Schema.php" name="src/Adapter/Postgresql/Schema.php" />
+   <install as="Adapter/SplitRead.php" name="src/Adapter/SplitRead.php" />
+   <install as="Adapter/Sqlite/Column.php" name="src/Adapter/Sqlite/Column.php" />
+   <install as="Adapter/Sqlite/Schema.php" name="src/Adapter/Sqlite/Schema.php" />
+   <install as="Constants.php" name="src/Constants.php" />
+   <install as="DbException.php" name="src/DbException.php" />
+   <install as="Migration/Base.php" name="src/Migration/Base.php" />
+   <install as="Migration/MigrationException.php" name="src/Migration/MigrationException.php" />
+   <install as="Migration/Migrator.php" name="src/Migration/Migrator.php" />
+   <install as="SearchParser.php" name="src/SearchParser.php" />
+   <install as="StatementParser.php" name="src/StatementParser.php" />
+   <install as="Value.php" name="src/Value.php" />
+   <install as="Value/Binary.php" name="src/Value/Binary.php" />
+   <install as="Value/Lob.php" name="src/Value/Lob.php" />
+   <install as="Value/Text.php" name="src/Value/Text.php" />
+   <install as="Adapter/ColumnBase.php" name="test/Adapter/ColumnBase.php" />
+   <install as="Adapter/conf.php.dist" name="test/Adapter/conf.php.dist" />
+   <install as="Adapter/Mysql/ColumnDefinition.php" name="test/Adapter/Mysql/ColumnDefinition.php" />
+   <install as="Adapter/Mysql/ColumnTest.php" name="test/Adapter/Mysql/ColumnTest.php" />
+   <install as="Adapter/Mysql/TestTableDefinition.php" name="test/Adapter/Mysql/TestTableDefinition.php" />
+   <install as="Adapter/MysqlBase.php" name="test/Adapter/MysqlBase.php" />
+   <install as="Adapter/MysqliTest.php" name="test/Adapter/MysqliTest.php" />
+   <install as="Adapter/Oci8Test.php" name="test/Adapter/Oci8Test.php" />
+   <install as="Adapter/Oracle/ColumnDefinition.php" name="test/Adapter/Oracle/ColumnDefinition.php" />
+   <install as="Adapter/Oracle/ColumnTest.php" name="test/Adapter/Oracle/ColumnTest.php" />
+   <install as="Adapter/Oracle/TestTableDefinition.php" name="test/Adapter/Oracle/TestTableDefinition.php" />
+   <install as="Adapter/Pdo/MysqlTest.php" name="test/Adapter/Pdo/MysqlTest.php" />
+   <install as="Adapter/Pdo/PgsqlTest.php" name="test/Adapter/Pdo/PgsqlTest.php" />
+   <install as="Adapter/Pdo/SqliteTest.php" name="test/Adapter/Pdo/SqliteTest.php" />
+   <install as="Adapter/Postgresql/ColumnDefinition.php" name="test/Adapter/Postgresql/ColumnDefinition.php" />
+   <install as="Adapter/Postgresql/ColumnTest.php" name="test/Adapter/Postgresql/ColumnTest.php" />
+   <install as="Adapter/Postgresql/TestTableDefinition.php" name="test/Adapter/Postgresql/TestTableDefinition.php" />
+   <install as="Adapter/Sqlite/ColumnDefinition.php" name="test/Adapter/Sqlite/ColumnDefinition.php" />
+   <install as="Adapter/Sqlite/ColumnTest.php" name="test/Adapter/Sqlite/ColumnTest.php" />
+   <install as="Adapter/Sqlite/TestTableDefinition.php" name="test/Adapter/Sqlite/TestTableDefinition.php" />
+   <install as="Adapter/TestBase.php" name="test/Adapter/TestBase.php" />
+   <install as="Adapter/TestTableDefinition.php" name="test/Adapter/TestTableDefinition.php" />
+   <install as="AllTests.php" name="test/AllTests.php" />
+   <install as="bootstrap.php" name="test/bootstrap.php" />
+   <install as="fixtures/charsets/cp1257.txt" name="test/fixtures/charsets/cp1257.txt" />
+   <install as="fixtures/charsets/utf8.txt" name="test/fixtures/charsets/utf8.txt" />
+   <install as="fixtures/drop_create_table.sql" name="test/fixtures/drop_create_table.sql" />
+   <install as="fixtures/migrations/1_users_have_last_names1.php" name="test/fixtures/migrations/1_users_have_last_names1.php" />
+   <install as="fixtures/migrations/2_we_need_reminders1.php" name="test/fixtures/migrations/2_we_need_reminders1.php" />
+   <install as="fixtures/migrations/3_innocent_jointable1.php" name="test/fixtures/migrations/3_innocent_jointable1.php" />
+   <install as="fixtures/migrations_with_decimal/1_give_me_big_numbers.php" name="test/fixtures/migrations_with_decimal/1_give_me_big_numbers.php" />
+   <install as="fixtures/migrations_with_duplicate/1_users_have_last_names2.php" name="test/fixtures/migrations_with_duplicate/1_users_have_last_names2.php" />
+   <install as="fixtures/migrations_with_duplicate/2_we_need_reminders2.php" name="test/fixtures/migrations_with_duplicate/2_we_need_reminders2.php" />
+   <install as="fixtures/migrations_with_duplicate/3_foo.php" name="test/fixtures/migrations_with_duplicate/3_foo.php" />
+   <install as="fixtures/migrations_with_duplicate/3_innocent_jointable2.php" name="test/fixtures/migrations_with_duplicate/3_innocent_jointable2.php" />
+   <install as="fixtures/migrations_with_missing_versions/1_users_have_last_names3.php" name="test/fixtures/migrations_with_missing_versions/1_users_have_last_names3.php" />
+   <install as="fixtures/migrations_with_missing_versions/3_we_need_reminders.php" name="test/fixtures/migrations_with_missing_versions/3_we_need_reminders.php" />
+   <install as="fixtures/migrations_with_missing_versions/4_innocent_jointable3.php" name="test/fixtures/migrations_with_missing_versions/4_innocent_jointable3.php" />
+   <install as="fixtures/migrations_with_missing_versions/1000_users_have_middle_names.php" name="test/fixtures/migrations_with_missing_versions/1000_users_have_middle_names.php" />
+   <install as="fixtures/unit_tests.sql" name="test/fixtures/unit_tests.sql" />
+   <install as="Migration/BaseTest.php" name="test/Migration/BaseTest.php" />
+   <install as="Migration/MigratorTest.php" name="test/Migration/MigratorTest.php" />
+   <install as="StatementParserTest.php" name="test/StatementParserTest.php" />
   </filelist>
  </phprelease>
  <changelog>
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
   <release>
    <version>
     <release>0.1.0</release>
@@ -1085,7 +1146,7 @@
   <release>
    <version>
     <release>3.0.0alpha4</release>
-    <api>3.0.0</api>
+    <api>3.0.0alpha1</api>
    </version>
    <stability>
     <release>alpha</release>
@@ -1094,7 +1155,8 @@
    <date>2021-03-13</date>
    <license uri="http://www.horde.org/licenses/bsd">BSD-2-Clause</license>
    <notes>
-* 
+* [rla] Improved PHP 8.1 compatibility.
+* |+
    </notes>
   </release>
  </changelog>
