@@ -65,7 +65,7 @@ class Horde_Db_StatementParser implements Iterator
     }
 
     #[\ReturnTypeWillChange]
-    public function rewind()
+    public function rewind(): void
     {
         $this->_count = 0;
         $this->_currentStatement = null;
@@ -73,7 +73,7 @@ class Horde_Db_StatementParser implements Iterator
         $this->next();
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return !$this->_file->eof() && $this->_file->isReadable();
     }
