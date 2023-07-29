@@ -108,7 +108,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
     /**
      * Implementation of the rewind() method for iterator.
      */
-    public function rewind()
+    public function rewind(): void
     {
         if ($this->_result) {
             unset($this->_result);
@@ -128,7 +128,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      *
      * @return array  The current row, or null if no rows.
      */
-    public function current()
+    public function current(): array
     {
         if (is_null($this->_result)) {
             $this->rewind();
@@ -141,7 +141,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      *
      * @return mixed  The current row number (starts at 0), or null if no rows.
      */
-    public function key()
+    public function key(): mixed
     {
         if (is_null($this->_result)) {
             $this->rewind();
@@ -152,10 +152,10 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
     /**
      * Implementation of the next() method for Iterator.
      *
-     * @return array|null  The next row in the resultset or null if there are
+     * @return void        The next row in the resultset or null if there are
      *                     no more results.
      */
-    public function next()
+    public function next(): void
     {
         if (is_null($this->_result)) {
             $this->rewind();
@@ -177,8 +177,6 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
                 $this->_current = $row;
             }
         }
-
-        return $this->_current;
     }
 
     /**
@@ -186,7 +184,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      *
      * @return boolean  Whether the iteration is valid.
      */
-    public function valid()
+    public function valid(): bool
     {
         if (is_null($this->_result)) {
             $this->rewind();

@@ -64,7 +64,7 @@ class Horde_Db_Adapter_Mysql_Column extends Horde_Db_Adapter_Base_Column
         if (strpos(Horde_String::lower($this->_sqlType), 'tinyint(1)') !== false) {
             $this->_type = 'boolean';
             return;
-        } elseif (preg_match('/enum/i', $this->_sqlType)) {
+        } elseif (preg_match('/enum/i', is_null($this->_sqlType) ? "" : $this->_sqlType)) {
             $this->_type = 'string';
             return;
         }

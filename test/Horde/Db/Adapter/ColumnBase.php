@@ -113,13 +113,15 @@ abstract class Horde_Db_Adapter_ColumnBase extends Horde_Test_Case
 
     public function testTypeDatetime()
     {
-        $col = new $this->_class('age', 'NULL', 'datetime');
+        #$col = new $this->_class('age', 'NULL', 'datetime');
+        $col = new $this->_class('age', is_null('NULL'), 'datetime');
         $this->assertEquals('datetime', $col->getType());
     }
 
     public function testTypeTimestamp()
     {
-        $col = new $this->_class('age', 'CURRENT_TIMESTAMP', 'timestamp');
+        #$col = new $this->_class('age', 'CURRENT_TIMESTAMP', 'timestamp');
+        $col = new $this->_class('age', is_null('CURRENT_TIMESTAMP'), 'timestamp');
         $this->assertEquals('timestamp', $col->getType());
     }
 
@@ -131,7 +133,8 @@ abstract class Horde_Db_Adapter_ColumnBase extends Horde_Test_Case
 
     public function testTypeDate()
     {
-        $col = new $this->_class('age', 'NULL', 'date');
+        #$col = new $this->_class('age', 'NULL', 'date');
+        $col = new $this->_class('age', is_null('NULL'), 'date');
         $this->assertEquals('date', $col->getType());
     }
 

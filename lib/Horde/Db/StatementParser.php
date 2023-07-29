@@ -35,7 +35,7 @@ class Horde_Db_StatementParser implements Iterator
         $this->_file = $file;
     }
 
-    public function current()
+    public function current(): mixed
     {
         if (is_null($this->_currentStatement)) {
             $this->rewind();
@@ -43,7 +43,7 @@ class Horde_Db_StatementParser implements Iterator
         return $this->_currentStatement;
     }
 
-    public function key()
+    public function key(): mixed
     {
         if (is_null($this->_currentStatement)) {
             $this->rewind();
@@ -51,16 +51,14 @@ class Horde_Db_StatementParser implements Iterator
         return $this->_count;
     }
 
-    public function next()
+    public function next(): void
     {
         if ($statement = $this->_getNextStatement()) {
             $this->_count++;
-            return $statement;
         }
-        return null;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->_count = 0;
         $this->_currentStatement = null;
@@ -68,7 +66,7 @@ class Horde_Db_StatementParser implements Iterator
         $this->next();
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return !$this->_file->eof() && $this->_file->isReadable();
     }

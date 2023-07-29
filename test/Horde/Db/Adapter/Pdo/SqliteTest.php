@@ -179,7 +179,7 @@ class Horde_Db_Adapter_Pdo_SqliteTest extends Horde_Db_Adapter_TestBase
         $this->_conn->changeColumn('text_to_binary', 'data', 'binary');
 
         $afterChange = $this->_getColumn('text_to_binary', 'data');
-        $this->assertEquals('blob', $afterChange->getSqlType());
+        $this->assertEquals('BLOB', $afterChange->getSqlType());
         $this->assertEquals(
             "foo",
             $this->_conn->selectValue('SELECT data FROM text_to_binary'));

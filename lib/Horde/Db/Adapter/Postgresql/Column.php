@@ -64,50 +64,50 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
     protected function _setSimplifiedType()
     {
         switch (true) {
-        case preg_match('/^(?:real|double precision)$/', $this->_sqlType):
+        case preg_match('/^(?:real|double precision)$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Numeric and monetary types
             $this->_type = 'float';
             return;
-        case preg_match('/^money$/', $this->_sqlType):
+        case preg_match('/^money$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Monetary types
             $this->_type = 'decimal';
             return;
-        case preg_match('/^(?:character varying|bpchar)(?:\(\d+\))?$/', $this->_sqlType):
+        case preg_match('/^(?:character varying|bpchar)(?:\(\d+\))?$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Character types
             $this->_type = 'string';
             return;
-        case preg_match('/^bytea$/', $this->_sqlType):
+        case preg_match('/^bytea$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Binary data types
             $this->_type = 'binary';
             return;
-        case preg_match('/^timestamp with(?:out)? time zone$/', $this->_sqlType):
+        case preg_match('/^timestamp with(?:out)? time zone$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Date/time types
             $this->_type = 'datetime';
             return;
-        case preg_match('/^interval$/', $this->_sqlType):
+        case preg_match('/^interval$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'string';
             return;
-        case preg_match('/^(?:point|line|lseg|box|"?path"?|polygon|circle)$/', $this->_sqlType):
+        case preg_match('/^(?:point|line|lseg|box|"?path"?|polygon|circle)$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Geometric types
             $this->_type = 'string';
             return;
-        case preg_match('/^(?:cidr|inet|macaddr)$/', $this->_sqlType):
+        case preg_match('/^(?:cidr|inet|macaddr)$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Network address types
             $this->_type = 'string';
             return;
-        case preg_match('/^bit(?: varying)?(?:\(\d+\))?$/', $this->_sqlType):
+        case preg_match('/^bit(?: varying)?(?:\(\d+\))?$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Bit strings
             $this->_type = 'string';
             return;
-        case preg_match('/^xml$/', $this->_sqlType):
+        case preg_match('/^xml$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // XML type
             $this->_type = 'string';
             return;
-        case preg_match('/^\D+\[\]$/', $this->_sqlType):
+        case preg_match('/^\D+\[\]$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Arrays
             $this->_type = 'string';
             return;
-        case preg_match('/^oid$/', $this->_sqlType):
+        case preg_match('/^oid$/', is_null($this->_sqlType) ? "" : $this->_sqlType):
             // Object identifier types
             $this->_type = 'integer';
             return;
@@ -123,45 +123,45 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
     protected function _extractValueFromDefault($default)
     {
         switch (true) {
-        case preg_match('/\A-?\d+(\.\d*)?\z/', $default):
+        case preg_match('/\A-?\d+(\.\d*)?\z/', is_null($default) ? "" : $default):
             // Numeric types
             return $default;
-        case preg_match('/\A\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
+        case preg_match('/\A\'(.*)\'::(?:character varying|bpchar|text)\z/m', is_null($default) ? "" : $default, $matches):
             // Character types
             return $matches[1];
-        case preg_match('/\AE\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
+        case preg_match('/\AE\'(.*)\'::(?:character varying|bpchar|text)\z/m', is_null($default) ? "" : $default, $matches):
             // Character types (8.1 formatting)
             /*@TODO fix preg callback*/
             return preg_replace('/\\(\d\d\d)/', '$1.oct.chr', $matches[1]);
-        case preg_match('/\A\'(.*)\'::bytea\z/m', $default, $matches):
+        case preg_match('/\A\'(.*)\'::bytea\z/m', is_null($default) ? "" : $default, $matches):
             // Binary data types
             return $matches[1];
-        case preg_match('/\A\'(.+)\'::(?:time(?:stamp)? with(?:out)? time zone|date)\z/', $default, $matches):
+        case preg_match('/\A\'(.+)\'::(?:time(?:stamp)? with(?:out)? time zone|date)\z/', is_null($default) ? "" : $default, $matches):
             // Date/time types
             return $matches[1];
-        case preg_match('/\A\'(.*)\'::interval\z/', $default, $matches):
+        case preg_match('/\A\'(.*)\'::interval\z/', is_null($default) ? "" : $default, $matches):
             return $matches[1];
         case $default == 'true':
             // Boolean type
             return true;
         case $default == 'false':
             return false;
-        case preg_match('/\A\'(.*)\'::(?:point|line|lseg|box|"?path"?|polygon|circle)\z/', $default, $matches):
+        case preg_match('/\A\'(.*)\'::(?:point|line|lseg|box|"?path"?|polygon|circle)\z/', is_null($default) ? "" : $default, $matches):
             // Geometric types
             return $matches[1];
-        case preg_match('/\A\'(.*)\'::(?:cidr|inet|macaddr)\z/', $default, $matches):
+        case preg_match('/\A\'(.*)\'::(?:cidr|inet|macaddr)\z/', is_null($default) ? "" : $default, $matches):
             // Network address types
             return $matches[1];
-        case preg_match('/\AB\'(.*)\'::"?bit(?: varying)?"?\z/', $default, $matches):
+        case preg_match('/\AB\'(.*)\'::"?bit(?: varying)?"?\z/', is_null($default) ? "" : $default, $matches):
             // Bit string types
             return $matches[1];
-        case preg_match('/\A\'(.*)\'::xml\z/m', $default, $matches):
+        case preg_match('/\A\'(.*)\'::xml\z/m', is_null($default) ? "" : $default, $matches):
             // XML type
             return $matches[1];
-        case preg_match('/\A\'(.*)\'::"?\D+"?\[\]\z/', $default, $matches):
+        case preg_match('/\A\'(.*)\'::"?\D+"?\[\]\z/', is_null($default) ? "" : $default, $matches):
             // Arrays
             return $matches[1];
-        case preg_match('/\A-?\d+\z/', $default, $matches):
+        case preg_match('/\A-?\d+\z/', is_null($default) ? "" : $default, $matches):
             // Object identifier types
             return $matches[1];
         default:
@@ -185,7 +185,7 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
             return $string;
         }
 
-        return preg_replace_callback("/(?:\\\'|\\\\\\\\|\\\\\d{3})/", array($this, 'binaryToStringCallback'), $value);
+        return preg_replace_callback("/(?:\\\'|\\\\\\\\|\\\\\d{3})/", array($this, 'binaryToStringCallback'), is_null($value) ? "" : $value);
     }
 
     /**
@@ -213,10 +213,10 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _extractLimit($sqlType)
     {
-        if (preg_match('/^bigint/i', $sqlType)) {
+        if (preg_match('/^bigint/i', is_null($sqlType) ? "" : $sqlType)) {
             return 8;
         }
-        if (preg_match('/^smallint/i', $sqlType)) {
+        if (preg_match('/^smallint/i', is_null($sqlType) ? "" : $sqlType)) {
             return 2;
         }
         return parent::_extractLimit($sqlType);
@@ -228,7 +228,7 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _extractPrecision($sqlType)
     {
-        if (preg_match('/^money/', $sqlType)) {
+        if (preg_match('/^money/', is_null($sqlType) ? "" : $sqlType)) {
             return self::$moneyPrecision;
         }
         return parent::_extractPrecision($sqlType);
@@ -240,7 +240,7 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _extractScale($sqlType)
     {
-        if (preg_match('/^money/', $sqlType)) {
+        if (preg_match('/^money/', is_null($sqlType) ? "" : $sqlType)) {
             return 2;
         }
         return parent::_extractScale($sqlType);

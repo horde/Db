@@ -23,10 +23,12 @@ class Horde_Db_StatementParserTest extends Horde_Test_Case
         $file = new SplFileObject(__DIR__ . '/fixtures/' . $filename, 'r');
         $parser = new Horde_Db_StatementParser($file);
 
-        foreach ($expectedStatements as $i => $expected) {
+	foreach ($expectedStatements as $i => $expected) {
+	    $parser->next();
+	    $parser_next = $parser->current();
             // Strip any whitespace before comparing the strings.
             $this->assertEquals(preg_replace('/\s/', '', $expected),
-                                preg_replace('/\s/', '', $parser->next()),
+                                preg_replace('/\s/', '', $parser_next),
                                 "Parser differs on statement #$i");
         }
     }

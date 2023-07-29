@@ -46,7 +46,7 @@ class Horde_Db_Adapter_Sqlite_Column extends Horde_Db_Adapter_Base_Column
 
     public function binaryToString($value)
     {
-        return str_replace(array('%00', '%25'), array("\0", '%'), $value);
+        return str_replace(array('%00', '%25'), array("\0", '%'), is_null($value) ? "" : $value);
     }
 
     /**
@@ -76,7 +76,7 @@ class Horde_Db_Adapter_Sqlite_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _unquote($string)
     {
-        $first = substr($string, 0, 1);
+        $first = substr(is_null($string) ? "" : $string, 0, 1);
         if ($first == "'" || $first == '"') {
             $string = substr($string, 1);
             if (substr($string, -1) == $first) {

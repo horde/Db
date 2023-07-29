@@ -303,7 +303,7 @@ class Horde_Db_Adapter_Base_Column
      */
     protected function _extractLimit($sqlType)
     {
-        if (preg_match("/\((.*)\)/", $sqlType, $matches)) {
+        if (preg_match("/\((.*)\)/", is_null($sqlType) ? "" : $sqlType, $matches)) {
             return (int)$matches[1];
         }
         return null;
@@ -315,7 +315,7 @@ class Horde_Db_Adapter_Base_Column
      */
     protected function _extractPrecision($sqlType)
     {
-        if (preg_match("/^(numeric|decimal|number)\((\d+)(,\d+)?\)/i", $sqlType, $matches)) {
+        if (preg_match("/^(numeric|decimal|number)\((\d+)(,\d+)?\)/i", is_null($sqlType) ? "" : $sqlType, $matches)) {
             return (int)$matches[2];
         }
         return null;
@@ -328,10 +328,10 @@ class Horde_Db_Adapter_Base_Column
     protected function _extractScale($sqlType)
     {
         switch (true) {
-            case preg_match("/^(numeric|decimal|number)\((\d+)\)/i", $sqlType):
+	case preg_match("/^(numeric|decimal|number)\((\d+)\)/i", is_null($sqlType) ? "" : $sqlType):
                 return 0;
             case preg_match("/^(numeric|decimal|number)\((\d+)(,(\d+))\)/i",
-                            $sqlType, $match):
+                            is_null($sqlType) ? "" : $sqlType, $match):
                 return (int)$match[4];
         }
     }
@@ -342,7 +342,7 @@ class Horde_Db_Adapter_Base_Column
      */
     protected function _extractUnsigned($sqlType)
     {
-        return (boolean)preg_match('/^int.*unsigned/i', $sqlType);
+        return (boolean)preg_match('/^int.*unsigned/i', is_null($sqlType) ? "" : $sqlType);
     }
 
     /**
@@ -350,37 +350,37 @@ class Horde_Db_Adapter_Base_Column
     protected function _setSimplifiedType()
     {
         switch (true) {
-        case preg_match('/int/i', $this->_sqlType):
+	case preg_match('/int/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'integer';
             return;
-        case preg_match('/float|double/i', $this->_sqlType):
+	case preg_match('/float|double/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'float';
             return;
-        case preg_match('/decimal|numeric|number/i', $this->_sqlType):
+        case preg_match('/decimal|numeric|number/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = $this->_scale == 0 ? 'integer' : 'decimal';
             return;
-        case preg_match('/datetime/i', $this->_sqlType):
+        case preg_match('/datetime/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'datetime';
             return;
-        case preg_match('/timestamp/i', $this->_sqlType):
+        case preg_match('/timestamp/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'timestamp';
             return;
-        case preg_match('/time/i', $this->_sqlType):
+        case preg_match('/time/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'time';
             return;
-        case preg_match('/date/i', $this->_sqlType):
+        case preg_match('/date/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'date';
             return;
-        case preg_match('/clob|text/i', $this->_sqlType):
+        case preg_match('/clob|text/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'text';
             return;
-        case preg_match('/blob|binary/i', $this->_sqlType):
+        case preg_match('/blob|binary/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'binary';
             return;
-        case preg_match('/char|string/i', $this->_sqlType):
+        case preg_match('/char|string/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'string';
             return;
-        case preg_match('/boolean/i', $this->_sqlType):
+        case preg_match('/boolean/i', is_null($this->_sqlType) ? "" : $this->_sqlType):
             $this->_type = 'boolean';
             return;
         }
