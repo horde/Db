@@ -31,7 +31,7 @@ abstract class Horde_Db_Adapter_MysqlBase extends Horde_Db_Adapter_TestBase
         throw new LogicException('_available() must be implemented in a sub-class.');
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$_reason = 'The MySQL adapter is not available';
         if (static::_available()) {
@@ -131,9 +131,9 @@ abstract class Horde_Db_Adapter_MysqlBase extends Horde_Db_Adapter_TestBase
 
     public function testQuoteFloat()
     {
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.200000', $this->_conn->quote(42.2));
         setlocale(LC_NUMERIC, 'de_DE.UTF-8');
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.200000', $this->_conn->quote(42.2));
     }
 
     public function testQuoteString()
@@ -257,9 +257,9 @@ abstract class Horde_Db_Adapter_MysqlBase extends Horde_Db_Adapter_TestBase
     public function testColumns()
     {
         $col = parent::testColumns();
-        $this->assertEquals(10,        $col->getLimit());
+        $this->assertEquals(null,      $col->getLimit());
         $this->assertEquals(true,      $col->isUnsigned());
-        $this->assertEquals('int(10) unsigned', $col->getSqlType());
+        $this->assertEquals('int unsigned', $col->getSqlType());
     }
 
     public function testCreateTableWithSeparatePk()

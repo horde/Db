@@ -26,9 +26,9 @@ require_once dirname(__DIR__) . '/fixtures/migrations_with_decimal/1_give_me_big
  * @package    Db
  * @subpackage UnitTests
  */
-class Horde_Db_Migration_BaseTest extends PHPUnit_Framework_TestCase
+class Horde_Db_Migration_BaseTest extends Horde_Test_Case
 {
-    public function setUp()
+    public function setUp(): void
     {
         try {
             $this->_conn = new Horde_Db_Adapter_Pdo_Sqlite(array(

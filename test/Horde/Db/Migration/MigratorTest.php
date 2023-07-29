@@ -24,7 +24,7 @@
  */
 class Horde_Db_Migration_MigratorTest extends Horde_Test_Case
 {
-    public function setUp()
+    public function setUp(): void
     {
         try {
             $this->_conn = new Horde_Db_Adapter_Pdo_Sqlite(array(
@@ -178,6 +178,8 @@ class Horde_Db_Migration_MigratorTest extends Horde_Test_Case
 
     public function testWithDuplicates()
     {
+        $this->expectNotToPerformAssertions();
+
         try {
             $dir = dirname(__DIR__).'/fixtures/migrations_with_duplicate/';
             $migrator = new Horde_Db_Migration_Migrator($this->_conn, null, array('migrationsPath' => $dir));

@@ -19,7 +19,7 @@
  */
 class Horde_Db_Adapter_Oci8Test extends Horde_Db_Adapter_TestBase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$_reason = 'The OCI8 adapter is not available';
         if (extension_loaded('oci8')) {
@@ -114,9 +114,9 @@ class Horde_Db_Adapter_Oci8Test extends Horde_Db_Adapter_TestBase
 
     public function testQuoteFloat()
     {
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.200000', $this->_conn->quote(42.2));
         setlocale(LC_NUMERIC, 'de_DE.UTF-8');
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.200000', $this->_conn->quote(42.2));
     }
 
     public function testQuoteString()

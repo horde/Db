@@ -41,7 +41,7 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
         throw new LogicException('_getConnection() must be implemented in a sub-class.');
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         if (self::$_skip ||
             !($res = static::_getConnection())) {
@@ -56,7 +56,7 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
         $this->_dropTestTables();
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         if ($this->_conn) {
             // clean up
@@ -120,7 +120,7 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
         $this->assertGreaterThan(0, count(iterator_to_array($result)));
 
         foreach ($result as $row) break;
-        $this->assertInternalType('array', $row);
+        $this->assertIsArray($row);
         $this->assertEquals(1, $row['id']);
     }
 
@@ -134,7 +134,7 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
         $this->assertGreaterThan(0, count(iterator_to_array($result)));
 
         foreach ($result as $row) break;
-        $this->assertInternalType('array', $row);
+        $this->assertIsArray($row);
         $this->assertEquals(1, $row['id']);
     }
 
@@ -148,7 +148,7 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
         $this->assertGreaterThan(0, count(iterator_to_array($result)));
 
         foreach ($result as $row) break;
-        $this->assertInternalType('array', $row);
+        $this->assertIsArray($row);
         $this->assertEquals(1, $row['id']);
     }
 
@@ -158,7 +158,7 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 
         $sql = "SELECT * FROM unit_tests WHERE id='1'";
         $result = $this->_conn->selectAll($sql);
-        $this->assertInternalType('array', $result);
+        $this->assertIsArray($result);
         $this->assertGreaterThan(0, count($result));
         $this->assertEquals(1, $result[0]['id']);
     }
@@ -585,6 +585,8 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 
     public function testAddIndex()
     {
+        $this->expectNotToPerformAssertions();
+
         $this->_createTestUsersTable();
 
         // Limit size of last_name and key columns to support Firebird index
@@ -734,6 +736,8 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 
     public function testIndexNameInvalid()
     {
+        $this->expectNotToPerformAssertions();
+
         try {
             $name = $this->_conn->indexName('sports');
         } catch (Horde_Db_Exception $e) {
@@ -795,6 +799,8 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 
     public function testAddColumnNotNullWithoutDefault()
     {
+        $this->expectNotToPerformAssertions();
+
         $table = $this->_conn->createTable('testings');
         $table->column('foo', 'string');
         $table->end();
@@ -810,6 +816,8 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 
     public function testAddColumnNotNullWithDefault()
     {
+        $this->expectNotToPerformAssertions();
+
         $table = $this->_conn->createTable('testings');
             $table->column('foo', 'string');
         $table->end();
@@ -907,12 +915,10 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
         $this->assertEquals(2, $this->_conn->selectValue('SELECT foo FROM autoinc WHERE bar = 6'));
     }
 
-    /**
-     * @expectedException LogicException
-     * @expectedExceptionMessage foo has already been added as a primary key
-     */
     public function testAutoIncrementWithTypeInTableAndColumnDefined()
     {
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('foo has already been added as a primary key');
         $table = $this->_conn->createTable('autoincrement', array('autoincrementKey' => 'foo'));
         $table->column('foo', 'integer');
         $table->column('bar', 'integer');
@@ -1154,31 +1160,43 @@ abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 
     public function testTableConstruct()
     {
+        $this->expectNotToPerformAssertions();
+
         self::$_tableTest->testConstruct();
     }
 
     public function testTableName()
     {
+        $this->expectNotToPerformAssertions();
+
         self::$_tableTest->testName();
     }
 
     public function testTableGetOptions()
     {
+        $this->expectNotToPerformAssertions();
+
         self::$_tableTest->testGetOptions();
     }
 
     public function testTablePrimaryKey()
     {
+        $this->expectNotToPerformAssertions();
+
         self::$_tableTest->testPrimaryKey();
     }
 
     public function testTableColumn()
     {
+        $this->expectNotToPerformAssertions();
+
         self::$_tableTest->testColumn();
     }
 
     public function testTableToSql()
     {
+        $this->expectNotToPerformAssertions();
+
         self::$_tableTest->testToSql();
     }
 }

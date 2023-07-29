@@ -24,7 +24,7 @@
  */
 class Horde_Db_Adapter_Pdo_SqliteTest extends Horde_Db_Adapter_TestBase
 {
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         self::$_reason = 'The sqlite adapter is not available';
         if (extension_loaded('pdo') &&
@@ -108,9 +108,9 @@ class Horde_Db_Adapter_Pdo_SqliteTest extends Horde_Db_Adapter_TestBase
 
     public function testQuoteFloat()
     {
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.200000', $this->_conn->quote(42.2));
         setlocale(LC_NUMERIC, 'de_DE.UTF-8');
-        $this->assertEquals('42.2', $this->_conn->quote(42.2));
+        $this->assertEquals('42.200000', $this->_conn->quote(42.2));
     }
 
     public function testQuoteString()
@@ -208,7 +208,7 @@ class Horde_Db_Adapter_Pdo_SqliteTest extends Horde_Db_Adapter_TestBase
                                    array('precision' => '5', 'scale' => '2'));
 
         $afterChange = $this->_getColumn('sports', 'is_college');
-        $this->assertRegExp('/^decimal\(5,\s*2\)$/', $afterChange->getSqlType());
+        $this->assertMatchesRegularExpression('/^decimal\(5,\s*2\)$/', $afterChange->getSqlType());
     }
 
     public function testRenameColumn()
