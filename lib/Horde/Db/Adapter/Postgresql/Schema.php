@@ -1143,7 +1143,15 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         }
 
         // [primary_key, sequence]
-        return array($result['attname'], $result['relname']);
+        $_res_attname = null;
+        $_res_relname = null;
+        if (isset($result['attname'])) {
+            $_res_attname = $result['attname'];
+        }
+        if (isset($result['relname'])) {
+            $_res_relname = $result['relname'];
+        }
+        return array($_res_attname, $_res_relname);
     }
 
     /**
