@@ -22,6 +22,7 @@
  * @package    Db
  * @subpackage UnitTests
  */
+#[\AllowDynamicProperties]
 class Horde_Db_Adapter_Sqlite_TestTableDefinition extends Horde_Db_Adapter_TestTableDefinition
 {
 }

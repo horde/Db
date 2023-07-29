@@ -17,6 +17,7 @@
  * @package    Db
  * @subpackage UnitTests
  */
+#[\AllowDynamicProperties]
 class Horde_Db_Adapter_Oracle_TestTableDefinition extends Horde_Db_Adapter_TestTableDefinition
 {
 }

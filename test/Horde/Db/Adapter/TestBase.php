@@ -24,6 +24,7 @@
  * @package    Db
  * @subpackage UnitTests
  */
+#[\AllowDynamicProperties]
 abstract class Horde_Db_Adapter_TestBase extends Horde_Test_Case
 {
     protected static $_columnTest;

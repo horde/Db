@@ -22,6 +22,7 @@
  * @license   http://www.horde.org/licenses/bsd
  * @package   Db
  */
+#[\AllowDynamicProperties]
 class Horde_Db_StatementParser implements Iterator
 {
     protected $_count = 0;

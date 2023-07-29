@@ -28,6 +28,7 @@
  * @package    Db
  * @subpackage Migration
  */
+#[\AllowDynamicProperties]
 class Horde_Db_Migration_Migrator
 {
     /**

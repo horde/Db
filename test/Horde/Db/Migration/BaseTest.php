@@ -26,6 +26,7 @@ require_once dirname(__DIR__) . '/fixtures/migrations_with_decimal/1_give_me_big
  * @package    Db
  * @subpackage UnitTests
  */
+#[\AllowDynamicProperties]
 class Horde_Db_Migration_BaseTest extends Horde_Test_Case
 {
     public function setUp(): void

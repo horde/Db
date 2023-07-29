@@ -100,7 +100,7 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
             return;
         }
 
-        parent::connect();
+        parent::class::connect();
 
         $this->_connection->setAttribute(PDO::ATTR_EMULATE_PREPARES, true);
 
@@ -184,11 +184,11 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
     protected function _catchSchemaChanges($method, $args = array())
     {
         try {
-            return call_user_func_array(array($this, "parent::$method"), $args);
+            return call_user_func_array(array("Horde_Db_Adapter_Pdo_Base", "$method"), $args);
         } catch (Exception $e) {
             if (preg_match('/database schema has changed/i', $e->getMessage())) {
                 $this->reconnect();
-                return call_user_func_array(array($this, "parent::$method"), $args);
+                return call_user_func_array(array("Horde_Db_Adapter_Pdo_Base", "$method"), $args);
             } else {
                 throw $e;
             }
