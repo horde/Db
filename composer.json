@@ -24,31 +24,25 @@
     "version": "2.4.2",
     "time": "2021-02-17",
     "repositories": [
-        {
-            "type": "pear",
-            "url": "https://pear.horde.org"
-        }
     ],
     "require": {
         "php": "^5.3 || ^7",
-        "pear-pear.horde.org/Horde_Date": "^2",
-        "pear-pear.horde.org/Horde_Exception": "^2",
-        "pear-pear.horde.org/Horde_Support": "^2",
-        "pear-pear.horde.org/Horde_Util": "^2"
+        "horde/date": "^2",
+        "horde/exception": "^2",
+        "horde/support": "^2",
+        "horde/util": "^2"
     },
     "suggest": {
-        "pear-pear.horde.org/Horde_Autoloader": "^2",
-        "pear-pear.horde.org/Horde_Cache": "^2",
-        "pear-pear.horde.org/Horde_Log": "^2",
-        "pear-pear.horde.org/Horde_Test": "^2.1",
+        "horde/autoloader": "^2",
+        "horde/cache": "^2",
+        "horde/log": "^2",
+        "horde/test": "^2.1",
         "ext-mysql": "*",
         "ext-mysqli": "*",
         "ext-oci8": "*",
         "ext-PDO": "*"
     },
     "replace": {
-        "pear-pear.horde.org/Horde_Db": "2.*",
-        "pear-horde/Horde_Db": "2.*"
     },
     "autoload": {
         "psr-0": {
