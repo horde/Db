@@ -1129,7 +1129,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
 
         if (!$result) {
             $sql = "
-              SELECT c.column_name, c.ordinal_position,
+              SELECT c.column_name as attname, c.ordinal_position,
                   pg_get_serial_sequence(t.table_name, c.column_name) as relname
               FROM information_schema.key_column_usage AS c
               LEFT JOIN information_schema.table_constraints AS t
