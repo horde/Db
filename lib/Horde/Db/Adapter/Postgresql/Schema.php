@@ -1135,11 +1135,24 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
               LEFT JOIN information_schema.table_constraints AS t
                 ON t.constraint_name = c.constraint_name
               WHERE t.table_name = '$table' AND t.constraint_type = 'PRIMARY KEY';";
-            $result = $this->selectOne($sql, 'PK and custom sequence');
+             $result = $this->selectAll($sql, 'PK and custom sequence');
+
+            // Return null if no results or multiple rows
+            // (multiple rows means composite PK with multiple columns where autoincrement is not supported )
+            if (!$results || count($results) > 1) {
+                return array(null, null);
+            }
+            
+            $result = $results[0];
         }
 
-        if (!$result) {
-            return array(null, null);
+         // Only warn about missing sequences for plain integer primary keys
+        if (isset($result['data_type']) && 
+            (strpos($result['data_type'], 'int') !== false || 
+             strpos($result['data_type'], 'serial') !== false)) {
+            if ($this->_logger && !$result['relname']) {
+                $this->_logger->warn(sprintf('%s has Primary key %s with no default sequence', $table, $result['attname']));
+            }
         }
 
         // [primary_key, sequence]
