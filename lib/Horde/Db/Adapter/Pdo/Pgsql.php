@@ -131,13 +131,24 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
         $temp = explode(' ', trim($sql), 4);
         $table = str_replace('"', '', $temp[2]);
 
+        // Fetch the PK and sequence name for the table as we need them for the fallback (can still be null)
+        list($fetched_pk, $fetched_sequence) = $this->pkAndSequenceFor($table);
+        if(!$pk) {
+            $pk = $fetched_pk;
+        }
+        if(!$sequenceName) {
+            $sequenceName = $fetched_sequence;
+        }
+
         // Try an insert with 'returning id'
         if (!$pk) {
             list($pk, $sequenceName) = $this->pkAndSequenceFor($table);
         }
         if ($pk) {
             $id = $this->selectValue($sql . ' RETURNING ' . $this->quoteColumnName($pk), $arg1, $arg2);
-            $this->resetPkSequence($table, $pk, $sequenceName);
+            if($sequenceName) {
+                $this->resetPkSequence($table, $pk, $sequenceName);
+            }
             return $id;
         }
 
