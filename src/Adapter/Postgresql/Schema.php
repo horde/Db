@@ -1137,17 +1137,34 @@ class Schema extends BaseSchema
 
         if (!$result) {
             $sql = "
-              SELECT c.column_name, c.ordinal_position,
-                  pg_get_serial_sequence(t.table_name, c.column_name) as relname
+              SELECT c.column_name as attname, c.ordinal_position,
+                  pg_get_serial_sequence(t.table_name, c.column_name) as relname,
+                  col.data_type
               FROM information_schema.key_column_usage AS c
               LEFT JOIN information_schema.table_constraints AS t
                 ON t.constraint_name = c.constraint_name
+              LEFT JOIN information_schema.columns AS col
+                ON col.table_name = t.table_name 
+                AND col.column_name = c.column_name
               WHERE t.table_name = '$table' AND t.constraint_type = 'PRIMARY KEY';";
-            $result = $this->adapter->selectOne($sql, 'PK and custom sequence');
+            $results = $this->selectAll($sql, 'PK and custom sequence');
+            
+            // Return null if no results or multiple rows
+            // (multiple rows means composite PK with multiple columns where autoincrement is not supported )
+            if (!$results || count($results) > 1) {
+                return array(null, null);
+            }
+            
+            $result = $results[0];
         }
 
-        if (!$result) {
-            return array(null, null);
+        // Only warn about missing sequences for plain integer primary keys
+        if (isset($result['data_type']) && 
+            (strpos($result['data_type'], 'int') !== false || 
+             strpos($result['data_type'], 'serial') !== false)) {
+            if ($this->_logger && !$result['relname']) {
+                $this->_logger->warn(sprintf('%s has Primary key %s with no default sequence', $table, $result['attname']));
+            }
         }
 
         // [primary_key, sequence]
