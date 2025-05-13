@@ -149,7 +149,11 @@ class Horde_Db_Adapter_Mysqli extends Horde_Db_Adapter_Base
 
         // Set the default charset. http://dev.mysql.com/doc/refman/5.1/en/charset-connection.html
         if (!empty($config['charset'])) {
-            $this->setCharset($config['charset']);
+            $charset = $config['charset'];
+            if ($charset == 'utf8') {
+                $charset = 'utf8mb4';
+            }
+            $this->setCharset($charset);
         }
 
         $this->_hasMysqliFetchAll = function_exists('mysqli_fetch_all');
