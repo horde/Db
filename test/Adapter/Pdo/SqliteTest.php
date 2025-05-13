@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -33,6 +34,7 @@ use Exception;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class SqliteTest extends TestBase
 {
@@ -42,18 +44,18 @@ class SqliteTest extends TestBase
         if (extension_loaded('pdo') &&
             in_array('sqlite', PDO::getAvailableDrivers())) {
             self::$_skip = false;
-            list($conn, ) = static::_getConnection();
+            [$conn, ] = static::_getConnection();
             $conn->disconnect();
         }
         self::$_columnTest = new ColumnDefinition();
         self::$_tableTest = new TestTableDefinition();
     }
 
-    protected static function _getConnection($overrides = array())
+    protected static function _getConnection($overrides = [])
     {
-        $config = array(
+        $config = [
             'dbname' => ':memory:',
-        );
+        ];
         $config = array_merge($config, $overrides);
         $conn = new Sqlite($config);
 
@@ -61,7 +63,7 @@ class SqliteTest extends TestBase
         $conn->setCache($cache);
         //$conn->setLogger(new Horde_Log_Logger(new Horde_Log_Handler_Cli()));
 
-        return array($conn, $cache);
+        return [$conn, $cache];
     }
 
 
@@ -149,7 +151,7 @@ class SqliteTest extends TestBase
     public function testNativeDatabaseTypes()
     {
         $types = $this->conn->nativeDatabaseTypes();
-        $this->assertEquals(array('name' => 'int', 'limit' => null), $types['integer']);
+        $this->assertEquals(['name' => 'int', 'limit' => null], $types['integer']);
     }
 
     public function testTableAliasLength()
@@ -187,7 +189,7 @@ class SqliteTest extends TestBase
         $table->end();
         $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
-            array("foo")
+            ["foo"]
         );
 
         $this->conn->changeColumn('text_to_binary', 'data', 'binary');
@@ -210,7 +212,7 @@ class SqliteTest extends TestBase
             'sports',
             'is_college',
             'string',
-            array('limit' => '40')
+            ['limit' => '40']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -227,7 +229,7 @@ class SqliteTest extends TestBase
             'sports',
             'is_college',
             'decimal',
-            array('precision' => '5', 'scale' => '2')
+            ['precision' => '5', 'scale' => '2']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -326,27 +328,27 @@ class SqliteTest extends TestBase
 
     public function testAddColumnOptions()
     {
-        $result = $this->conn->addColumnOptions('test', array());
+        $result = $this->conn->addColumnOptions('test', []);
         $this->assertEquals('test', $result);
     }
 
     public function testAddColumnOptionsDefault()
     {
-        $options = array('default' => '0');
+        $options = ['default' => '0'];
         $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals("test DEFAULT '0'", $result);
     }
 
     public function testAddColumnOptionsNull()
     {
-        $options = array('null' => true);
+        $options = ['null' => true];
         $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test', $result);
     }
 
     public function testAddColumnOptionsNotNull()
     {
-        $options = array('null' => false);
+        $options = ['null' => false];
         $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test NOT NULL', $result);
     }
@@ -362,10 +364,10 @@ class SqliteTest extends TestBase
         $t->end();
         $this->conn->insert(
             'INSERT INTO dates (start, end) VALUES (?, ?)',
-            array(
+            [
                 '2011-12-10 00:00:00',
-                '2011-12-11 00:00:00'
-            )
+                '2011-12-11 00:00:00',
+            ]
         );
         $this->assertEquals(
             1,
@@ -402,7 +404,7 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('bitmap', '&', 2)
         );
         $this->assertEquals(
-            array('bitmap & ?', array(2)),
+            ['bitmap & ?', [2]],
             $this->conn->buildClause('bitmap', '&', 2, true)
         );
 
@@ -411,7 +413,7 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('bitmap', '|', 2)
         );
         $this->assertEquals(
-            array('bitmap | ?', array(2)),
+            ['bitmap | ?', [2]],
             $this->conn->buildClause('bitmap', '|', 2, true)
         );
 
@@ -420,7 +422,7 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('name', 'LIKE', "search")
         );
         $this->assertEquals(
-            array("LOWER(name) LIKE LOWER(?)", array('%search%')),
+            ["LOWER(name) LIKE LOWER(?)", ['%search%']],
             $this->conn->buildClause('name', 'LIKE', "search", true)
         );
         $this->assertEquals(
@@ -428,17 +430,17 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('name', 'LIKE', "search&replace?")
         );
         $this->assertEquals(
-            array("LOWER(name) LIKE LOWER(?)", array('%search&replace?%')),
+            ["LOWER(name) LIKE LOWER(?)", ['%search&replace?%']],
             $this->conn->buildClause('name', 'LIKE', "search&replace?", true)
         );
         $this->assertEquals(
             "(LOWER(name) LIKE LOWER('search\&replace\?%') OR LOWER(name) LIKE LOWER('% search\&replace\?%'))",
-            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, ['begin' => true])
         );
         $this->assertEquals(
-            array("(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))",
-                  array('search&replace?%', '% search&replace?%')),
-            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, array('begin' => true))
+            ["(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))",
+                ['search&replace?%', '% search&replace?%']],
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, ['begin' => true])
         );
 
         $this->assertEquals(
@@ -446,7 +448,7 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('value', '=', 2)
         );
         $this->assertEquals(
-            array('value = ?', array(2)),
+            ['value = ?', [2]],
             $this->conn->buildClause('value', '=', 2, true)
         );
         $this->assertEquals(
@@ -454,7 +456,7 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('value', '=', 'foo')
         );
         $this->assertEquals(
-            array('value = ?', array('foo')),
+            ['value = ?', ['foo']],
             $this->conn->buildClause('value', '=', 'foo', true)
         );
         $this->assertEquals(
@@ -462,20 +464,20 @@ class SqliteTest extends TestBase
             $this->conn->buildClause('value', '=', 'foo?bar')
         );
         $this->assertEquals(
-            array('value = ?', array('foo?bar')),
+            ['value = ?', ['foo?bar']],
             $this->conn->buildClause('value', '=', 'foo?bar', true)
         );
     }
 
     public function testInsertAndReadInCp1257()
     {
-        list($conn, ) = static::_getConnection(array('charset' => 'cp1257'));
+        [$conn, ] = static::_getConnection(['charset' => 'cp1257']);
         $table = $conn->createTable('charset_cp1257');
         $table->column('text', 'string');
         $table->end();
 
         $input = file_get_contents(__DIR__ . '/../../fixtures/charsets/cp1257.txt');
-        $conn->insert('INSERT INTO charset_cp1257 (text) VALUES (?)', array($input));
+        $conn->insert('INSERT INTO charset_cp1257 (text) VALUES (?)', [$input]);
         $output = $conn->selectValue('SELECT text FROM charset_cp1257');
 
         $this->assertEquals($input, $output);
@@ -489,9 +491,9 @@ class SqliteTest extends TestBase
     /**
      * Create table to perform tests on
      */
-    protected function _createTestTable($name, $options = array())
+    protected function _createTestTable($name, $options = [])
     {
-        parent::_createTestTable($name, $options = array());
+        parent::_createTestTable($name, $options = []);
         try {
             // make sure table was created
             $sql = "INSERT INTO $name

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -194,7 +195,7 @@ abstract class Base implements Adapter
      */
     public function __sleep()
     {
-        return array_diff(array_keys(get_class_vars(__CLASS__)), array('active', 'connection'));
+        return array_diff(array_keys(get_class_vars(__CLASS__)), ['active', 'connection']);
     }
 
     /**
@@ -216,7 +217,7 @@ abstract class Base implements Adapter
      */
     public function getOption($option)
     {
-        return isset($this->config[$option]) ? $this->config[$option] : null;
+        return $this->config[$option] ?? null;
     }
 
     /*##########################################################################
@@ -287,15 +288,15 @@ abstract class Base implements Adapter
         if (!$this->schema) {
             // Create the database-specific (but not adapter specific) schema
             // object.
-            $this->schema = new $this->schemaClass($this, array(
+            $this->schema = new $this->schemaClass($this, [
                 'cache' => $this->cache,
-                'logger' => $this->logger
-            ));
+                'logger' => $this->logger,
+            ]);
             $this->schemaMethods = array_flip(get_class_methods($this->schema));
         }
 
         if (isset($this->schemaMethods[$method])) {
-            return call_user_func_array(array($this->schema, $method), $args);
+            return call_user_func_array([$this->schema, $method], $args);
         }
 
         $support = new Horde_Support_Backtrace();
@@ -426,7 +427,7 @@ abstract class Base implements Adapter
     }
 
 
-    
+
     /*##########################################################################
     # Connection Management
     ##########################################################################*/
@@ -613,7 +614,7 @@ abstract class Base implements Adapter
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quoteTableName($table),
-            implode(', ', array_map(array($this, 'quoteColumnName'), array_keys($fields))),
+            implode(', ', array_map([$this, 'quoteColumnName'], array_keys($fields))),
             implode(', ', array_fill(0, count($fields), '?'))
         );
         return $this->insert($query, $fields, null, $pk, $idValue);
@@ -695,7 +696,7 @@ abstract class Base implements Adapter
      */
     public function transactionStarted()
     {
-        return (bool)$this->transactionStarted;
+        return (bool) $this->transactionStarted;
     }
 
     /**
@@ -731,7 +732,7 @@ abstract class Base implements Adapter
     /**
      * Appends a locking clause to an SQL statement.
      * This method *modifies* the +sql+ parameter.
-     * 
+     *
      * TODO: BC BREAK Rather return the modified string
      *
      *   # SELECT * FROM suppliers FOR UPDATE

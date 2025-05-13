@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -25,6 +26,7 @@ use Horde\Db\Value\Binary as BinaryValue;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class Oci8Test extends TestBase
 {
@@ -33,7 +35,7 @@ class Oci8Test extends TestBase
         self::$_reason = 'The OCI8 adapter is not available';
         if (extension_loaded('oci8')) {
             self::$_skip = false;
-            list($conn, ) = static::_getConnection();
+            [$conn, ] = static::_getConnection();
             if (self::$_skip) {
                 return;
             }
@@ -43,15 +45,15 @@ class Oci8Test extends TestBase
         self::$_tableTest = new TestTableDefinition();
     }
 
-    protected static function _getConnection($overrides = array())
+    protected static function _getConnection($overrides = [])
     {
         $config = TestCase::getConfig(
             'DB_ADAPTER_OCI8_TEST_CONFIG',
             null,
-            array('host' => 'localhost',
-                                                   'username' => '',
-                                                   'password' => '',
-                                                   'dbname' => 'test')
+            ['host' => 'localhost',
+                'username' => '',
+                'password' => '',
+                'dbname' => 'test']
         );
         if (isset($config['db']['adapter']['oci8']['test']) &&
             is_array($config['db']['adapter']['oci8']['test'])) {
@@ -70,7 +72,7 @@ class Oci8Test extends TestBase
         //$conn->setLogger(new Horde_Log_Logger(new Horde_Log_Handler_Cli()));
         $conn->reconnect();
 
-        return array($conn, $cache);
+        return [$conn, $cache];
     }
 
 
@@ -154,7 +156,7 @@ class Oci8Test extends TestBase
     public function testNativeDatabaseTypes()
     {
         $types = $this->conn->nativeDatabaseTypes();
-        $this->assertEquals(array('name' => 'number', 'limit' => null), $types['integer']);
+        $this->assertEquals(['name' => 'number', 'limit' => null], $types['integer']);
     }
 
     public function testTableAliasLength()
@@ -179,11 +181,11 @@ class Oci8Test extends TestBase
         $table->end();
         $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
-            array('foo')
+            ['foo']
         );
         $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
-            array(null)
+            [null]
         );
 
         $this->conn->changeColumn('text_to_binary', 'data', 'binary');
@@ -206,7 +208,7 @@ class Oci8Test extends TestBase
             'sports',
             'is_college',
             'string',
-            array('limit' => '40')
+            ['limit' => '40']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -224,7 +226,7 @@ class Oci8Test extends TestBase
             'sports',
             'is_college',
             'decimal',
-            array('precision' => '5', 'scale' => '2')
+            ['precision' => '5', 'scale' => '2']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -253,8 +255,8 @@ class Oci8Test extends TestBase
 
     public function testIndexNameByMultiColumn()
     {
-        $name = $this->conn->indexName('sports', array('column' =>
-                                                array('name', 'is_college')));
+        $name = $this->conn->indexName('sports', ['column' =>
+                                                ['name', 'is_college']]);
         $this->assertEquals('ind_sports_5ca2d9c7', $name);
     }
 
@@ -332,27 +334,27 @@ class Oci8Test extends TestBase
 
     public function testAddColumnOptions()
     {
-        $result = $this->conn->addColumnOptions('test', array());
+        $result = $this->conn->addColumnOptions('test', []);
         $this->assertEquals('test', $result);
     }
 
     public function testAddColumnOptionsDefault()
     {
-        $options = array('default' => '0');
+        $options = ['default' => '0'];
         $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test DEFAULT \'0\'', $result);
     }
 
     public function testAddColumnOptionsNull()
     {
-        $options = array('null' => true);
+        $options = ['null' => true];
         $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test NULL', $result);
     }
 
     public function testAddColumnOptionsNotNull()
     {
-        $options = array('null' => false);
+        $options = ['null' => false];
         $result = $this->conn->addColumnOptions('test', $options);
         $this->assertEquals('test NOT NULL', $result);
     }
@@ -360,12 +362,12 @@ class Oci8Test extends TestBase
     public function testBug14163()
     {
         $table = $this->conn->createTable('binary_testings');
-        $table->column('data', 'binary', array('null' => false));
+        $table->column('data', 'binary', ['null' => false]);
         $table->end();
         $blob = new BinaryValue('foo');
-        $this->conn->insertBlob('binary_testings', array('data' => $blob));
-        $this->conn->updateBlob('binary_testings', array('data' => ''));
-        $this->conn->insertBlob('binary_testings', array('data' => ''));
+        $this->conn->insertBlob('binary_testings', ['data' => $blob]);
+        $this->conn->updateBlob('binary_testings', ['data' => '']);
+        $this->conn->insertBlob('binary_testings', ['data' => '']);
     }
 
     public function testModifyDate()
@@ -379,10 +381,10 @@ class Oci8Test extends TestBase
         $t->end();
         $this->conn->insert(
             'INSERT INTO dates (mystart, myend) VALUES (?, ?)',
-            array(
+            [
                 '2011-12-10 00:00:00',
-                '2011-12-11 00:00:00'
-            )
+                '2011-12-11 00:00:00',
+            ]
         );
         $this->assertEquals(
             1,
@@ -398,7 +400,7 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('bitmap', '&', 2)
         );
         $this->assertEquals(
-            array('BITAND(bitmap, ?)', array(2)),
+            ['BITAND(bitmap, ?)', [2]],
             $this->conn->buildClause('bitmap', '&', 2, true)
         );
 
@@ -407,7 +409,7 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('bitmap', '|', 2)
         );
         $this->assertEquals(
-            array('bitmap + ? - BITAND(bitmap, ?)', array(2, 2)),
+            ['bitmap + ? - BITAND(bitmap, ?)', [2, 2]],
             $this->conn->buildClause('bitmap', '|', 2, true)
         );
 
@@ -416,7 +418,7 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('name', 'LIKE', 'search')
         );
         $this->assertEquals(
-            array('LOWER(name) LIKE LOWER(?)', array('%search%')),
+            ['LOWER(name) LIKE LOWER(?)', ['%search%']],
             $this->conn->buildClause('name', 'LIKE', 'search', true)
         );
         $this->assertEquals(
@@ -424,17 +426,17 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('name', 'LIKE', 'search&replace?')
         );
         $this->assertEquals(
-            array('LOWER(name) LIKE LOWER(?)', array('%search&replace?%')),
+            ['LOWER(name) LIKE LOWER(?)', ['%search&replace?%']],
             $this->conn->buildClause('name', 'LIKE', 'search&replace?', true)
         );
         $this->assertEquals(
             "(LOWER(name) LIKE LOWER('search\&replace\?%') OR LOWER(name) LIKE LOWER('% search\&replace\?%'))",
-            $this->conn->buildClause('name', 'LIKE', 'search&replace?', false, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', 'search&replace?', false, ['begin' => true])
         );
         $this->assertEquals(
-            array('(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))',
-                  array('search&replace?%', '% search&replace?%')),
-            $this->conn->buildClause('name', 'LIKE', 'search&replace?', true, array('begin' => true))
+            ['(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))',
+                ['search&replace?%', '% search&replace?%']],
+            $this->conn->buildClause('name', 'LIKE', 'search&replace?', true, ['begin' => true])
         );
 
         $this->assertEquals(
@@ -442,7 +444,7 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('value', '=', 2)
         );
         $this->assertEquals(
-            array('value = ?', array(2)),
+            ['value = ?', [2]],
             $this->conn->buildClause('value', '=', 2, true)
         );
         $this->assertEquals(
@@ -450,7 +452,7 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('value', '=', 'foo')
         );
         $this->assertEquals(
-            array('value = ?', array('foo')),
+            ['value = ?', ['foo']],
             $this->conn->buildClause('value', '=', 'foo', true)
         );
         $this->assertEquals(
@@ -458,7 +460,7 @@ class Oci8Test extends TestBase
             $this->conn->buildClause('value', '=', 'foo?bar')
         );
         $this->assertEquals(
-            array('value = ?', array('foo?bar')),
+            ['value = ?', ['foo?bar']],
             $this->conn->buildClause('value', '=', 'foo?bar', true)
         );
     }

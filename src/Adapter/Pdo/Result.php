@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
@@ -37,11 +38,11 @@ class Result extends BaseResult
      *
      * @var array
      */
-    protected $map = array(
+    protected $map = [
         Constants::FETCH_ASSOC => PDO::FETCH_ASSOC,
         Constants::FETCH_NUM   => PDO::FETCH_NUM,
-        Constants::FETCH_BOTH  => PDO::FETCH_BOTH
-    );
+        Constants::FETCH_BOTH  => PDO::FETCH_BOTH,
+    ];
 
     /**
      * Returns a row from a resultset.

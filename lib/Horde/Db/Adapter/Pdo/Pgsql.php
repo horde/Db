@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -124,26 +125,31 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
      * @return integer  Last inserted ID.
      * @throws Horde_Db_Exception
      */
-    public function insert($sql, $arg1 = null, $arg2 = null, $pk = null,
-                           $idValue = null, $sequenceName = null)
-    {
+    public function insert(
+        $sql,
+        $arg1 = null,
+        $arg2 = null,
+        $pk = null,
+        $idValue = null,
+        $sequenceName = null
+    ) {
         // Extract the table from the insert sql. Yuck.
         $temp = explode(' ', trim($sql), 4);
         $table = str_replace('"', '', $temp[2]);
 
         // Fetch the PK and sequence name for the table as we need them for the fallback (can still be null)
-        list($fetched_pk, $fetched_sequence) = $this->pkAndSequenceFor($table);
-        if(!$pk) {
+        [$fetched_pk, $fetched_sequence] = $this->pkAndSequenceFor($table);
+        if (!$pk) {
             $pk = $fetched_pk;
         }
-        if(!$sequenceName) {
+        if (!$sequenceName) {
             $sequenceName = $fetched_sequence;
         }
 
         // Try an insert with 'returning id'
         if ($pk) {
             $id = $this->selectValue($sql . ' RETURNING ' . $this->quoteColumnName($pk), $arg1, $arg2);
-            if($sequenceName) {
+            if ($sequenceName) {
                 $this->resetPkSequence($table, $pk, $sequenceName);
             }
             return $id;
@@ -151,7 +157,7 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
 
         // If neither pk nor sequence name is given, look them up.
         if (!($pk || $sequenceName)) {
-            list($pk, $sequenceName) = $this->pkAndSequenceFor($table);
+            [$pk, $sequenceName] = $this->pkAndSequenceFor($table);
         }
 
         // Otherwise, insert then grab last_insert_id.
@@ -226,23 +232,27 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
     protected function _configureConnection()
     {
         if (!empty($this->_config['charset'])) {
-            $this->_lastQuery = $sql = 'SET client_encoding TO '.$this->quoteString($this->_config['charset']);
+            $this->_lastQuery = $sql = 'SET client_encoding TO ' . $this->quoteString($this->_config['charset']);
             $this->execute($sql);
         }
 
-        if (!empty($this->_config['client_min_messages'])) $this->setClientMinMessages($this->_config['client_min_messages']);
+        if (!empty($this->_config['client_min_messages'])) {
+            $this->setClientMinMessages($this->_config['client_min_messages']);
+        }
         $this->setSchemaSearchPath(!empty($this->_config['schema_search_path']) || !empty($this->_config['schema_order']));
     }
 
     /**
      * @TODO
      */
-    protected function _selectRaw($sql, $arg1=null, $arg2=null)
+    protected function _selectRaw($sql, $arg1 = null, $arg2 = null)
     {
         $result = $this->execute($sql, $arg1, $arg2);
-        if (!$result) return array();
+        if (!$result) {
+            return [];
+        }
 
-        $moneyFields = array();
+        $moneyFields = [];
         for ($i = 0, $i_max = $result->columnCount(); $i < $i_max; $i++) {
             $f = $result->getColumnMeta($i);
             if (!empty($f['pgsql:oid']) && $f['pgsql:oid'] == Horde_Db_Adapter_Postgresql_Column::MONEY_COLUMN_TYPE_OID) {
@@ -284,6 +294,6 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
      */
     protected function _lastInsertId($table, $sequenceName)
     {
-        return (int)$this->selectValue('SELECT currval('.$this->quoteSequenceName($sequenceName).')');
+        return (int) $this->selectValue('SELECT currval(' . $this->quoteSequenceName($sequenceName) . ')');
     }
 }

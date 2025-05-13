@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -106,22 +107,22 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function nativeDatabaseTypes()
     {
-        return array(
+        return [
             'autoincrementKey' => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-            'string'           => array('name' => 'varchar',    'limit' => 255),
-            'text'             => array('name' => 'text',       'limit' => null),
-            'mediumtext'       => array('name' => 'mediumtext', 'limit' => null),
-            'longtext'         => array('name' => 'longtext',   'limit' => null),
-            'integer'          => array('name' => 'int',        'limit' => 11),
-            'float'            => array('name' => 'float',      'limit' => null),
-            'decimal'          => array('name' => 'decimal',    'limit' => null),
-            'datetime'         => array('name' => 'datetime',   'limit' => null),
-            'timestamp'        => array('name' => 'datetime',   'limit' => null),
-            'time'             => array('name' => 'time',       'limit' => null),
-            'date'             => array('name' => 'date',       'limit' => null),
-            'binary'           => array('name' => 'longblob',   'limit' => null),
-            'boolean'          => array('name' => 'tinyint',    'limit' => 1),
-        );
+            'string'           => ['name' => 'varchar',    'limit' => 255],
+            'text'             => ['name' => 'text',       'limit' => null],
+            'mediumtext'       => ['name' => 'mediumtext', 'limit' => null],
+            'longtext'         => ['name' => 'longtext',   'limit' => null],
+            'integer'          => ['name' => 'int',        'limit' => 11],
+            'float'            => ['name' => 'float',      'limit' => null],
+            'decimal'          => ['name' => 'decimal',    'limit' => null],
+            'datetime'         => ['name' => 'datetime',   'limit' => null],
+            'timestamp'        => ['name' => 'datetime',   'limit' => null],
+            'time'             => ['name' => 'time',       'limit' => null],
+            'date'             => ['name' => 'date',       'limit' => null],
+            'binary'           => ['name' => 'longblob',   'limit' => null],
+            'boolean'          => ['name' => 'tinyint',    'limit' => 1],
+        ];
     }
 
     /**
@@ -150,12 +151,13 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
         if (!$rows) {
             $rows = $this->selectAll(
                 'SHOW FIELDS FROM ' . $this->quoteTableName($tableName),
-                $name);
+                $name
+            );
 
             $this->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
-        $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, array());
+        $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, []);
         foreach ($rows as $row) {
             if ($row['Key'] == 'PRI') {
                 $pk->columns[] = $row['Field'];
@@ -173,12 +175,12 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      *
      * @return array  A list of Horde_Db_Adapter_Base_Index objects.
      */
-    public function indexes($tableName, $name=null)
+    public function indexes($tableName, $name = null)
     {
         $indexes = @unserialize($this->cacheRead("tables/indexes/$tableName"));
 
         if (!$indexes) {
-            $indexes = array();
+            $indexes = [];
             $currentIndex = null;
             foreach ($this->select('SHOW KEYS FROM ' . $this->quoteTableName($tableName)) as $row) {
                 if ($currentIndex != $row['Key_name']) {
@@ -187,7 +189,12 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
                     }
                     $currentIndex = $row['Key_name'];
                     $indexes[] = $this->makeIndex(
-                        $tableName, $row['Key_name'], false, $row['Non_unique'] == '0', array());
+                        $tableName,
+                        $row['Key_name'],
+                        false,
+                        $row['Non_unique'] == '0',
+                        []
+                    );
                 }
                 $indexes[count($indexes) - 1]->columns[] = $row['Column_name'];
             }
@@ -206,7 +213,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      *
      * @return array  A list of Horde_Db_Adapter_Base_Column objects.
      */
-    public function columns($tableName, $name=null)
+    public function columns($tableName, $name = null)
     {
         $rows = @unserialize($this->cacheRead("tables/columns/$tableName"));
 
@@ -217,10 +224,14 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
         }
 
         // Create columns from rows.
-        $columns = array();
+        $columns = [];
         foreach ($rows as $row) {
             $columns[$row['Field']] = $this->makeColumn(
-                $row['Field'], $row['Default'], $row['Type'], $row['Null'] == 'YES');
+                $row['Field'],
+                $row['Default'],
+                $row['Type'],
+                $row['Null'] == 'YES'
+            );
         }
 
         return $columns;
@@ -234,7 +245,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      * @param array $options
      *        A list of options. See createTable().
      */
-    public function endTable($name, $options = array())
+    public function endTable($name, $options = [])
     {
         if ($name instanceof Horde_Db_Adapter_Base_TableDefinition) {
             $options = array_merge($name->getOptions(), $options);
@@ -247,7 +258,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
             }
             $opts = 'ENGINE=InnoDB DEFAULT CHARSET=' . $options['charset'];
         }
-        return parent::endTable($name, array_merge(array('options' => $opts), $options));
+        return parent::endTable($name, array_merge(['options' => $opts], $options));
     }
 
     /**
@@ -259,9 +270,11 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
     public function renameTable($name, $newName)
     {
         $this->_clearTableCache($name);
-        $sql = sprintf('ALTER TABLE %s RENAME %s',
-                       $this->quoteTableName($name),
-                       $this->quoteTableName($newName));
+        $sql = sprintf(
+            'ALTER TABLE %s RENAME %s',
+            $this->quoteTableName($name),
+            $this->quoteTableName($newName)
+        );
         return $this->execute($sql);
     }
 
@@ -275,46 +288,60 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    public function changeColumn($tableName, $columnName, $type,
-                                 $options = array())
-    {
+    public function changeColumn(
+        $tableName,
+        $columnName,
+        $type,
+        $options = []
+    ) {
         $this->_clearTableCache($tableName);
 
         $quotedTableName = $this->quoteTableName($tableName);
         $quotedColumnName = $this->quoteColumnName($columnName);
 
         $options = array_merge(
-            array('limit'     => null,
-                  'precision' => null,
-                  'scale'     => null,
-                  'unsigned'  => null),
-            $options);
+            ['limit'     => null,
+                'precision' => null,
+                'scale'     => null,
+                'unsigned'  => null],
+            $options
+        );
 
-        $sql = sprintf('SHOW COLUMNS FROM %s LIKE %s',
-                       $quotedTableName,
-                       $this->quoteString($columnName));
+        $sql = sprintf(
+            'SHOW COLUMNS FROM %s LIKE %s',
+            $quotedTableName,
+            $this->quoteString($columnName)
+        );
         $row = $this->selectOne($sql);
         if (!array_key_exists('default', $options)) {
             $options['default'] = $row['Default'];
-            $options['column'] = $this->makeColumn($columnName,
-                                                   $row['Default'],
-                                                   $row['Type'],
-                                                   $row['Null'] == 'YES');
+            $options['column'] = $this->makeColumn(
+                $columnName,
+                $row['Default'],
+                $row['Type'],
+                $row['Null'] == 'YES'
+            );
         }
 
-        $typeSql = $this->typeToSql($type, $options['limit'],
-                                    $options['precision'], $options['scale'],
-                                    $options['unsigned']);
+        $typeSql = $this->typeToSql(
+            $type,
+            $options['limit'],
+            $options['precision'],
+            $options['scale'],
+            $options['unsigned']
+        );
         $dropPk = ($type == 'autoincrementKey' && $row['Key'] == 'PRI')
             ? 'DROP PRIMARY KEY,'
             : '';
 
-        $sql = sprintf('ALTER TABLE %s %s CHANGE %s %s %s',
-                       $quotedTableName,
-                       $dropPk,
-                       $quotedColumnName,
-                       $quotedColumnName,
-                       $typeSql);
+        $sql = sprintf(
+            'ALTER TABLE %s %s CHANGE %s %s %s',
+            $quotedTableName,
+            $dropPk,
+            $quotedColumnName,
+            $quotedColumnName,
+            $typeSql
+        );
         if ($type != 'autoincrementKey') {
             $sql = $this->addColumnOptions($sql, $options);
         }
@@ -339,19 +366,23 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
         $quotedTableName = $this->quoteTableName($tableName);
         $quotedColumnName = $this->quoteColumnName($columnName);
 
-        $sql = sprintf('SHOW COLUMNS FROM %s LIKE %s',
-                       $quotedTableName,
-                       $this->quoteString($columnName));
+        $sql = sprintf(
+            'SHOW COLUMNS FROM %s LIKE %s',
+            $quotedTableName,
+            $this->quoteString($columnName)
+        );
         $res = $this->selectOne($sql);
         $column = $this->makeColumn($columnName, $res['Default'], $res['Type'], $res['Null'] == 'YES');
 
         $default = $this->quote($default, $column);
-        $sql = sprintf('ALTER TABLE %s CHANGE %s %s %s DEFAULT %s',
-                       $quotedTableName,
-                       $quotedColumnName,
-                       $quotedColumnName,
-                       $res['Type'],
-                       $default);
+        $sql = sprintf(
+            'ALTER TABLE %s CHANGE %s %s %s DEFAULT %s',
+            $quotedTableName,
+            $quotedColumnName,
+            $quotedColumnName,
+            $res['Type'],
+            $default
+        );
         return $this->execute($sql);
     }
 
@@ -369,17 +400,21 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
         $quotedTableName = $this->quoteTableName($tableName);
         $quotedColumnName = $this->quoteColumnName($columnName);
 
-        $sql = sprintf('SHOW COLUMNS FROM %s LIKE %s',
-                       $quotedTableName,
-                       $this->quoteString($columnName));
+        $sql = sprintf(
+            'SHOW COLUMNS FROM %s LIKE %s',
+            $quotedTableName,
+            $this->quoteString($columnName)
+        );
         $res = $this->selectOne($sql);
         $currentType = $res['Type'];
 
-        $sql = sprintf('ALTER TABLE %s CHANGE %s %s %s',
-                       $quotedTableName,
-                       $quotedColumnName,
-                       $this->quoteColumnName($newColumnName),
-                       $currentType);
+        $sql = sprintf(
+            'ALTER TABLE %s CHANGE %s %s %s',
+            $quotedTableName,
+            $quotedColumnName,
+            $this->quoteColumnName($newColumnName),
+            $currentType
+        );
 
         return $this->execute($sql);
     }
@@ -394,8 +429,10 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
     public function removePrimaryKey($tableName)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s DROP PRIMARY KEY',
-                       $this->quoteTableName($tableName));
+        $sql = sprintf(
+            'ALTER TABLE %s DROP PRIMARY KEY',
+            $this->quoteTableName($tableName)
+        );
         return $this->execute($sql);
     }
 
@@ -411,7 +448,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      *                               - name: (string) the index name to fall
      *                                 back to if no column names specified.
      */
-    public function indexName($tableName, $options = array())
+    public function indexName($tableName, $options = [])
     {
         return substr(parent::indexName($tableName, $options), 0, 64);
     }
@@ -422,7 +459,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      * @param string $name    A database name.
      * @param array $options  Database options.
      */
-    public function createDatabase($name, $options = array())
+    public function createDatabase($name, $options = [])
     {
         return $this->execute("CREATE DATABASE `$name`");
     }
@@ -460,14 +497,18 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      * @return string  The SQL definition. If $type is not one of the
      *                 internally supported types, $type is returned unchanged.
      */
-    public function typeToSql($type, $limit = null, $precision = null,
-                              $scale = null, $unsigned = null)
-    {
+    public function typeToSql(
+        $type,
+        $limit = null,
+        $precision = null,
+        $scale = null,
+        $unsigned = null
+    ) {
         // If there is no explicit limit, adjust $nativeLimit for unsigned
         // integers.
         if ($type == 'integer' && !empty($unsigned) && empty($limit)) {
             $natives = $this->nativeDatabaseTypes();
-            $native = isset($natives[$type]) ? $natives[$type] : null;
+            $native = $natives[$type] ?? null;
             if (empty($native)) {
                 return $type;
             }
@@ -526,16 +567,20 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      * @return string|array  The SQL test fragment, or an array containing the
      *                       query and a list of values if $bind is true.
      */
-    public function buildClause($lhs, $op, $rhs, $bind = false,
-                                $params = array())
-    {
+    public function buildClause(
+        $lhs,
+        $op,
+        $rhs,
+        $bind = false,
+        $params = []
+    ) {
         switch ($op) {
-        case '~':
-            if ($bind) {
-                return array($lhs . ' REGEXP ?', array($rhs));
-            } else {
-                return $lhs . ' REGEXP ' . $rhs;
-            }
+            case '~':
+                if ($bind) {
+                    return [$lhs . ' REGEXP ?', [$rhs]];
+                } else {
+                    return $lhs . ' REGEXP ' . $rhs;
+                }
         }
         return parent::buildClause($lhs, $op, $rhs, $bind, $params);
     }
@@ -576,9 +621,11 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function _mysqlCharsetName($charset)
     {
-        $charset = preg_replace(array('/[^a-z0-9]/', '/iso8859(\d)/'),
-                                array('', 'latin$1'),
-                                Horde_String::lower($charset));
+        $charset = preg_replace(
+            ['/[^a-z0-9]/', '/iso8859(\d)/'],
+            ['', 'latin$1'],
+            Horde_String::lower($charset)
+        );
         $validCharsets = $this->selectValues('SHOW CHARACTER SET');
         if (!in_array($charset, $validCharsets)) {
             throw new Horde_Db_Exception($charset . ' is not supported by MySQL (' . implode(', ', $validCharsets) . ')');
@@ -627,7 +674,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
     /**
      */
     public function limitedUpdateConditions($whereSql, $quotedTableName,
-                                            $quotedPrimaryKey)
+        $quotedPrimaryKey)
     {
         return $whereSql;
     }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
@@ -43,7 +44,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
             return;
         }
 
-        list($dsn, $user, $pass) = $this->_parseConfig();
+        [$dsn, $user, $pass] = $this->_parseConfig();
 
         try {
             $pdo = @new PDO($dsn, $user, $pass);
@@ -111,11 +112,11 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectAll($sql, $arg1=null, $arg2=null)
+    public function selectAll($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
-            return array();
+            return [];
         }
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
         // Required to really close the connection.
@@ -137,7 +138,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
-            return array();
+            return [];
         }
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         // Required to really close the connection.
@@ -153,7 +154,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      * @return  string
      */
-    public function selectValue($sql, $arg1=null, $arg2=null)
+    public function selectValue($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -173,7 +174,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectValues($sql, $arg1=null, $arg2=null)
+    public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -195,7 +196,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectAssoc($sql, $arg1=null, $arg2=null)
+    public function selectAssoc($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -229,10 +230,10 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         } else {
             $name = $arg1;
             $query = $sql;
-            $arg1 = array();
+            $arg1 = [];
         }
 
-        $t = new Horde_Support_Timer;
+        $t = new Horde_Support_Timer();
         $t->push();
 
         try {
@@ -278,7 +279,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
             throw new Horde_Db_Exception($e);
         }
 
-        $t = new Horde_Support_Timer;
+        $t = new Horde_Support_Timer();
         $t->push();
 
         try {
@@ -290,7 +291,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
             throw new Horde_Db_Exception($e);
         }
 
-        $t = new Horde_Support_Timer;
+        $t = new Horde_Support_Timer();
         $t->push();
 
         $this->_logInfo($sql, $values, null, $t->pop());
@@ -316,7 +317,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
     {
-        $placeholders = $values = $binary = array();
+        $placeholders = $values = $binary = [];
         $binary_cnt = 0;
         foreach ($fields as $name => $value) {
             if ($value instanceof Horde_Db_Value_Binary) {
@@ -331,7 +332,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quoteTableName($table),
-            implode(', ', array_map(array($this, 'quoteColumnName'), array_keys($fields))),
+            implode(', ', array_map([$this, 'quoteColumnName'], array_keys($fields))),
             implode(', ', $placeholders)
         );
 
@@ -371,7 +372,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
             $where = $this->_replaceParameters($where[0], $where[1]);
         }
 
-        $values = $binary_values = $fnames = array();
+        $values = $binary_values = $fnames = [];
         $binary_cnt = 0;
 
         foreach ($fields as $field => $value) {
@@ -417,9 +418,14 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      * @return integer  Last inserted ID.
      * @throws Horde_Db_Exception
      */
-    public function insert($sql, $arg1 = null, $arg2 = null, $pk = null,
-                           $idValue = null, $sequenceName = null)
-    {
+    public function insert(
+        $sql,
+        $arg1 = null,
+        $arg2 = null,
+        $pk = null,
+        $idValue = null,
+        $sequenceName = null
+    ) {
         $this->execute($sql, $arg1, $arg2);
 
         try {
@@ -508,8 +514,8 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
     protected function _normalizeConfig($params)
     {
         // Normalize config parameters to what PDO expects.
-        $normalize = array('database' => 'dbname',
-                           'hostspec' => 'host');
+        $normalize = ['database' => 'dbname',
+            'hostspec' => 'host'];
 
         foreach ($normalize as $from => $to) {
             if (isset($params[$from])) {
@@ -540,7 +546,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      */
     protected function _parseConfig()
     {
-        $this->_checkRequiredConfig(array('adapter', 'username'));
+        $this->_checkRequiredConfig(['adapter', 'username']);
 
         // try an empty password if it's not set.
         if (!isset($this->_config['password'])) {
@@ -561,9 +567,9 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         );
 
         // return DSN and user/pass for connection
-        return array(
+        return [
             $this->_buildDsnString($this->_normalizeConfig($dsnOpts)),
             $this->_config['username'],
-            $this->_config['password']);
+            $this->_config['password']];
     }
 }

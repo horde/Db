@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -35,6 +36,7 @@ require_once dirname(__DIR__) . '/fixtures/migrations_with_decimal/1_give_me_big
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class BaseTest extends TestCase
 {
@@ -42,34 +44,34 @@ class BaseTest extends TestCase
     public function setUp(): void
     {
         try {
-            $this->conn = new Sqlite(array(
+            $this->conn = new Sqlite([
                 'dbname' => ':memory:',
-            ));
+            ]);
         } catch (DbException $e) {
             $this->markTestSkipped('The sqlite adapter is not available');
         }
 
         $table = $this->conn->createTable('users');
-        $table->column('company_id', 'integer', array('limit' => 11));
-        $table->column('name', 'string', array('limit' => 255, 'default' => ''));
-        $table->column('first_name', 'string', array('limit' => 40, 'default' => ''));
-        $table->column('approved', 'boolean', array('default' => true));
-        $table->column('type', 'string', array('limit' => 255, 'default' => ''));
-        $table->column('created_at', 'datetime', array('default' => '0000-00-00 00:00:00'));
-        $table->column('created_on', 'date', array('default' => '0000-00-00'));
-        $table->column('updated_at', 'datetime', array('default' => '0000-00-00 00:00:00'));
-        $table->column('updated_on', 'date', array('default' => '0000-00-00'));
+        $table->column('company_id', 'integer', ['limit' => 11]);
+        $table->column('name', 'string', ['limit' => 255, 'default' => '']);
+        $table->column('first_name', 'string', ['limit' => 40, 'default' => '']);
+        $table->column('approved', 'boolean', ['default' => true]);
+        $table->column('type', 'string', ['limit' => 255, 'default' => '']);
+        $table->column('created_at', 'datetime', ['default' => '0000-00-00 00:00:00']);
+        $table->column('created_on', 'date', ['default' => '0000-00-00']);
+        $table->column('updated_at', 'datetime', ['default' => '0000-00-00 00:00:00']);
+        $table->column('updated_on', 'date', ['default' => '0000-00-00']);
         $table->end();
     }
 
     public function testChangeColumnWithNilDefault()
     {
-        $this->conn->addColumn('users', 'contributor', 'boolean', array('default' => true));
+        $this->conn->addColumn('users', 'contributor', 'boolean', ['default' => true]);
         $users = $this->conn->table('users');
         $this->assertTrue($users->contributor->getDefault());
 
         // changeColumn() throws exception on error
-        $this->conn->changeColumn('users', 'contributor', 'boolean', array('default' => null));
+        $this->conn->changeColumn('users', 'contributor', 'boolean', ['default' => null]);
 
         $users = $this->conn->table('users');
         $this->assertNull($users->contributor->getDefault());
@@ -77,12 +79,12 @@ class BaseTest extends TestCase
 
     public function testChangeColumnWithNewDefault()
     {
-        $this->conn->addColumn('users', 'administrator', 'boolean', array('default' => true));
+        $this->conn->addColumn('users', 'administrator', 'boolean', ['default' => true]);
         $users = $this->conn->table('users');
         $this->assertTrue($users->administrator->getDefault());
 
         // changeColumn() throws exception on error
-        $this->conn->changeColumn('users', 'administrator', 'boolean', array('default' => false));
+        $this->conn->changeColumn('users', 'administrator', 'boolean', ['default' => false]);
 
         $users = $this->conn->table('users');
         $this->assertFalse($users->administrator->getDefault());
@@ -117,7 +119,7 @@ class BaseTest extends TestCase
 
         $this->conn->insert("INSERT INTO reminders (content, remind_at) VALUES ('hello world', '2005-01-01 11:10:01')");
 
-        $reminder = (object)$this->conn->selectOne('SELECT * FROM reminders');
+        $reminder = (object) $this->conn->selectOne('SELECT * FROM reminders');
         $this->assertEquals('hello world', $reminder->content);
 
         $m->down();
@@ -140,7 +142,7 @@ class BaseTest extends TestCase
 
         $this->conn->insert('INSERT INTO big_numbers (bank_balance, big_bank_balance, world_population, my_house_population, value_of_e) VALUES (1586.43, 1000234000567.95, 6000000000, 3, 2.7182818284590452353602875)');
 
-        $b = (object)$this->conn->selectOne('SELECT * FROM big_numbers');
+        $b = (object) $this->conn->selectOne('SELECT * FROM big_numbers');
         $this->assertNotNull($b->bank_balance);
         $this->assertNotNull($b->big_bank_balance);
         $this->assertNotNull($b->world_population);
@@ -156,8 +158,8 @@ class BaseTest extends TestCase
 
     public function testAutoincrement()
     {
-        $t = $this->conn->createTable('imp_sentmail', array('autoincrementKey' => array('sentmail_id')));
-        $t->column('sentmail_id', 'bigint', array('null' => false));
+        $t = $this->conn->createTable('imp_sentmail', ['autoincrementKey' => ['sentmail_id']]);
+        $t->column('sentmail_id', 'bigint', ['null' => false]);
         $t->column('sentmail_foo', 'string');
         $t->end();
         $migration = new BaseMigration($this->conn, null);
@@ -166,9 +168,9 @@ class BaseTest extends TestCase
         $this->assertEquals(2, count($columns));
         $this->assertTrue(isset($columns['sentmail_id']));
         $this->assertEquals(
-            array('sentmail_id'),
+            ['sentmail_id'],
             $this->conn->primaryKey('imp_sentmail')->columns
         );
-        $this->conn->insert('INSERT INTO imp_sentmail (sentmail_foo) VALUES (?)', array('bar'));
+        $this->conn->insert('INSERT INTO imp_sentmail (sentmail_foo) VALUES (?)', ['bar']);
     }
 }

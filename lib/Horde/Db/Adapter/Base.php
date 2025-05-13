@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -35,7 +36,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      *
      * @var array
      */
-    protected $_config = array();
+    protected $_config = [];
 
     /**
      * DB connection.
@@ -119,7 +120,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      *
      * @var array
      */
-    protected $_schemaMethods = array();
+    protected $_schemaMethods = [];
 
     /**
      * Log query flag
@@ -177,7 +178,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      */
     public function __sleep()
     {
-        return array_diff(array_keys(get_class_vars(__CLASS__)), array('_active', '_connection'));
+        return array_diff(array_keys(get_class_vars(__CLASS__)), ['_active', '_connection']);
     }
 
     /**
@@ -199,7 +200,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      */
     public function getOption($option)
     {
-        return isset($this->_config[$option]) ? $this->_config[$option] : null;
+        return $this->_config[$option] ?? null;
     }
 
     /*##########################################################################
@@ -270,15 +271,15 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
         if (!$this->_schema) {
             // Create the database-specific (but not adapter specific) schema
             // object.
-            $this->_schema = new $this->_schemaClass($this, array(
+            $this->_schema = new $this->_schemaClass($this, [
                 'cache' => $this->_cache,
-                'logger' => $this->_logger
-            ));
+                'logger' => $this->_logger,
+            ]);
             $this->_schemaMethods = array_flip(get_class_methods($this->_schema));
         }
 
         if (isset($this->_schemaMethods[$method])) {
-            return call_user_func_array(array($this->_schema, $method), $args);
+            return call_user_func_array([$this->_schema, $method], $args);
         }
 
         $support = new Horde_Support_Backtrace();
@@ -473,7 +474,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      */
     public function selectAll($sql, $arg1 = null, $arg2 = null)
     {
-        $rows = array();
+        $rows = [];
         $result = $this->select($sql, $arg1, $arg2);
         if ($result) {
             foreach ($result as $row) {
@@ -501,7 +502,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
         $result = $this->selectAll($sql, $arg1, $arg2);
         return $result
             ? next($result)
-            : array();
+            : [];
     }
 
     /**
@@ -541,7 +542,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
     public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
         $result = $this->selectAll($sql, $arg1, $arg2);
-        $values = array();
+        $values = [];
         foreach ($result as $row) {
             $values[] = next($row);
         }
@@ -566,7 +567,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
     public function selectAssoc($sql, $arg1 = null, $arg2 = null)
     {
         $result = $this->selectAll($sql, $arg1, $arg2);
-        $values = array();
+        $values = [];
         foreach ($result as $row) {
             $values[current($row)] = next($row);
         }
@@ -595,7 +596,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quoteTableName($table),
-            implode(', ', array_map(array($this, 'quoteColumnName'), array_keys($fields))),
+            implode(', ', array_map([$this, 'quoteColumnName'], array_keys($fields))),
             implode(', ', array_fill(0, count($fields), '?'))
         );
         return $this->insert($query, $fields, null, $pk, $idValue);
@@ -639,7 +640,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
         if (is_array($where)) {
             $where = $this->_replaceParameters($where[0], $where[1]);
         }
-        $fnames = array();
+        $fnames = [];
         foreach (array_keys($fields) as $field) {
             $fnames[] = $this->quoteColumnName($field) . ' = ?';
         }
@@ -677,7 +678,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      */
     public function transactionStarted()
     {
-        return (bool)$this->_transactionStarted;
+        return (bool) $this->_transactionStarted;
     }
 
     /**
@@ -721,7 +722,7 @@ abstract class Horde_Db_Adapter_Base implements Horde_Db_Adapter
      * @param string &$sql    SQL statment.
      * @param array $options  TODO.
      */
-    public function addLock(&$sql, array $options = array())
+    public function addLock(&$sql, array $options = [])
     {
         $sql .= (isset($options['lock']) && is_string($options['lock']))
             ? ' ' . $options['lock']

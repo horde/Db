@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -134,9 +135,9 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function execute($sql, $arg1=null, $arg2=null)
+    public function execute($sql, $arg1 = null, $arg2 = null)
     {
-        return $this->_catchSchemaChanges('execute', array($sql, $arg1, $arg2));
+        return $this->_catchSchemaChanges('execute', [$sql, $arg1, $arg2]);
     }
 
     /**
@@ -167,13 +168,11 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
     /**
      * SELECT ... FOR UPDATE is redundant since the table is locked.
      */
-    public function addLock(&$sql, array $options = array())
-    {
-    }
+    public function addLock(&$sql, array $options = []) {}
 
     public function emptyInsertStatement($tableName)
     {
-        return 'INSERT INTO '.$this->quoteTableName($tableName).' VALUES(NULL)';
+        return 'INSERT INTO ' . $this->quoteTableName($tableName) . ' VALUES(NULL)';
     }
 
 
@@ -181,14 +180,14 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
     # Protected
     ##########################################################################*/
 
-    protected function _catchSchemaChanges($method, $args = array())
+    protected function _catchSchemaChanges($method, $args = [])
     {
         try {
-            return call_user_func_array(array($this, "parent::$method"), $args);
+            return call_user_func_array([$this, "parent::$method"], $args);
         } catch (Exception $e) {
             if (preg_match('/database schema has changed/i', $e->getMessage())) {
                 $this->reconnect();
-                return call_user_func_array(array($this, "parent::$method"), $args);
+                return call_user_func_array([$this, "parent::$method"], $args);
             } else {
                 throw $e;
             }
@@ -219,7 +218,7 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
         unset($dsnOpts['adapter'], $dsnOpts['username'], $dsnOpts['password']);
 
         // return DSN and dummy user/pass for connection
-        return array($this->_buildDsnString($this->_normalizeConfig($dsnOpts)), '', '');
+        return [$this->_buildDsnString($this->_normalizeConfig($dsnOpts)), '', ''];
     }
 
 }

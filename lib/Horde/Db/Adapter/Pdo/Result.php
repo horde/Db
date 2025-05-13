@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -29,11 +30,11 @@ class Horde_Db_Adapter_Pdo_Result extends Horde_Db_Adapter_Base_Result
      *
      * @var array
      */
-    protected $_map = array(
+    protected $_map = [
         Horde_Db::FETCH_ASSOC => PDO::FETCH_ASSOC,
         Horde_Db::FETCH_NUM   => PDO::FETCH_NUM,
-        Horde_Db::FETCH_BOTH  => PDO::FETCH_BOTH
-    );
+        Horde_Db::FETCH_BOTH  => PDO::FETCH_BOTH,
+    ];
 
     /**
      * Returns a row from a resultset.

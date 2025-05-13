@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -32,6 +33,7 @@ use Horde_Cache_Storage_Mock;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class MysqlTest extends MysqlBase
 {
@@ -41,15 +43,15 @@ class MysqlTest extends MysqlBase
             in_array('mysql', PDO::getAvailableDrivers());
     }
 
-    protected static function _getConnection($overrides = array())
+    protected static function _getConnection($overrides = [])
     {
         $config = TestCase::getConfig(
             'DB_ADAPTER_PDO_MYSQL_TEST_CONFIG',
             __DIR__ . '/..',
-            array('host' => 'localhost',
-                                                   'username' => '',
-                                                   'password' => '',
-                                                   'dbname' => 'test')
+            ['host' => 'localhost',
+                'username' => '',
+                'password' => '',
+                'dbname' => 'test']
         );
         if (isset($config['db']['adapter']['pdo']['mysql']['test'])) {
             $config = $config['db']['adapter']['pdo']['mysql']['test'];
@@ -66,7 +68,7 @@ class MysqlTest extends MysqlBase
         $cache = new Horde_Cache(new Horde_Cache_Storage_Mock());
         $conn->setCache($cache);
 
-        return array($conn, $cache);
+        return [$conn, $cache];
     }
 
 

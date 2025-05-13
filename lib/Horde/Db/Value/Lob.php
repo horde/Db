@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
  *
@@ -60,27 +61,27 @@ abstract class Horde_Db_Value_Lob implements Horde_Db_Value
     public function __get($name)
     {
         switch ($name) {
-        case 'value':
-            if (isset($this->_value)) {
-                return $this->_value;
-            }
-            if (isset($this->_stream)) {
-                rewind($this->_stream);
-                return stream_get_contents($this->_stream);
-            }
-            break;
+            case 'value':
+                if (isset($this->_value)) {
+                    return $this->_value;
+                }
+                if (isset($this->_stream)) {
+                    rewind($this->_stream);
+                    return stream_get_contents($this->_stream);
+                }
+                break;
 
-        case 'stream':
-            if (isset($this->_stream)) {
-                return $this->_stream;
-            }
-            if (isset($this->_value)) {
-                $stream = @fopen('php://temp', 'r+');
-                fwrite($stream, $this->_value);
-                rewind($stream);
-                return $stream;
-            }
-            break;
+            case 'stream':
+                if (isset($this->_stream)) {
+                    return $this->_stream;
+                }
+                if (isset($this->_value)) {
+                    $stream = @fopen('php://temp', 'r+');
+                    fwrite($stream, $this->_value);
+                    rewind($stream);
+                    return $stream;
+                }
+                break;
         }
     }
 
@@ -90,10 +91,10 @@ abstract class Horde_Db_Value_Lob implements Horde_Db_Value
     public function __set($name, $value)
     {
         switch ($name) {
-        case 'value':
-        case 'stream':
-            $this->{'_' . $name} = $value;
-            break;
+            case 'value':
+            case 'stream':
+                $this->{'_' . $name} = $value;
+                break;
         }
     }
 }

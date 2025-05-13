@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -26,6 +27,7 @@ use Horde\Test\TestCase;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class ColumnDefinition extends TestCase
 {

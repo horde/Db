@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -34,6 +35,7 @@ use Exception;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class PgsqlTest extends TestBase
 {
@@ -43,7 +45,7 @@ class PgsqlTest extends TestBase
         if (extension_loaded('pdo') &&
             in_array('pgsql', PDO::getAvailableDrivers())) {
             self::$_skip = false;
-            list($conn, ) = static::_getConnection();
+            [$conn, ] = static::_getConnection();
             if ($conn) {
                 $conn->disconnect();
             }
@@ -52,14 +54,14 @@ class PgsqlTest extends TestBase
         self::$_tableTest = new TestTableDefinition();
     }
 
-    protected static function _getConnection($overrides = array())
+    protected static function _getConnection($overrides = [])
     {
         $config = TestCase::getConfig(
             'DB_ADAPTER_PDO_PGSQL_TEST_CONFIG',
             __DIR__ . '/..',
-            array('username' => '',
-                                                   'password' => '',
-                                                   'dbname' => 'test')
+            ['username' => '',
+                'password' => '',
+                'dbname' => 'test']
         );
         if (isset($config['db']['adapter']['pdo']['pgsql']['test'])) {
             $config = $config['db']['adapter']['pdo']['pgsql']['test'];
@@ -76,7 +78,7 @@ class PgsqlTest extends TestBase
         $cache = new Horde_Cache(new Horde_Cache_Storage_Mock());
         $conn->setCache($cache);
 
-        return array($conn, $cache);
+        return [$conn, $cache];
     }
 
 
@@ -160,7 +162,7 @@ class PgsqlTest extends TestBase
     public function testNativeDatabaseTypes()
     {
         $types = $this->conn->nativeDatabaseTypes();
-        $this->assertEquals(array('name' => 'integer', 'limit' => null), $types['integer']);
+        $this->assertEquals(['name' => 'integer', 'limit' => null], $types['integer']);
     }
 
     public function testTableAliasLength()
@@ -198,7 +200,7 @@ class PgsqlTest extends TestBase
         $table->end();
         $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
-            array("foo")
+            ["foo"]
         );
 
         $this->conn->changeColumn('text_to_binary', 'data', 'binary');
@@ -221,7 +223,7 @@ class PgsqlTest extends TestBase
             'sports',
             'is_college',
             'string',
-            array('limit' => '40')
+            ['limit' => '40']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -238,7 +240,7 @@ class PgsqlTest extends TestBase
             'sports',
             'is_college',
             'decimal',
-            array('precision' => '5', 'scale' => '2')
+            ['precision' => '5', 'scale' => '2']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -337,27 +339,27 @@ class PgsqlTest extends TestBase
 
     public function testAddColumnOptions()
     {
-        $result = $this->conn->addColumnOptions("test", array());
+        $result = $this->conn->addColumnOptions("test", []);
         $this->assertEquals("test", $result);
     }
 
     public function testAddColumnOptionsDefault()
     {
-        $options = array('default' => '0');
+        $options = ['default' => '0'];
         $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test DEFAULT '0'", $result);
     }
 
     public function testAddColumnOptionsNull()
     {
-        $options = array('null' => true);
+        $options = ['null' => true];
         $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test", $result);
     }
 
     public function testAddColumnOptionsNotNull()
     {
-        $options = array('null' => false);
+        $options = ['null' => false];
         $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test NOT NULL", $result);
     }
@@ -381,10 +383,10 @@ class PgsqlTest extends TestBase
         $t->end();
         $this->conn->insert(
             'INSERT INTO dates (mystart, myend) VALUES (?, ?)',
-            array(
+            [
                 '2011-12-10 00:00:00',
-                '2011-12-11 00:00:00'
-            )
+                '2011-12-11 00:00:00',
+            ]
         );
         $this->assertEquals(
             1,
@@ -400,7 +402,7 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('bitmap', '&', 2)
         );
         $this->assertEquals(
-            array("CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) & ?) ELSE 0 END", array(2)),
+            ["CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) & ?) ELSE 0 END", [2]],
             $this->conn->buildClause('bitmap', '&', 2, true)
         );
 
@@ -409,7 +411,7 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('bitmap', '|', 2)
         );
         $this->assertEquals(
-            array("CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) | ?) ELSE 0 END", array(2)),
+            ["CASE WHEN CAST(bitmap AS VARCHAR) ~ '^-?[0-9]+$' THEN (CAST(bitmap AS INTEGER) | ?) ELSE 0 END", [2]],
             $this->conn->buildClause('bitmap', '|', 2, true)
         );
 
@@ -418,7 +420,7 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('name', 'LIKE', "search")
         );
         $this->assertEquals(
-            array("name ILIKE ?", array('%search%')),
+            ["name ILIKE ?", ['%search%']],
             $this->conn->buildClause('name', 'LIKE', "search", true)
         );
         $this->assertEquals(
@@ -426,17 +428,17 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('name', 'LIKE', "search&replace?")
         );
         $this->assertEquals(
-            array("name ILIKE ?", array('%search&replace?%')),
+            ["name ILIKE ?", ['%search&replace?%']],
             $this->conn->buildClause('name', 'LIKE', "search&replace?", true)
         );
         $this->assertEquals(
             "(name ILIKE 'search\&replace\?%' OR name ILIKE '% search\&replace\?%')",
-            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, ['begin' => true])
         );
         $this->assertEquals(
-            array("(name ILIKE ? OR name ILIKE ?)",
-                  array('search&replace?%', '% search&replace?%')),
-            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, array('begin' => true))
+            ["(name ILIKE ? OR name ILIKE ?)",
+                ['search&replace?%', '% search&replace?%']],
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, ['begin' => true])
         );
 
         $this->assertEquals(
@@ -444,7 +446,7 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('value', '=', 2)
         );
         $this->assertEquals(
-            array('value = ?', array(2)),
+            ['value = ?', [2]],
             $this->conn->buildClause('value', '=', 2, true)
         );
         $this->assertEquals(
@@ -452,7 +454,7 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('value', '=', 'foo')
         );
         $this->assertEquals(
-            array('value = ?', array('foo')),
+            ['value = ?', ['foo']],
             $this->conn->buildClause('value', '=', 'foo', true)
         );
         $this->assertEquals(
@@ -460,7 +462,7 @@ class PgsqlTest extends TestBase
             $this->conn->buildClause('value', '=', 'foo?bar')
         );
         $this->assertEquals(
-            array('value = ?', array('foo?bar')),
+            ['value = ?', ['foo?bar']],
             $this->conn->buildClause('value', '=', 'foo?bar', true)
         );
     }
@@ -473,9 +475,9 @@ class PgsqlTest extends TestBase
     /**
      * Create table to perform tests on
      */
-    protected function _createTestTable($name, $options = array())
+    protected function _createTestTable($name, $options = [])
     {
-        parent::_createTestTable($name, $options = array());
+        parent::_createTestTable($name, $options = []);
         try {
             // make sure table was created
             $sql = "INSERT INTO $name

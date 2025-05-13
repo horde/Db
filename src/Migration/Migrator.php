@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -83,7 +84,7 @@ class Migrator
      */
     public function __construct(
         Adapter $connection,
-        Horde_Log_Logger $logger = null,
+        ?Horde_Log_Logger $logger = null,
         array $options = []
     ) {
         if (!$connection->supportsMigrations()) {
@@ -155,7 +156,7 @@ class Migrator
     {
         $migrations = [];
         foreach ($this->getMigrationFiles() as $migrationFile) {
-            list($version, $name) = $this->getMigrationVersionAndName($migrationFile);
+            [$version, $name] = $this->getMigrationVersionAndName($migrationFile);
             $this->assertUniqueMigrationVersion($migrations, $version);
             $migrations[$version] = $name;
         }
@@ -218,7 +219,7 @@ class Migrator
         $migrations = [];
         foreach ($this->getMigrationFiles() as $migrationFile) {
             require_once $migrationFile;
-            list($version, $name) = $this->getMigrationVersionAndName($migrationFile);
+            [$version, $name] = $this->getMigrationVersionAndName($migrationFile);
             $this->assertUniqueMigrationVersion($migrations, $version);
             $migrations[$version] = $this->getMigrationClass($name, $version);
         }
@@ -291,7 +292,7 @@ class Migrator
     protected function getMigrationVersionAndName($migrationFile)
     {
         preg_match_all('/([0-9]+)_([_a-z0-9]*).php/', $migrationFile, $matches);
-        return array($matches[1][0], $matches[2][0]);
+        return [$matches[1][0], $matches[2][0]];
     }
 
     /**
@@ -302,7 +303,7 @@ class Migrator
         if (in_array($this->schemaTableName, $this->connection->tables())) {
             return;
         }
-        $schemaTable = $this->connection->createTable($this->schemaTableName, array('autoincrementKey' => false));
+        $schemaTable = $this->connection->createTable($this->schemaTableName, ['autoincrementKey' => false]);
         $schemaTable->column('version', 'integer');
         $schemaTable->end();
         $this->connection->insert('INSERT INTO ' . $this->schemaTableName . ' (version) VALUES (0)', null, null, null, 1);
@@ -315,7 +316,7 @@ class Migrator
     {
         $version = $this->isDown() ? $version - 1 : $version;
         if ($version) {
-            $sql = 'UPDATE ' . $this->schemaTableName . ' SET version = ' . (int)$version;
+            $sql = 'UPDATE ' . $this->schemaTableName . ' SET version = ' . (int) $version;
             $this->connection->update($sql);
         } else {
             $this->connection->dropTable($this->schemaTableName);

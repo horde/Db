@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -45,7 +46,7 @@ abstract class TestBase extends TestCase
 
     protected $conn;
 
-    protected static function _getConnection($overrides = array())
+    protected static function _getConnection($overrides = [])
     {
         throw new LogicException('_getConnection() must be implemented in a sub-class.');
     }
@@ -57,7 +58,7 @@ abstract class TestBase extends TestCase
             $this->markTestSkipped(self::$_reason);
         }
 
-        list($this->conn, $this->_cache) = $res;
+        [$this->conn, $this->_cache] = $res;
         self::$_columnTest->conn = $this->conn;
         self::$_tableTest->conn = $this->conn;
 
@@ -140,7 +141,7 @@ abstract class TestBase extends TestCase
         $this->_createTable();
 
         $sql = "SELECT * FROM unit_tests WHERE id=?";
-        $result = $this->conn->select($sql, array(1));
+        $result = $this->conn->select($sql, [1]);
         $this->assertInstanceOf('Traversable', $result);
         $this->assertGreaterThan(0, count(iterator_to_array($result)));
 
@@ -156,7 +157,7 @@ abstract class TestBase extends TestCase
         $this->_createTable();
 
         $sql = "SELECT * FROM unit_tests WHERE string_value=?";
-        $result = $this->conn->select($sql, array('name a'));
+        $result = $this->conn->select($sql, ['name a']);
         $this->assertInstanceOf('Traversable', $result);
         $this->assertGreaterThan(0, count(iterator_to_array($result)));
 
@@ -203,7 +204,7 @@ abstract class TestBase extends TestCase
 
         $sql = "SELECT * FROM unit_tests";
         $result = $this->conn->selectValues($sql);
-        $this->assertEquals(array(1, 2, 3, 4, 5, 6), $result);
+        $this->assertEquals([1, 2, 3, 4, 5, 6], $result);
     }
 
     public function testInsert()
@@ -223,11 +224,11 @@ abstract class TestBase extends TestCase
 
         $result = $this->conn->insertBlob(
             'unit_tests',
-            array(
+            [
                 'id' => 7,
                 'integer_value' => 999,
-                'blob_value' => new BinaryValue(str_repeat("\0", 5000))
-            ),
+                'blob_value' => new BinaryValue(str_repeat("\0", 5000)),
+            ],
             null,
             7
         );
@@ -241,11 +242,11 @@ abstract class TestBase extends TestCase
 
         $result = $this->conn->insertBlob(
             'unit_tests',
-            array(
+            [
                 'id' => 8,
                 'integer_value' => 1000,
-                'text_value' => new TextValue(str_repeat('X', 5000))
-            ),
+                'text_value' => new TextValue(str_repeat('X', 5000)),
+            ],
             null,
             8
         );
@@ -261,11 +262,11 @@ abstract class TestBase extends TestCase
         fwrite($stream, str_repeat('X', 5000));
         $result = $this->conn->insertBlob(
             'unit_tests',
-            array(
+            [
                 'id' => 9,
                 'integer_value' => 1001,
-                'text_value' => new TextValue($stream)
-            ),
+                'text_value' => new TextValue($stream),
+            ],
             null,
             9
         );
@@ -281,11 +282,11 @@ abstract class TestBase extends TestCase
         fwrite($stream, str_repeat("\0", 10000));
         $result = $this->conn->insertBlob(
             'unit_tests',
-            array(
+            [
                 'id' => 10,
                 'integer_value' => 1002,
-                'blob_value' => new BinaryValue($stream)
-            ),
+                'blob_value' => new BinaryValue($stream),
+            ],
             null,
             10
         );
@@ -315,18 +316,18 @@ abstract class TestBase extends TestCase
 
         $result = $this->conn->updateBlob(
             'unit_tests',
-            array(
-                'blob_value' => new BinaryValue(str_repeat("\0", 5000))
-            ),
+            [
+                'blob_value' => new BinaryValue(str_repeat("\0", 5000)),
+            ],
             'id = 1'
         );
         $this->assertEquals(1, $result);
 
         $result = $this->conn->updateBlob(
             'unit_tests',
-            array(
-                'text_value' => new TextValue(str_repeat('X', 5000))
-            ),
+            [
+                'text_value' => new TextValue(str_repeat('X', 5000)),
+            ],
             'id = 1'
         );
         $this->assertEquals(1, $result);
@@ -335,9 +336,9 @@ abstract class TestBase extends TestCase
         fwrite($stream, str_repeat('X', 5001));
         $result = $this->conn->updateBlob(
             'unit_tests',
-            array(
-                'text_value' => new TextValue($stream)
-            ),
+            [
+                'text_value' => new TextValue($stream),
+            ],
             'id = 1'
         );
         $this->assertEquals(1, $result);
@@ -346,9 +347,9 @@ abstract class TestBase extends TestCase
         fwrite($stream, str_repeat("\0", 5001));
         $result = $this->conn->updateBlob(
             'unit_tests',
-            array(
-                'blob_value' => new BinaryValue($stream)
-            ),
+            [
+                'blob_value' => new BinaryValue($stream),
+            ],
             'id = 1'
         );
         $this->assertEquals(1, $result);
@@ -430,10 +431,10 @@ abstract class TestBase extends TestCase
         $original = base64_decode('Zm9vAGJhclxiYXonYm9vXCdiZWU=');
 
         $table = $this->conn->createTable('binary_testings');
-        $table->column('data', 'binary', array('null' => false));
+        $table->column('data', 'binary', ['null' => false]);
         $table->end();
 
-        $this->conn->insert('INSERT INTO binary_testings (data) VALUES (?)', array(new BinaryValue($original)));
+        $this->conn->insert('INSERT INTO binary_testings (data) VALUES (?)', [new BinaryValue($original)]);
         $retrieved = $this->conn->selectValue('SELECT data FROM binary_testings');
 
         $columns = $this->conn->columns('binary_testings');
@@ -471,28 +472,28 @@ abstract class TestBase extends TestCase
         $this->_createTable();
 
         $pk = $this->conn->primaryKey('unit_tests');
-        $this->assertEquals('id', (string)$pk);
+        $this->assertEquals('id', (string) $pk);
         $this->assertEquals(1, count($pk->columns));
         $this->assertEquals('id', $pk->columns[0]);
 
-        $table = $this->conn->createTable('pk_tests', array('autoincrementKey' => false));
+        $table = $this->conn->createTable('pk_tests', ['autoincrementKey' => false]);
         $table->column('foo', 'string');
         $table->column('bar', 'string');
         $table->end();
         $pk = $this->conn->primaryKey('pk_tests');
-        $this->assertEmpty((string)$pk);
+        $this->assertEmpty((string) $pk);
         $this->assertEquals(0, count($pk->columns));
         $this->conn->addPrimaryKey('pk_tests', 'foo');
         $pk = $this->conn->primaryKey('pk_tests');
-        $this->assertEquals('foo', (string)$pk);
+        $this->assertEquals('foo', (string) $pk);
         $this->assertEquals(1, count($pk->columns));
         $this->conn->removePrimaryKey('pk_tests');
         $pk = $this->conn->primaryKey('pk_tests');
-        $this->assertEmpty((string)$pk);
+        $this->assertEmpty((string) $pk);
         $this->assertEquals(0, count($pk->columns));
-        $this->conn->addPrimaryKey('pk_tests', array('foo', 'bar'));
+        $this->conn->addPrimaryKey('pk_tests', ['foo', 'bar']);
         $pk = $this->conn->primaryKey('pk_tests');
-        $this->assertEquals('foo,bar', (string)$pk);
+        $this->assertEquals('foo,bar', (string) $pk);
     }
 
     public function testIndexes()
@@ -508,21 +509,21 @@ abstract class TestBase extends TestCase
         });
 
         // multi-column index
-        $col = array('integer_value', 'string_value');
+        $col = ['integer_value', 'string_value'];
         $this->assertEquals('unit_tests', $indexes[0]->table);
         $this->assertEquals('integer_string', $indexes[0]->name);
         $this->assertEquals(false, $indexes[0]->unique);
         $this->assertEquals($col, $indexes[0]->columns);
 
         // unique index
-        $col = array('integer_value');
+        $col = ['integer_value'];
         $this->assertEquals('unit_tests', $indexes[1]->table);
         $this->assertEquals('integer_value', $indexes[1]->name);
         $this->assertEquals(true, $indexes[1]->unique);
         $this->assertEquals($col, $indexes[1]->columns);
 
         // normal index
-        $col = array('string_value');
+        $col = ['string_value'];
         $this->assertEquals('unit_tests', $indexes[2]->table);
         $this->assertEquals('string_value', $indexes[2]->name);
         $this->assertEquals(false, $indexes[2]->unique);
@@ -549,7 +550,7 @@ abstract class TestBase extends TestCase
 
     public function testCreateTableWithSeparatePk()
     {
-        $table = $this->conn->createTable('testings', array('autoincrementKey' => false));
+        $table = $this->conn->createTable('testings', ['autoincrementKey' => false]);
         $table->column('foo', 'autoincrementKey');
         $table->column('bar', 'integer');
         $table->end();
@@ -584,7 +585,7 @@ abstract class TestBase extends TestCase
             'sports',
             'name',
             'string',
-            array('null' => false)
+            ['null' => false]
         );
         $column = $this->_getColumn('sports', 'name');
         $this->assertFalse($column->isNull());
@@ -592,7 +593,7 @@ abstract class TestBase extends TestCase
             'sports',
             'name',
             'string',
-            array('null' => true)
+            ['null' => true]
         );
         $column = $this->_getColumn('sports', 'name');
         $this->assertTrue($column->isNull());
@@ -618,13 +619,13 @@ abstract class TestBase extends TestCase
             'users',
             'last_name',
             'string',
-            array('limit' => 100)
+            ['limit' => 100]
         );
         $this->conn->addColumn(
             'users',
             'key',
             'string',
-            array('limit' => 100)
+            ['limit' => 100]
         );
         $this->conn->addColumn(
             'users',
@@ -635,39 +636,39 @@ abstract class TestBase extends TestCase
         $this->conn->addIndex('users', 'last_name');
         $this->conn->removeIndex('users', 'last_name');
 
-        $this->conn->addIndex('users', array('last_name', 'first_name'));
+        $this->conn->addIndex('users', ['last_name', 'first_name']);
         $this->conn->removeIndex(
             'users',
-            array('column' => array('last_name', 'first_name'))
+            ['column' => ['last_name', 'first_name']]
         );
 
         $index = $this->conn->addIndex(
             'users',
-            array('last_name', 'first_name')
+            ['last_name', 'first_name']
         );
-        $this->conn->removeIndex('users', array('name' => $index));
+        $this->conn->removeIndex('users', ['name' => $index]);
 
-        $this->conn->addIndex('users', array('last_name', 'first_name'));
+        $this->conn->addIndex('users', ['last_name', 'first_name']);
         $this->conn->removeIndex('users', 'last_name_and_first_name');
 
         // quoting
         $index = $this->conn->addIndex(
             'users',
-            array('key'),
-            array('name' => 'key_idx', 'unique' => true)
+            ['key'],
+            ['name' => 'key_idx', 'unique' => true]
         );
         $this->conn->removeIndex(
             'users',
-            array('name' => $index, 'unique' => true)
+            ['name' => $index, 'unique' => true]
         );
 
         $index = $this->conn->addIndex(
             'users',
-            array('last_name', 'first_name', 'administrator'),
-            array('name' => 'named_admin')
+            ['last_name', 'first_name', 'administrator'],
+            ['name' => 'named_admin']
         );
 
-        $this->conn->removeIndex('users', array('name' => $index));
+        $this->conn->removeIndex('users', ['name' => $index]);
 
         $this->markTestIncomplete();
     }
@@ -687,12 +688,12 @@ abstract class TestBase extends TestCase
     public function testAddIndexMultiColumn()
     {
         $this->_createTestTable('sports');
-        $index = $this->_getIndex('sports', array('name', 'is_college'));
+        $index = $this->_getIndex('sports', ['name', 'is_college']);
         $this->assertNull($index);
 
-        $this->conn->addIndex('sports', array('name', 'is_college'));
+        $this->conn->addIndex('sports', ['name', 'is_college']);
 
-        $index = $this->_getIndex('sports', array('name', 'is_college'));
+        $index = $this->_getIndex('sports', ['name', 'is_college']);
         $this->assertNotNull($index);
     }
 
@@ -702,7 +703,7 @@ abstract class TestBase extends TestCase
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNull($index);
 
-        $this->conn->addIndex('sports', 'is_college', array('unique' => true));
+        $this->conn->addIndex('sports', 'is_college', ['unique' => true]);
 
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNotNull($index);
@@ -715,7 +716,7 @@ abstract class TestBase extends TestCase
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNull($index);
 
-        $this->conn->addIndex('sports', 'is_college', array('name' => 'sports_test'));
+        $this->conn->addIndex('sports', 'is_college', ['name' => 'sports_test']);
 
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNotNull($index);
@@ -732,7 +733,7 @@ abstract class TestBase extends TestCase
         $this->assertNotNull($index);
 
         // remove it again
-        $this->conn->removeIndex('sports', array('column' => 'is_college'));
+        $this->conn->removeIndex('sports', ['column' => 'is_college']);
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNull($index);
     }
@@ -742,13 +743,13 @@ abstract class TestBase extends TestCase
         $this->_createTestTable('sports');
 
         // add the index
-        $this->conn->addIndex('sports', array('name', 'is_college'));
-        $index = $this->_getIndex('sports', array('name', 'is_college'));
+        $this->conn->addIndex('sports', ['name', 'is_college']);
+        $index = $this->_getIndex('sports', ['name', 'is_college']);
         $this->assertNotNull($index);
 
         // remove it again
-        $this->conn->removeIndex('sports', array('column' => array('name', 'is_college')));
-        $index = $this->_getIndex('sports', array('name', 'is_college'));
+        $this->conn->removeIndex('sports', ['column' => ['name', 'is_college']]);
+        $index = $this->_getIndex('sports', ['name', 'is_college']);
         $this->assertNull($index);
     }
 
@@ -757,12 +758,12 @@ abstract class TestBase extends TestCase
         $this->_createTestTable('sports');
 
         // add the index
-        $this->conn->addIndex('sports', 'is_college', array('name' => 'sports_test'));
+        $this->conn->addIndex('sports', 'is_college', ['name' => 'sports_test']);
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNotNull($index);
 
         // remove it again
-        $this->conn->removeIndex('sports', array('name' => 'sports_test'));
+        $this->conn->removeIndex('sports', ['name' => 'sports_test']);
         $index = $this->_getIndex('sports', 'is_college');
         $this->assertNull($index);
     }
@@ -775,20 +776,20 @@ abstract class TestBase extends TestCase
 
     public function testIndexNameBySingleColumn()
     {
-        $name = $this->conn->indexName('sports', array('column' => 'is_college'));
+        $name = $this->conn->indexName('sports', ['column' => 'is_college']);
         $this->assertEquals('index_sports_on_is_college', $name);
     }
 
     public function testIndexNameByMultiColumn()
     {
-        $name = $this->conn->indexName('sports', array('column' =>
-                                                array('name', 'is_college')));
+        $name = $this->conn->indexName('sports', ['column' =>
+                                                ['name', 'is_college']]);
         $this->assertEquals('index_sports_on_name_and_is_college', $name);
     }
 
     public function testIndexNameByName()
     {
-        $name = $this->conn->indexName('sports', array('name' => 'test'));
+        $name = $this->conn->indexName('sports', ['name' => 'test']);
         $this->assertEquals('test', $name);
     }
 
@@ -831,7 +832,7 @@ abstract class TestBase extends TestCase
         $table = $this->conn->createTable('testings');
         $table->column('foo', 'string');
         $table->end();
-        $this->conn->addColumn('testings', 'bar', 'string', array('null' => false, 'default' => ''));
+        $this->conn->addColumn('testings', 'bar', 'string', ['null' => false, 'default' => '']);
 
         $this->conn->insert("INSERT INTO testings (foo, bar) VALUES ('hello', NULL)");
     }
@@ -846,7 +847,7 @@ abstract class TestBase extends TestCase
 
         $this->conn->insert("INSERT INTO testings (id, foo) VALUES ('1', 'hello')");
 
-        $this->conn->addColumn('testings', 'bar', 'string', array('null' => false, 'default' => 'default'));
+        $this->conn->addColumn('testings', 'bar', 'string', ['null' => false, 'default' => 'default']);
 
         $this->conn->insert("INSERT INTO testings (id, foo, bar) VALUES (2, 'hello', NULL)");
     }
@@ -875,7 +876,7 @@ abstract class TestBase extends TestCase
 
         $this->conn->renameColumn('users', 'girlfriend', 'exgirlfriend');
 
-        $bob = (object)$this->conn->selectOne('SELECT * FROM users');
+        $bob = (object) $this->conn->selectOne('SELECT * FROM users');
         $this->assertEquals('bobette', $bob->exgirlfriend);
     }
 
@@ -889,7 +890,7 @@ abstract class TestBase extends TestCase
     {
         $result = $this->conn->addOrderByForAssocLimiting(
             'SELECT * FROM documents ',
-            array('order' => 'name DESC')
+            ['order' => 'name DESC']
         );
         $this->assertEquals('SELECT * FROM documents ORDER BY name DESC', $result);
     }
@@ -900,13 +901,13 @@ abstract class TestBase extends TestCase
 
     public function testInsertAndReadInUtf8()
     {
-        list($conn, ) = static::_getConnection(array('charset' => 'utf8'));
+        [$conn, ] = static::_getConnection(['charset' => 'utf8']);
         $table = $conn->createTable('charset_utf8');
         $table->column('text', 'string');
         $table->end();
 
         $input = file_get_contents(__DIR__ . '/../fixtures/charsets/utf8.txt');
-        $conn->insert('INSERT INTO charset_utf8 (text) VALUES (?)', array($input));
+        $conn->insert('INSERT INTO charset_utf8 (text) VALUES (?)', [$input]);
         $output = $conn->selectValue('SELECT text FROM charset_utf8');
 
         $this->assertEquals($input, $output);
@@ -919,7 +920,7 @@ abstract class TestBase extends TestCase
 
     public function testAutoIncrementWithTypeInColumn()
     {
-        $table = $this->conn->createTable('autoinc', array('autoincrementKey' => false));
+        $table = $this->conn->createTable('autoinc', ['autoincrementKey' => false]);
         $table->column('foo', 'autoincrementKey');
         $table->column('bar', 'integer');
         $table->end();
@@ -941,7 +942,7 @@ abstract class TestBase extends TestCase
     public function testAutoIncrementWithTypeInTableAndColumnDefined()
     {
         $this->expectException('LogicException');
-        $table = $this->conn->createTable('autoincrement', array('autoincrementKey' => 'foo'));
+        $table = $this->conn->createTable('autoincrement', ['autoincrementKey' => 'foo']);
         $table->column('foo', 'integer');
         $table->column('bar', 'integer');
         $table->end();
@@ -949,7 +950,7 @@ abstract class TestBase extends TestCase
 
     public function testAutoIncrementWithTypeInTable()
     {
-        $table = $this->conn->createTable('autoinc', array('autoincrementKey' => 'foo'));
+        $table = $this->conn->createTable('autoinc', ['autoincrementKey' => 'foo']);
         $table->column('bar', 'integer');
         $table->end();
 
@@ -960,7 +961,7 @@ abstract class TestBase extends TestCase
 
     public function testAutoIncrementWithAddColumn()
     {
-        $table = $this->conn->createTable('autoinc', array('autoincrementKey' => false));
+        $table = $this->conn->createTable('autoinc', ['autoincrementKey' => false]);
         $table->column('bar', 'integer');
         $table->end();
         $this->conn->addColumn('autoinc', 'foo', 'autoincrementKey');
@@ -972,7 +973,7 @@ abstract class TestBase extends TestCase
 
     public function testAutoIncrementWithChangeColumn()
     {
-        $table = $this->conn->createTable('autoinc', array('autoincrementKey' => false));
+        $table = $this->conn->createTable('autoinc', ['autoincrementKey' => false]);
         $table->column('foo', 'integer');
         $table->column('bar', 'integer');
         $table->end();
@@ -1020,24 +1021,24 @@ abstract class TestBase extends TestCase
     protected function _createTable()
     {
         $table = $this->conn->createTable('unit_tests');
-        $table->column('integer_value', 'integer', array('limit' => 11, 'default' => 0));
-        $table->column('string_value', 'string', array('limit' => 255, 'default' => ''));
-        $table->column('text_value', 'text', array());
-        $table->column('float_value', 'float', array('precision' => 2, 'default' => 0.0));
-        $table->column('decimal_value', 'decimal', array('precision' => 2, 'scale' => 1, 'default' => 0.0));
-        $table->column('datetime_value', 'datetime', array());
-        $table->column('date_value', 'date', array());
-        $table->column('time_value', 'time', array());
-        $table->column('blob_value', 'binary', array());
-        $table->column('boolean_value', 'boolean', array('default' => false));
-        $table->column('email_value', 'string', array('limit' => 255, 'default' => ''));
+        $table->column('integer_value', 'integer', ['limit' => 11, 'default' => 0]);
+        $table->column('string_value', 'string', ['limit' => 255, 'default' => '']);
+        $table->column('text_value', 'text', []);
+        $table->column('float_value', 'float', ['precision' => 2, 'default' => 0.0]);
+        $table->column('decimal_value', 'decimal', ['precision' => 2, 'scale' => 1, 'default' => 0.0]);
+        $table->column('datetime_value', 'datetime', []);
+        $table->column('date_value', 'date', []);
+        $table->column('time_value', 'time', []);
+        $table->column('blob_value', 'binary', []);
+        $table->column('boolean_value', 'boolean', ['default' => false]);
+        $table->column('email_value', 'string', ['limit' => 255, 'default' => '']);
         $table->end();
-        $this->conn->addIndex('unit_tests', 'string_value', array('name' => 'string_value'));
-        $this->conn->addIndex('unit_tests', 'integer_value', array('name' => 'integer_value', 'unique' => true));
-        $this->conn->addIndex('unit_tests', array('integer_value', 'string_value'), array('name' => 'integer_string'));
+        $this->conn->addIndex('unit_tests', 'string_value', ['name' => 'string_value']);
+        $this->conn->addIndex('unit_tests', 'integer_value', ['name' => 'integer_value', 'unique' => true]);
+        $this->conn->addIndex('unit_tests', ['integer_value', 'string_value'], ['name' => 'integer_string']);
 
         // read sql file for statements
-        $statements = array();
+        $statements = [];
         $current_stmt = '';
         $fp = fopen(__DIR__ . '/../fixtures/unit_tests.sql', 'r');
         while ($line = fgets($fp, 8192)) {
@@ -1061,7 +1062,7 @@ abstract class TestBase extends TestCase
         }
     }
 
-    protected function _createTestTable($name, $options = array())
+    protected function _createTestTable($name, $options = [])
     {
         $table = $this->conn->createTable($name, $options);
         $table->column('name', 'string');
@@ -1072,15 +1073,15 @@ abstract class TestBase extends TestCase
     protected function _createTestUsersTable()
     {
         $table = $this->conn->createTable('users');
-        $table->column('company_id', 'integer', array('limit' => 11));
-        $table->column('name', 'string', array('limit' => 255, 'default' => ''));
-        $table->column('first_name', 'string', array('limit' => 40, 'default' => ''));
-        $table->column('approved', 'boolean', array('default' => true));
-        $table->column('type', 'string', array('limit' => 255, 'default' => ''));
-        $table->column('created_at', 'datetime', array());
-        $table->column('created_on', 'date', array());
-        $table->column('updated_at', 'datetime', array());
-        $table->column('updated_on', 'date', array());
+        $table->column('company_id', 'integer', ['limit' => 11]);
+        $table->column('name', 'string', ['limit' => 255, 'default' => '']);
+        $table->column('first_name', 'string', ['limit' => 40, 'default' => '']);
+        $table->column('approved', 'boolean', ['default' => true]);
+        $table->column('type', 'string', ['limit' => 255, 'default' => '']);
+        $table->column('created_at', 'datetime', []);
+        $table->column('created_on', 'date', []);
+        $table->column('updated_at', 'datetime', []);
+        $table->column('updated_on', 'date', []);
         $table->end();
     }
 
@@ -1089,7 +1090,7 @@ abstract class TestBase extends TestCase
      */
     protected function _dropTestTables()
     {
-        $tables = array(
+        $tables = [
             'autoinc',
             'binary_testings',
             'cache_table',
@@ -1107,7 +1108,7 @@ abstract class TestBase extends TestCase
             'text_to_binary',
             'unit_tests',
             'users',
-        );
+        ];
 
         foreach ($tables as $table) {
             try {
@@ -1119,7 +1120,7 @@ abstract class TestBase extends TestCase
 
     protected function _columnNames($tableName)
     {
-        $columns = array();
+        $columns = [];
         foreach ($this->conn->columns($tableName) as $c) {
             $columns[] = $c->getName();
         }

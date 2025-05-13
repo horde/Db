@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2004-2021 Horde LLC (http://www.horde.org/)
  *
@@ -10,9 +11,11 @@
  * @license  http://www.horde.org/licenses/bsd
  * @package  Db
  */
+
 namespace Horde\Db;
-use \Horde_String;
-use \array_shift;
+
+use Horde_String;
+use array_shift;
 
 /**
  * This class provides a parser which can construct an SQL WHERE clause from a
@@ -81,7 +84,7 @@ class SearchParser
             if (empty($expr)) {
                 break;
             }
-            if (substr($expr,0,1) == '(') {
+            if (substr($expr, 0, 1) == '(') {
                 $expr = substr($expr, 1);
                 $token = '!(';
             } elseif (substr($expr, 0, 1) == ')') {
@@ -90,17 +93,23 @@ class SearchParser
             } elseif (substr($expr, 0, 1) == ',') {
                 $expr = substr($expr, 1);
                 $token = '!OR';
-            } elseif (preg_match('/^(AND|OR|NOT)([^a-z].*)?$/i', $expr,
-                                 $matches)) {
+            } elseif (preg_match(
+                '/^(AND|OR|NOT)([^a-z].*)?$/i',
+                $expr,
+                $matches
+            )) {
                 $token = '!' . Horde_String::upper($matches[1]);
                 $expr = substr($expr, strlen($matches[1]));
-            } elseif (preg_match('/^"(([^"]|\\[0-7]+|\\[Xx][0-9a-fA-F]+|\\[^Xx0-7])*)"/',
-                                 $expr, $matches)) {
+            } elseif (preg_match(
+                '/^"(([^"]|\\[0-7]+|\\[Xx][0-9a-fA-F]+|\\[^Xx0-7])*)"/',
+                $expr,
+                $matches
+            )) {
                 $token = '=' . stripcslashes($matches[1]);
                 $expr = substr($expr, strlen($matches[0]));
             } elseif (preg_match('/^[^\\s\\(\\),]+/', $expr, $matches)) {
                 $token = '=' . $matches[0];
-                $expr = substr($expr,strlen($token)-1);
+                $expr = substr($expr, strlen($token) - 1);
             } else {
                 throw new DbException('Syntax error in search terms');
             }

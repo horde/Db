@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -30,6 +31,4 @@ use Horde\Exception\Wrapped;
  * @license   http://www.horde.org/licenses/bsd
  * @package   Db
  */
-class DbException extends Wrapped
-{
-}
+class DbException extends Wrapped {}

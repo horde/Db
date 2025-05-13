@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
@@ -26,6 +27,4 @@
  * @license   http://www.horde.org/licenses/bsd
  * @package   Db
  */
-class Horde_Db_Exception extends Horde_Exception_Wrapped
-{
-}
+class Horde_Db_Exception extends Horde_Exception_Wrapped {}

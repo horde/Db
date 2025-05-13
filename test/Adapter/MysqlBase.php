@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -46,7 +47,7 @@ abstract class MysqlBase extends TestBase
         self::$_reason = 'The MySQL adapter is not available';
         if (static::_available()) {
             self::$_skip = false;
-            list($conn, ) = static::_getConnection();
+            [$conn, ] = static::_getConnection();
             if (self::$_skip) {
                 return;
             }
@@ -178,13 +179,13 @@ abstract class MysqlBase extends TestBase
 
         $correctValue = 12345678901234567890.0123456789;
 
-        $this->conn->addColumn("users", "wealth", 'decimal', array('precision' => 30, 'scale' => 10));
+        $this->conn->addColumn("users", "wealth", 'decimal', ['precision' => 30, 'scale' => 10]);
 
         // do a manual insertion
         $this->conn->execute("INSERT INTO users (wealth) VALUES ('12345678901234567890.0123456789')");
 
         // SELECT @todo - type cast attribute values
-        $user = (object)$this->conn->selectOne('SELECT * FROM users');
+        $user = (object) $this->conn->selectOne('SELECT * FROM users');
         // assert_kind_of BigDecimal, row.wealth
 
         // If this assert fails, that means the SELECT is broken!
@@ -197,7 +198,7 @@ abstract class MysqlBase extends TestBase
         $this->conn->insert('INSERT INTO users (wealth) VALUES (12345678901234567890.0123456789)');
 
         // SELECT @todo - type cast attribute values
-        $user = (object)$this->conn->selectOne('SELECT * FROM users');
+        $user = (object) $this->conn->selectOne('SELECT * FROM users');
         // assert_kind_of BigDecimal, row.wealth
 
         // If these asserts fail, that means the INSERT (create function, or cast to SQL) is broken!
@@ -212,7 +213,7 @@ abstract class MysqlBase extends TestBase
         $this->conn->addColumn("users", "bio", 'text');
         $this->conn->addColumn("users", "age", 'integer');
         $this->conn->addColumn("users", "height", 'float');
-        $this->conn->addColumn("users", "wealth", 'decimal', array('precision' => '30', 'scale' => '10'));
+        $this->conn->addColumn("users", "wealth", 'decimal', ['precision' => '30', 'scale' => '10']);
         $this->conn->addColumn("users", "birthday", 'datetime');
         $this->conn->addColumn("users", "favorite_day", 'date');
         $this->conn->addColumn("users", "moment_of_truth", 'datetime');
@@ -221,7 +222,7 @@ abstract class MysqlBase extends TestBase
         $this->conn->insert('INSERT INTO users (first_name, last_name, bio, age, height, wealth, birthday, favorite_day, moment_of_truth, male, company_id) ' .
                              "VALUES ('bob', 'bobsen', 'I was born ....', 18, 1.78, 12345678901234567890.0123456789, '2005-01-01 12:23:40', '1980-03-05', '1582-10-10 21:40:18', 1, 1)");
 
-        $bob = (object)$this->conn->selectOne('SELECT * FROM users');
+        $bob = (object) $this->conn->selectOne('SELECT * FROM users');
         $this->assertEquals('bob', $bob->first_name);
         $this->assertEquals('bobsen', $bob->last_name);
         $this->assertEquals('I was born ....', $bob->bio);
@@ -238,7 +239,7 @@ abstract class MysqlBase extends TestBase
     public function testNativeDatabaseTypes()
     {
         $types = $this->conn->nativeDatabaseTypes();
-        $this->assertEquals(array('name' => 'int', 'limit' => 11), $types['integer']);
+        $this->assertEquals(['name' => 'int', 'limit' => 11], $types['integer']);
     }
 
     public function testUnabstractedDatabaseDependentTypes()
@@ -249,7 +250,7 @@ abstract class MysqlBase extends TestBase
         $this->conn->addColumn('users', 'intelligence_quotient', 'tinyint');
         try {
             $this->conn->insert('INSERT INTO users (intelligence_quotient) VALUES (300)');
-            $jonnyg = (object)$this->conn->selectOne('SELECT * FROM users');
+            $jonnyg = (object) $this->conn->selectOne('SELECT * FROM users');
             $this->assertEquals('127', $jonnyg->intelligence_quotient);
         } catch (DbException $e) {
             if (strpos($e->getMessage(), "Out of range value for column 'intelligence_quotient' at row 1") === false) {
@@ -294,7 +295,7 @@ abstract class MysqlBase extends TestBase
         $table->end();
         $this->conn->insert(
             'INSERT INTO text_to_binary (data) VALUES (?)',
-            array("foo")
+            ["foo"]
         );
 
         $this->conn->changeColumn('text_to_binary', 'data', 'binary');
@@ -317,7 +318,7 @@ abstract class MysqlBase extends TestBase
             'sports',
             'is_college',
             'string',
-            array('limit' => '40')
+            ['limit' => '40']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -334,7 +335,7 @@ abstract class MysqlBase extends TestBase
             'sports',
             'is_college',
             'decimal',
-            array('precision' => '5', 'scale' => '2')
+            ['precision' => '5', 'scale' => '2']
         );
 
         $afterChange = $this->_getColumn('sports', 'is_college');
@@ -353,12 +354,12 @@ abstract class MysqlBase extends TestBase
         $this->conn->execute('INSERT INTO testings (id, foo) VALUES (1, -1)');
 
         try {
-            $this->conn->changeColumn('testings', 'foo', 'integer', array('unsigned' => true));
+            $this->conn->changeColumn('testings', 'foo', 'integer', ['unsigned' => true]);
 
             $afterChange = $this->_getColumn('testings', 'foo');
             $this->assertTrue($afterChange->isUnsigned());
 
-            $row = (object)$this->conn->selectOne('SELECT * FROM testings');
+            $row = (object) $this->conn->selectOne('SELECT * FROM testings');
             $this->assertEquals(0, $row->foo);
         } catch (DbException $e) {
             if (strpos($e->getMessage(), "Out of range value for column 'foo' at row 1") === false) {
@@ -465,27 +466,27 @@ abstract class MysqlBase extends TestBase
 
     public function testAddColumnOptions()
     {
-        $result = $this->conn->addColumnOptions("test", array());
+        $result = $this->conn->addColumnOptions("test", []);
         $this->assertEquals("test", $result);
     }
 
     public function testAddColumnOptionsDefault()
     {
-        $options = array('default' => '0');
+        $options = ['default' => '0'];
         $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test DEFAULT '0'", $result);
     }
 
     public function testAddColumnOptionsNull()
     {
-        $options = array('null' => true);
+        $options = ['null' => true];
         $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test", $result);
     }
 
     public function testAddColumnOptionsNotNull()
     {
-        $options = array('null' => false);
+        $options = ['null' => false];
         $result = $this->conn->addColumnOptions("test", $options);
         $this->assertEquals("test NOT NULL", $result);
     }
@@ -509,10 +510,10 @@ abstract class MysqlBase extends TestBase
         $t->end();
         $this->conn->insert(
             'INSERT INTO dates (start, end) VALUES (?, ?)',
-            array(
+            [
                 '2011-12-10 00:00:00',
-                '2011-12-11 00:00:00'
-            )
+                '2011-12-11 00:00:00',
+            ]
         );
         $this->assertEquals(
             1,
@@ -528,7 +529,7 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('bitmap', '&', 2)
         );
         $this->assertEquals(
-            array('bitmap & ?', array(2)),
+            ['bitmap & ?', [2]],
             $this->conn->buildClause('bitmap', '&', 2, true)
         );
 
@@ -537,7 +538,7 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('bitmap', '|', 2)
         );
         $this->assertEquals(
-            array('bitmap | ?', array(2)),
+            ['bitmap | ?', [2]],
             $this->conn->buildClause('bitmap', '|', 2, true)
         );
 
@@ -546,7 +547,7 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('name', 'LIKE', "search")
         );
         $this->assertEquals(
-            array("LOWER(name) LIKE LOWER(?)", array('%search%')),
+            ["LOWER(name) LIKE LOWER(?)", ['%search%']],
             $this->conn->buildClause('name', 'LIKE', "search", true)
         );
         $this->assertEquals(
@@ -554,17 +555,17 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('name', 'LIKE', "search&replace?")
         );
         $this->assertEquals(
-            array("LOWER(name) LIKE LOWER(?)", array('%search&replace?%')),
+            ["LOWER(name) LIKE LOWER(?)", ['%search&replace?%']],
             $this->conn->buildClause('name', 'LIKE', "search&replace?", true)
         );
         $this->assertEquals(
             "(LOWER(name) LIKE LOWER('search\&replace\?%') OR LOWER(name) LIKE LOWER('% search\&replace\?%'))",
-            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, array('begin' => true))
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", false, ['begin' => true])
         );
         $this->assertEquals(
-            array("(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))",
-                  array('search&replace?%', '% search&replace?%')),
-            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, array('begin' => true))
+            ["(LOWER(name) LIKE LOWER(?) OR LOWER(name) LIKE LOWER(?))",
+                ['search&replace?%', '% search&replace?%']],
+            $this->conn->buildClause('name', 'LIKE', "search&replace?", true, ['begin' => true])
         );
 
         $this->assertEquals(
@@ -572,7 +573,7 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('value', '=', 2)
         );
         $this->assertEquals(
-            array('value = ?', array(2)),
+            ['value = ?', [2]],
             $this->conn->buildClause('value', '=', 2, true)
         );
         $this->assertEquals(
@@ -580,7 +581,7 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('value', '=', 'foo')
         );
         $this->assertEquals(
-            array('value = ?', array('foo')),
+            ['value = ?', ['foo']],
             $this->conn->buildClause('value', '=', 'foo', true)
         );
         $this->assertEquals(
@@ -588,20 +589,20 @@ abstract class MysqlBase extends TestBase
             $this->conn->buildClause('value', '=', 'foo?bar')
         );
         $this->assertEquals(
-            array('value = ?', array('foo?bar')),
+            ['value = ?', ['foo?bar']],
             $this->conn->buildClause('value', '=', 'foo?bar', true)
         );
     }
 
     public function testInsertAndReadInCp1257()
     {
-        list($conn, ) = static::_getConnection(array('charset' => 'cp1257'));
+        [$conn, ] = static::_getConnection(['charset' => 'cp1257']);
         $table = $conn->createTable('charset_cp1257');
         $table->column('text', 'string');
         $table->end();
 
         $input = file_get_contents(__DIR__ . '/../fixtures/charsets/cp1257.txt');
-        $conn->insert('INSERT INTO charset_cp1257 (text) VALUES (?)', array($input));
+        $conn->insert('INSERT INTO charset_cp1257 (text) VALUES (?)', [$input]);
         $output = $conn->selectValue('SELECT text FROM charset_cp1257');
 
         $this->assertEquals($input, $output);
@@ -615,9 +616,9 @@ abstract class MysqlBase extends TestBase
     /**
      * Create table to perform tests on
      */
-    protected function _createTestTable($name, $options = array())
+    protected function _createTestTable($name, $options = [])
     {
-        parent::_createTestTable($name, $options = array());
+        parent::_createTestTable($name, $options = []);
         try {
             // make sure table was created
             $sql = "INSERT INTO $name

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -26,6 +27,4 @@ use Horde\Db\Test\Adapter\TestTableDefinition as BaseTestTableDefinition;
  * @package    Db
  * @subpackage UnitTests
  */
-class TestTableDefinition extends BaseTestTableDefinition
-{
-}
+class TestTableDefinition extends BaseTestTableDefinition {}

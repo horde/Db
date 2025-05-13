@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
@@ -38,11 +39,11 @@ class Horde_Db_Adapter_Mysql_Result extends Horde_Db_Adapter_Base_Result
      *
      * @var array
      */
-    protected $_map = array(
+    protected $_map = [
         Horde_Db::FETCH_ASSOC => MYSQL_ASSOC,
         Horde_Db::FETCH_NUM   => MYSQL_NUM,
-        Horde_Db::FETCH_BOTH  => MYSQL_BOTH
-    );
+        Horde_Db::FETCH_BOTH  => MYSQL_BOTH,
+    ];
 
     /**
      * Returns a row from a resultset.

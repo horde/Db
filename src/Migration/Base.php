@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -98,7 +99,7 @@ class Base
         $t = new Horde_Support_Timer();
         $t->push();
 
-        $result = call_user_func_array(array($this->connection, $method), $args);
+        $result = call_user_func_array([$this->connection, $method], $args);
         $time = $t->pop();
 
         // print stats

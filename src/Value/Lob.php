@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
  *
@@ -10,8 +11,11 @@
  * @license  http://www.horde.org/licenses/bsd
  * @package  Db
  */
+
 namespace Horde\Db\Value;
-use \Horde\Db\Value;
+
+use Horde\Db\Value;
+
 /**
  * Encapsulation object for LOB values to be used in SQL statements to ensure
  * proper quoting, escaping, retrieval, etc.
@@ -61,27 +65,27 @@ abstract class Lob implements Value
     public function __get($name)
     {
         switch ($name) {
-        case 'value':
-            if (isset($this->value)) {
-                return $this->value;
-            }
-            if (isset($this->stream)) {
-                rewind($this->stream);
-                return stream_get_contents($this->stream);
-            }
-            break;
+            case 'value':
+                if (isset($this->value)) {
+                    return $this->value;
+                }
+                if (isset($this->stream)) {
+                    rewind($this->stream);
+                    return stream_get_contents($this->stream);
+                }
+                break;
 
-        case 'stream':
-            if (isset($this->stream)) {
-                return $this->stream;
-            }
-            if (isset($this->value)) {
-                $stream = @fopen('php://temp', 'r+');
-                fwrite($stream, $this->value);
-                rewind($stream);
-                return $stream;
-            }
-            break;
+            case 'stream':
+                if (isset($this->stream)) {
+                    return $this->stream;
+                }
+                if (isset($this->value)) {
+                    $stream = @fopen('php://temp', 'r+');
+                    fwrite($stream, $this->value);
+                    rewind($stream);
+                    return $stream;
+                }
+                break;
         }
     }
 
@@ -91,10 +95,10 @@ abstract class Lob implements Value
     public function __set($name, $value)
     {
         switch ($name) {
-        case 'value':
-        case 'stream':
-            $this->$name = $value;
-            break;
+            case 'value':
+            case 'stream':
+                $this->$name = $value;
+                break;
         }
     }
 }

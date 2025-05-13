@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -143,18 +144,18 @@ class Pgsql extends Base
         $table = str_replace('"', '', $temp[2]);
 
         // Fetch the PK and sequence name for the table as we need them for the fallback (can still be null)
-        list($fetched_pk, $fetched_sequence) = $this->pkAndSequenceFor($table);
-        if(!$pk) {
+        [$fetched_pk, $fetched_sequence] = $this->pkAndSequenceFor($table);
+        if (!$pk) {
             $pk = $fetched_pk;
         }
-        if(!$sequenceName) {
+        if (!$sequenceName) {
             $sequenceName = $fetched_sequence;
         }
 
         // Try an insert with 'returning id'
         if ($pk) {
             $id = $this->selectValue($sql . ' RETURNING ' . $this->quoteColumnName($pk), $arg1, $arg2);
-            if($sequenceName) {
+            if ($sequenceName) {
                 $this->resetPkSequence($table, $pk, $sequenceName);
             }
             return $id;
@@ -162,7 +163,7 @@ class Pgsql extends Base
 
         // If neither pk nor sequence name is given, look them up.
         if (!($pk || $sequenceName)) {
-            list($pk, $sequenceName) = $this->schema->pkAndSequenceFor($table);
+            [$pk, $sequenceName] = $this->schema->pkAndSequenceFor($table);
         }
 
         // Otherwise, insert then grab last_insert_id.
@@ -238,7 +239,7 @@ class Pgsql extends Base
     protected function configureConnection()
     {
         if (!empty($this->config['charset'])) {
-            $this->lastQuery = $sql = 'SET client_encoding TO '.$this->quoteString($this->config['charset']);
+            $this->lastQuery = $sql = 'SET client_encoding TO ' . $this->quoteString($this->config['charset']);
             $this->execute($sql);
         }
 
@@ -251,7 +252,7 @@ class Pgsql extends Base
     /**
      * @TODO
      */
-    protected function selectRaw($sql, $arg1=null, $arg2=null)
+    protected function selectRaw($sql, $arg1 = null, $arg2 = null)
     {
         $rows = [];
         $result = $this->execute($sql, $arg1, $arg2);
@@ -301,6 +302,6 @@ class Pgsql extends Base
      */
     protected function lastInsertId($table, $sequenceName)
     {
-        return (int)$this->selectValue('SELECT currval('.$this->schema->quoteSequenceName($sequenceName).')');
+        return (int) $this->selectValue('SELECT currval(' . $this->schema->quoteSequenceName($sequenceName) . ')');
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -45,8 +46,8 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
     protected $columns = null;
     protected $primaryKey = null;
 
-    protected $columntypes = array('string', 'text', 'integer', 'float',
-        'datetime', 'timestamp', 'time', 'date', 'binary', 'boolean');
+    protected $columntypes = ['string', 'text', 'integer', 'float',
+        'datetime', 'timestamp', 'time', 'date', 'binary', 'boolean'];
 
     /**
      * Constructor.
@@ -139,13 +140,13 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
         }
 
         $options = array_merge(
-            array('limit'         => null,
-                  'precision'     => null,
-                  'scale'         => null,
-                  'unsigned'      => null,
-                  'default'       => null,
-                  'null'          => null,
-                  'autoincrement' => null),
+            ['limit'         => null,
+                'precision'     => null,
+                'scale'         => null,
+                'unsigned'      => null,
+                'default'       => null,
+                'null'          => null,
+                'autoincrement' => null],
             $options
         );
 
@@ -184,7 +185,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
     public function belongsTo($columns)
     {
         if (!is_array($columns)) {
-            $columns = array($columns);
+            $columns = [$columns];
         }
         foreach ($columns as $col) {
             $this->column($col . '_id', 'integer');
@@ -215,10 +216,10 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
             return $this->column(
                 $arguments[0],
                 $method,
-                isset($arguments[1]) ? $arguments[1] : array()
+                $arguments[1] ?? []
             );
         }
-        throw new BadMethodCallException('Method "'.$method.'" takes two arguments');
+        throw new BadMethodCallException('Method "' . $method . '" takes two arguments');
     }
 
     /**
@@ -310,7 +311,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function offsetSet($offset, $value)
     {
-        foreach ($this->columns as $key=>$column) {
+        foreach ($this->columns as $key => $column) {
             if ($column->getName() == $offset) {
                 $this->columns[$key] = $value;
             }
@@ -324,7 +325,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      */
     public function offsetUnset($offset)
     {
-        foreach ($this->columns as $key=>$column) {
+        foreach ($this->columns as $key => $column) {
             if ($column->getName() == $offset) {
                 unset($this->columns[$key]);
             }

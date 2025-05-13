@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -46,7 +47,7 @@ class Horde_Db_Adapter_Sqlite_Column extends Horde_Db_Adapter_Base_Column
 
     public function binaryToString($value)
     {
-        return str_replace(array('%00', '%25'), array("\0", '%'), $value);
+        return str_replace(['%00', '%25'], ["\0", '%'], $value);
     }
 
     /**

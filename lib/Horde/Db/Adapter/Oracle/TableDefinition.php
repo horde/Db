@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -54,7 +55,7 @@ class Horde_Db_Adapter_Oracle_TableDefinition extends Horde_Db_Adapter_Base_Tabl
      *
      * @return Horde_Db_Adapter_Base_TableDefinition  This object.
      */
-    public function column($name, $type, $options = array())
+    public function column($name, $type, $options = [])
     {
         parent::column($name, $type, $options);
 

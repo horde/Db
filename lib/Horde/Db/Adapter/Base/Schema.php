@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -47,7 +48,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      *
      * @var array
      */
-    protected $_adapterMethods = array();
+    protected $_adapterMethods = [];
 
 
     /*##########################################################################
@@ -107,12 +108,29 @@ abstract class Horde_Db_Adapter_Base_Schema
      *                                                 object.
      */
     public function makeColumnDefinition(
-        $base, $name, $type, $limit = null, $precision = null, $scale = null,
-        $unsigned = null, $default = null, $null = null, $autoincrement = null)
-    {
+        $base,
+        $name,
+        $type,
+        $limit = null,
+        $precision = null,
+        $scale = null,
+        $unsigned = null,
+        $default = null,
+        $null = null,
+        $autoincrement = null
+    ) {
         return new Horde_Db_Adapter_Base_ColumnDefinition(
-            $base, $name, $type, $limit, $precision, $scale, $unsigned,
-            $default, $null, $autoincrement);
+            $base,
+            $name,
+            $type,
+            $limit,
+            $precision,
+            $scale,
+            $unsigned,
+            $default,
+            $null,
+            $autoincrement
+        );
     }
 
     /**
@@ -146,7 +164,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      *
      * @return Horde_Db_Adapter_Base_TableDefinition  A table definition object.
      */
-    public function makeTableDefinition($name, $base, $options = array())
+    public function makeTableDefinition($name, $base, $options = [])
     {
         return new Horde_Db_Adapter_Base_TableDefinition($name, $base, $options);
     }
@@ -168,7 +186,7 @@ abstract class Horde_Db_Adapter_Base_Schema
     public function __call($method, $args)
     {
         if (isset($this->_adapterMethods[$method])) {
-            return call_user_func_array(array($this->_adapter, $method), $args);
+            return call_user_func_array([$this->_adapter, $method], $args);
         }
 
         throw new BadMethodCallException('Call to undeclared method "' . $method . '"');
@@ -211,7 +229,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      */
     public function quote($value, $column = null)
     {
-        if (is_object($value) && is_callable(array($value, 'quotedId'))) {
+        if (is_object($value) && is_callable([$value, 'quotedId'])) {
             return $value->quotedId();
         }
 
@@ -236,7 +254,7 @@ abstract class Horde_Db_Adapter_Base_Schema
                                                 ? $value->format('U')
                                                 : $value->format('Y-m-d H:i:s'));
         } elseif ($type == 'integer') {
-            return (int)$value;
+            return (int) $value;
         } elseif ($type == 'float') {
             return sprintf('%F', $value);
         } else {
@@ -254,7 +272,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      */
     public function quoteString($string)
     {
-        return "'" . str_replace(array('\\', '\''), array('\\\\', '\\\''), $string) . "'";
+        return "'" . str_replace(['\\', '\''], ['\\\\', '\\\''], $string) . "'";
     }
 
     /**
@@ -312,7 +330,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      */
     public function quoteDate($value)
     {
-        return $this->quoteString((string)$value);
+        return $this->quoteString((string) $value);
     }
 
     /**
@@ -510,7 +528,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      * @return Horde_Db_Adapter_Base_TableDefinition  The definition of the
      *                                                created table.
      */
-    public function createTable($name, $options = array())
+    public function createTable($name, $options = [])
     {
         $tableDefinition = $this->makeTableDefinition($name, $this, $options);
 
@@ -549,7 +567,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      * @param array $options
      *        A list of options. See createTable().
      */
-    public function endTable($name, $options = array())
+    public function endTable($name, $options = [])
     {
         if ($name instanceof Horde_Db_Adapter_Base_TableDefinition) {
             $tableDefinition = $name;
@@ -563,13 +581,15 @@ abstract class Horde_Db_Adapter_Base_Schema
             $this->dropTable($tableDefinition->getName(), $options);
         }
 
-        $temp = !empty($options['temporary']) ? 'TEMPORARY'         : null;
-        $opts = !empty($options['options'])   ? $options['options'] : null;
-        $sql  = sprintf("CREATE %s TABLE %s (\n%s\n) %s",
-                        $temp,
-                        $this->quoteTableName($tableDefinition->getName()),
-                        $tableDefinition->toSql(),
-                        $opts);
+        $temp = !empty($options['temporary']) ? 'TEMPORARY' : null;
+        $opts = !empty($options['options']) ? $options['options'] : null;
+        $sql  = sprintf(
+            "CREATE %s TABLE %s (\n%s\n) %s",
+            $temp,
+            $this->quoteTableName($tableDefinition->getName()),
+            $tableDefinition->toSql(),
+            $opts
+        );
 
         $this->execute($sql);
     }
@@ -603,26 +623,34 @@ abstract class Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    public function addColumn($tableName, $columnName, $type,
-                              $options = array())
-    {
+    public function addColumn(
+        $tableName,
+        $columnName,
+        $type,
+        $options = []
+    ) {
         $this->_clearTableCache($tableName);
 
         $options = array_merge(
-            array('limit'     => null,
-                  'precision' => null,
-                  'scale'     => null,
-                  'unsigned'  => null),
-            $options);
+            ['limit'     => null,
+                'precision' => null,
+                'scale'     => null,
+                'unsigned'  => null],
+            $options
+        );
 
-        $sql = sprintf('ALTER TABLE %s ADD %s %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $this->typeToSql($type,
-                                        $options['limit'],
-                                        $options['precision'],
-                                        $options['scale'],
-                                        $options['unsigned']));
+        $sql = sprintf(
+            'ALTER TABLE %s ADD %s %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $this->typeToSql(
+                $type,
+                $options['limit'],
+                $options['precision'],
+                $options['scale'],
+                $options['unsigned']
+            )
+        );
         $sql = $this->addColumnOptions($sql, $options);
 
         return $this->execute($sql);
@@ -637,9 +665,11 @@ abstract class Horde_Db_Adapter_Base_Schema
     public function removeColumn($tableName, $columnName)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s DROP %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName));
+        $sql = sprintf(
+            'ALTER TABLE %s DROP %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName)
+        );
         return $this->execute($sql);
     }
 
@@ -653,7 +683,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    abstract public function changeColumn($tableName, $columnName, $type, $options = array());
+    abstract public function changeColumn($tableName, $columnName, $type, $options = []);
 
     /**
      * Sets a new default value for a column.
@@ -687,10 +717,12 @@ abstract class Horde_Db_Adapter_Base_Schema
     public function addPrimaryKey($tableName, $columns)
     {
         $this->_clearTableCache($tableName);
-        $columns = (array)$columns;
-        $sql = sprintf('ALTER TABLE %s ADD PRIMARY KEY (%s)',
-                       $this->quoteTableName($tableName),
-                       implode(', ', $columns));
+        $columns = (array) $columns;
+        $sql = sprintf(
+            'ALTER TABLE %s ADD PRIMARY KEY (%s)',
+            $this->quoteTableName($tableName),
+            implode(', ', $columns)
+        );
         return $this->execute($sql);
     }
 
@@ -758,23 +790,25 @@ abstract class Horde_Db_Adapter_Base_Schema
      *
      * @return string  The index name. @since Horde_Db 2.1.0
      */
-    public function addIndex($tableName, $columnName, $options = array())
+    public function addIndex($tableName, $columnName, $options = [])
     {
         $this->_clearTableCache($tableName);
 
-        $columnNames = (array)$columnName;
+        $columnNames = (array) $columnName;
         $indexName = empty($options['name'])
-            ? $this->indexName($tableName, array('column' => $columnNames))
+            ? $this->indexName($tableName, ['column' => $columnNames])
             : $this->indexName($tableName, $options);
         foreach ($columnNames as &$colName) {
             $colName = $this->quoteColumnName($colName);
         }
 
-        $sql = sprintf('CREATE %s INDEX %s ON %s (%s)',
-                       empty($options['unique']) ? null : 'UNIQUE',
-                       $this->quoteColumnName($indexName),
-                       $this->quoteTableName($tableName),
-                       implode(', ', $columnNames));
+        $sql = sprintf(
+            'CREATE %s INDEX %s ON %s (%s)',
+            empty($options['unique']) ? null : 'UNIQUE',
+            $this->quoteColumnName($indexName),
+            $this->quoteTableName($tableName),
+            implode(', ', $columnNames)
+        );
         $this->execute($sql);
 
         return $indexName;
@@ -812,14 +846,16 @@ abstract class Horde_Db_Adapter_Base_Schema
      *                               - name: (string) the index name.
      *                               - column: (string|array) column name(s).
      */
-    public function removeIndex($tableName, $options = array())
+    public function removeIndex($tableName, $options = [])
     {
         $this->_clearTableCache($tableName);
 
         $index = $this->indexName($tableName, $options);
-        $sql = sprintf('DROP INDEX %s ON %s',
-                       $this->quoteColumnName($index),
-                       $this->quoteTableName($tableName));
+        $sql = sprintf(
+            'DROP INDEX %s ON %s',
+            $this->quoteColumnName($index),
+            $this->quoteTableName($tableName)
+        );
 
         return $this->execute($sql);
     }
@@ -833,13 +869,13 @@ abstract class Horde_Db_Adapter_Base_Schema
      *                               - name: (string) the index name to fall
      *                                 back to if no column names specified.
      */
-    public function indexName($tableName, $options = array())
+    public function indexName($tableName, $options = [])
     {
         if (!is_array($options)) {
-            $options = array('column' => $options);
+            $options = ['column' => $options];
         }
         if (isset($options['column'])) {
-            $columns = (array)$options['column'];
+            $columns = (array) $options['column'];
             return "index_{$tableName}_on_" . implode('_and_', $columns);
         }
         if (isset($options['name'])) {
@@ -865,7 +901,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      * @param string $name    A database name.
      * @param array $options  Database options.
      */
-    abstract public function createDatabase($name, $options = array());
+    abstract public function createDatabase($name, $options = []);
 
     /**
      * Drops a database.
@@ -894,11 +930,15 @@ abstract class Horde_Db_Adapter_Base_Schema
      * @return string  The SQL definition. If $type is not one of the
      *                 internally supported types, $type is returned unchanged.
      */
-    public function typeToSql($type, $limit = null, $precision = null,
-                              $scale = null, $unsigned = null)
-    {
+    public function typeToSql(
+        $type,
+        $limit = null,
+        $precision = null,
+        $scale = null,
+        $unsigned = null
+    ) {
         $natives = $this->nativeDatabaseTypes();
-        $native = isset($natives[$type]) ? $natives[$type] : null;
+        $native = $natives[$type] ?? null;
         if (empty($native)) {
             return $type;
         }
@@ -907,11 +947,11 @@ abstract class Horde_Db_Adapter_Base_Schema
         if ($type == 'decimal' ||
             is_array($native) && (isset($native['precision']) || isset($native['scale'])) ||
             isset($precision) || isset($scale)) {
-            $nativePrec  = isset($native['precision']) ? $native['precision'] : null;
-            $nativeScale = isset($native['scale'])     ? $native['scale']     : null;
+            $nativePrec  = $native['precision'] ?? null;
+            $nativeScale = $native['scale'] ?? null;
 
             $precision = !empty($precision) ? $precision : $nativePrec;
-            $scale     = !empty($scale)     ? $scale     : $nativeScale;
+            $scale     = !empty($scale) ? $scale : $nativeScale;
             if ($precision) {
                 $sql .= $scale ? "($precision, $scale)" : "($precision)";
             }
@@ -957,7 +997,7 @@ abstract class Horde_Db_Adapter_Base_Schema
 
         if (isset($options['default'])) {
             $default = $options['default'];
-            $column  = isset($options['column']) ? $options['column'] : null;
+            $column  = $options['column'] ?? null;
             $sql .= ' DEFAULT ' . $this->quote($default, $column);
         }
 
@@ -1029,11 +1069,13 @@ abstract class Horde_Db_Adapter_Base_Schema
         if (!is_int($amount)) {
             throw new InvalidArgumentException('$amount parameter must be an integer');
         }
-        return sprintf('%s %s INTERVAL \'%s\' %s',
-                       $reference,
-                       $operator,
-                       $amount,
-                       $interval);
+        return sprintf(
+            '%s %s INTERVAL \'%s\' %s',
+            $reference,
+            $operator,
+            $amount,
+            $interval
+        );
     }
 
     /**
@@ -1049,75 +1091,88 @@ abstract class Horde_Db_Adapter_Base_Schema
      * @return string|array  The SQL test fragment, or an array containing the
      *                       query and a list of values if $bind is true.
      */
-    public function buildClause($lhs, $op, $rhs, $bind = false,
-                                $params = array())
-    {
+    public function buildClause(
+        $lhs,
+        $op,
+        $rhs,
+        $bind = false,
+        $params = []
+    ) {
         $lhs = $this->_escapePrepare($lhs);
         switch ($op) {
-        case '|':
-        case '&':
-            if ($bind) {
-                return array($lhs . ' ' . $op . ' ?',
-                             array((int)$rhs));
-            }
-            return $lhs . ' ' . $op . ' ' . (int)$rhs;
+            case '|':
+            case '&':
+                if ($bind) {
+                    return [$lhs . ' ' . $op . ' ?',
+                        [(int) $rhs]];
+                }
+                return $lhs . ' ' . $op . ' ' . (int) $rhs;
 
-        case '~':
-            if ($bind) {
-                return array($lhs . ' ' . $op . ' ?', array($rhs));
-            }
-            return $lhs . ' ' . $op . ' ' . $rhs;
+            case '~':
+                if ($bind) {
+                    return [$lhs . ' ' . $op . ' ?', [$rhs]];
+                }
+                return $lhs . ' ' . $op . ' ' . $rhs;
 
-        case 'IN':
-            if ($bind) {
+            case 'IN':
+                if ($bind) {
+                    if (is_array($rhs)) {
+                        return [$lhs . ' IN (?' . str_repeat(', ?', count($rhs) - 1) . ')', $rhs];
+                    }
+                    /* We need to bind each member of the IN clause separately to
+                     * ensure proper quoting. */
+                    if (substr($rhs, 0, 1) == '(') {
+                        $rhs = substr($rhs, 1);
+                    }
+                    if (substr($rhs, -1) == ')') {
+                        $rhs = substr($rhs, 0, -1);
+                    }
+
+                    $ids = preg_split('/\s*,\s*/', $rhs);
+
+                    return [$lhs . ' IN (?' . str_repeat(', ?', count($ids) - 1) . ')', $ids];
+                }
                 if (is_array($rhs)) {
-                    return array($lhs . ' IN (?' . str_repeat(', ?', count($rhs) - 1) . ')', $rhs);
+                    return $lhs . ' IN ' . implode(', ', $rhs);
                 }
-                /* We need to bind each member of the IN clause separately to
-                 * ensure proper quoting. */
-                if (substr($rhs, 0, 1) == '(') {
-                    $rhs = substr($rhs, 1);
+                return $lhs . ' IN ' . $rhs;
+
+            case 'LIKE':
+                $query = 'LOWER(%s) LIKE LOWER(%s)';
+                if ($bind) {
+                    if (empty($params['begin'])) {
+                        return [sprintf($query, $lhs, '?'),
+                            ['%' . $rhs . '%']];
+                    }
+                    return [sprintf(
+                        '(' . $query . ' OR ' . $query . ')',
+                        $lhs,
+                        '?',
+                        $lhs,
+                        '?'
+                    ),
+                        [$rhs . '%', '% ' . $rhs . '%']];
                 }
-                if (substr($rhs, -1) == ')') {
-                    $rhs = substr($rhs, 0, -1);
-                }
-
-                $ids = preg_split('/\s*,\s*/', $rhs);
-
-                return array($lhs . ' IN (?' . str_repeat(', ?', count($ids) - 1) . ')', $ids);
-            }
-            if (is_array($rhs)) {
-                return $lhs . ' IN ' . implode(', ', $rhs);
-            }
-            return $lhs . ' IN ' . $rhs;
-
-        case 'LIKE':
-            $query = 'LOWER(%s) LIKE LOWER(%s)';
-            if ($bind) {
                 if (empty($params['begin'])) {
-                    return array(sprintf($query, $lhs, '?'),
-                                 array('%' . $rhs . '%'));
+                    return sprintf(
+                        $query,
+                        $lhs,
+                        $this->_escapePrepare($this->quote('%' . $rhs . '%'))
+                    );
                 }
-                return array(sprintf('(' . $query . ' OR ' . $query . ')',
-                                     $lhs, '?', $lhs, '?'),
-                             array($rhs . '%', '% ' . $rhs . '%'));
-            }
-            if (empty($params['begin'])) {
-                return sprintf($query,
-                               $lhs,
-                               $this->_escapePrepare($this->quote('%' . $rhs . '%')));
-            }
-            return sprintf('(' . $query . ' OR ' . $query . ')',
-                           $lhs,
-                           $this->_escapePrepare($this->quote($rhs . '%')),
-                           $lhs,
-                           $this->_escapePrepare($this->quote('% ' . $rhs . '%')));
+                return sprintf(
+                    '(' . $query . ' OR ' . $query . ')',
+                    $lhs,
+                    $this->_escapePrepare($this->quote($rhs . '%')),
+                    $lhs,
+                    $this->_escapePrepare($this->quote('% ' . $rhs . '%'))
+                );
 
-        default:
-            if ($bind) {
-                return array($lhs . ' ' . $this->_escapePrepare($op) . ' ?', array($rhs));
-            }
-            return $lhs . ' ' . $this->_escapePrepare($op . ' ' . $this->quote($rhs));
+            default:
+                if ($bind) {
+                    return [$lhs . ' ' . $this->_escapePrepare($op) . ' ?', [$rhs]];
+                }
+                return $lhs . ' ' . $this->_escapePrepare($op . ' ' . $this->quote($rhs));
         }
     }
 

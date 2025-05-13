@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -93,7 +94,7 @@ class Horde_Db_Adapter_Pdo_Mysql extends Horde_Db_Adapter_Pdo_Base
     {
         $this->_config['adapter'] = 'mysql';
 
-        $this->_checkRequiredConfig(array('adapter', 'username'));
+        $this->_checkRequiredConfig(['adapter', 'username']);
 
         if (!empty($this->_config['socket'])) {
             $this->_config['unix_socket'] = $this->_config['socket'];
@@ -113,10 +114,10 @@ class Horde_Db_Adapter_Pdo_Mysql extends Horde_Db_Adapter_Pdo_Base
         // Collect options to build PDO Data Source Name (DSN) string.
         $dsnOpts = $this->_config;
         unset($dsnOpts['adapter'],
-              $dsnOpts['username'],
-              $dsnOpts['password'],
-              $dsnOpts['charset'],
-              $dsnOpts['phptype']);
+            $dsnOpts['username'],
+            $dsnOpts['password'],
+            $dsnOpts['charset'],
+            $dsnOpts['phptype']);
         $dsnOpts = $this->_normalizeConfig($dsnOpts);
 
         if (isset($dsnOpts['port'])) {
@@ -133,9 +134,9 @@ class Horde_Db_Adapter_Pdo_Mysql extends Horde_Db_Adapter_Pdo_Base
         }
 
         // Return DSN and user/pass for connection.
-        return array(
+        return [
             $this->_buildDsnString($dsnOpts),
             $this->_config['username'],
-            $this->_config['password']);
+            $this->_config['password']];
     }
 }

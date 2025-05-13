@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -38,7 +39,7 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
      * The internal PostgreSQL identifier of the money data type.
      * @const integer
      */
-    const MONEY_COLUMN_TYPE_OID = 790;
+    public const MONEY_COLUMN_TYPE_OID = 790;
 
 
     /**
@@ -54,7 +55,7 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
      * @param   string  $sqlType
      * @param   boolean $null
      */
-    public function __construct($name, $default, $sqlType=null, $null=true)
+    public function __construct($name, $default, $sqlType = null, $null = true)
     {
         parent::__construct($name, $this->_extractValueFromDefault($default), $sqlType, $null);
     }
@@ -64,53 +65,53 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
     protected function _setSimplifiedType()
     {
         switch (true) {
-        case preg_match('/^(?:real|double precision)$/', $this->_sqlType):
-            // Numeric and monetary types
-            $this->_type = 'float';
-            return;
-        case preg_match('/^money$/', $this->_sqlType):
-            // Monetary types
-            $this->_type = 'decimal';
-            return;
-        case preg_match('/^(?:character varying|bpchar)(?:\(\d+\))?$/', $this->_sqlType):
-            // Character types
-            $this->_type = 'string';
-            return;
-        case preg_match('/^bytea$/', $this->_sqlType):
-            // Binary data types
-            $this->_type = 'binary';
-            return;
-        case preg_match('/^timestamp with(?:out)? time zone$/', $this->_sqlType):
-            // Date/time types
-            $this->_type = 'datetime';
-            return;
-        case preg_match('/^interval$/', $this->_sqlType):
-            $this->_type = 'string';
-            return;
-        case preg_match('/^(?:point|line|lseg|box|"?path"?|polygon|circle)$/', $this->_sqlType):
-            // Geometric types
-            $this->_type = 'string';
-            return;
-        case preg_match('/^(?:cidr|inet|macaddr)$/', $this->_sqlType):
-            // Network address types
-            $this->_type = 'string';
-            return;
-        case preg_match('/^bit(?: varying)?(?:\(\d+\))?$/', $this->_sqlType):
-            // Bit strings
-            $this->_type = 'string';
-            return;
-        case preg_match('/^xml$/', $this->_sqlType):
-            // XML type
-            $this->_type = 'string';
-            return;
-        case preg_match('/^\D+\[\]$/', $this->_sqlType):
-            // Arrays
-            $this->_type = 'string';
-            return;
-        case preg_match('/^oid$/', $this->_sqlType):
-            // Object identifier types
-            $this->_type = 'integer';
-            return;
+            case preg_match('/^(?:real|double precision)$/', $this->_sqlType):
+                // Numeric and monetary types
+                $this->_type = 'float';
+                return;
+            case preg_match('/^money$/', $this->_sqlType):
+                // Monetary types
+                $this->_type = 'decimal';
+                return;
+            case preg_match('/^(?:character varying|bpchar)(?:\(\d+\))?$/', $this->_sqlType):
+                // Character types
+                $this->_type = 'string';
+                return;
+            case preg_match('/^bytea$/', $this->_sqlType):
+                // Binary data types
+                $this->_type = 'binary';
+                return;
+            case preg_match('/^timestamp with(?:out)? time zone$/', $this->_sqlType):
+                // Date/time types
+                $this->_type = 'datetime';
+                return;
+            case preg_match('/^interval$/', $this->_sqlType):
+                $this->_type = 'string';
+                return;
+            case preg_match('/^(?:point|line|lseg|box|"?path"?|polygon|circle)$/', $this->_sqlType):
+                // Geometric types
+                $this->_type = 'string';
+                return;
+            case preg_match('/^(?:cidr|inet|macaddr)$/', $this->_sqlType):
+                // Network address types
+                $this->_type = 'string';
+                return;
+            case preg_match('/^bit(?: varying)?(?:\(\d+\))?$/', $this->_sqlType):
+                // Bit strings
+                $this->_type = 'string';
+                return;
+            case preg_match('/^xml$/', $this->_sqlType):
+                // XML type
+                $this->_type = 'string';
+                return;
+            case preg_match('/^\D+\[\]$/', $this->_sqlType):
+                // Arrays
+                $this->_type = 'string';
+                return;
+            case preg_match('/^oid$/', $this->_sqlType):
+                // Object identifier types
+                $this->_type = 'integer';
+                return;
         }
 
         // Pass through all types that are not specific to PostgreSQL.
@@ -123,51 +124,51 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
     protected function _extractValueFromDefault($default)
     {
         switch (true) {
-        case preg_match('/\A-?\d+(\.\d*)?\z/', $default):
-            // Numeric types
-            return $default;
-        case preg_match('/\A\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
-            // Character types
-            return $matches[1];
-        case preg_match('/\AE\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
-            // Character types (8.1 formatting)
-            /*@TODO fix preg callback*/
-            return preg_replace('/\\(\d\d\d)/', '$1.oct.chr', $matches[1]);
-        case preg_match('/\A\'(.*)\'::bytea\z/m', $default, $matches):
-            // Binary data types
-            return $matches[1];
-        case preg_match('/\A\'(.+)\'::(?:time(?:stamp)? with(?:out)? time zone|date)\z/', $default, $matches):
-            // Date/time types
-            return $matches[1];
-        case preg_match('/\A\'(.*)\'::interval\z/', $default, $matches):
-            return $matches[1];
-        case $default == 'true':
-            // Boolean type
-            return true;
-        case $default == 'false':
-            return false;
-        case preg_match('/\A\'(.*)\'::(?:point|line|lseg|box|"?path"?|polygon|circle)\z/', $default, $matches):
-            // Geometric types
-            return $matches[1];
-        case preg_match('/\A\'(.*)\'::(?:cidr|inet|macaddr)\z/', $default, $matches):
-            // Network address types
-            return $matches[1];
-        case preg_match('/\AB\'(.*)\'::"?bit(?: varying)?"?\z/', $default, $matches):
-            // Bit string types
-            return $matches[1];
-        case preg_match('/\A\'(.*)\'::xml\z/m', $default, $matches):
-            // XML type
-            return $matches[1];
-        case preg_match('/\A\'(.*)\'::"?\D+"?\[\]\z/', $default, $matches):
-            // Arrays
-            return $matches[1];
-        case preg_match('/\A-?\d+\z/', $default, $matches):
-            // Object identifier types
-            return $matches[1];
-        default:
-            // Anything else is blank, some user type, or some function
-            // and we can't know the value of that, so return nil.
-            return null;
+            case preg_match('/\A-?\d+(\.\d*)?\z/', $default):
+                // Numeric types
+                return $default;
+            case preg_match('/\A\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
+                // Character types
+                return $matches[1];
+            case preg_match('/\AE\'(.*)\'::(?:character varying|bpchar|text)\z/m', $default, $matches):
+                // Character types (8.1 formatting)
+                /*@TODO fix preg callback*/
+                return preg_replace('/\\(\d\d\d)/', '$1.oct.chr', $matches[1]);
+            case preg_match('/\A\'(.*)\'::bytea\z/m', $default, $matches):
+                // Binary data types
+                return $matches[1];
+            case preg_match('/\A\'(.+)\'::(?:time(?:stamp)? with(?:out)? time zone|date)\z/', $default, $matches):
+                // Date/time types
+                return $matches[1];
+            case preg_match('/\A\'(.*)\'::interval\z/', $default, $matches):
+                return $matches[1];
+            case $default == 'true':
+                // Boolean type
+                return true;
+            case $default == 'false':
+                return false;
+            case preg_match('/\A\'(.*)\'::(?:point|line|lseg|box|"?path"?|polygon|circle)\z/', $default, $matches):
+                // Geometric types
+                return $matches[1];
+            case preg_match('/\A\'(.*)\'::(?:cidr|inet|macaddr)\z/', $default, $matches):
+                // Network address types
+                return $matches[1];
+            case preg_match('/\AB\'(.*)\'::"?bit(?: varying)?"?\z/', $default, $matches):
+                // Bit string types
+                return $matches[1];
+            case preg_match('/\A\'(.*)\'::xml\z/m', $default, $matches):
+                // XML type
+                return $matches[1];
+            case preg_match('/\A\'(.*)\'::"?\D+"?\[\]\z/', $default, $matches):
+                // Arrays
+                return $matches[1];
+            case preg_match('/\A-?\d+\z/', $default, $matches):
+                // Object identifier types
+                return $matches[1];
+            default:
+                // Anything else is blank, some user type, or some function
+                // and we can't know the value of that, so return nil.
+                return null;
         }
     }
 
@@ -185,7 +186,7 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
             return $string;
         }
 
-        return preg_replace_callback("/(?:\\\'|\\\\\\\\|\\\\\d{3})/", array($this, 'binaryToStringCallback'), $value);
+        return preg_replace_callback("/(?:\\\'|\\\\\\\\|\\\\\d{3})/", [$this, 'binaryToStringCallback'], $value);
     }
 
     /**

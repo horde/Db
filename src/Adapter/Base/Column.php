@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -65,7 +66,7 @@ class Column
      *                         or "unsigned => true" in "int(10) UNSIGNED".
      * @param bool $null    Whether this column allows NULL values. optional
      */
-    public function __construct(string $name, string $default = null, string $sqlType = null, bool $null = true)
+    public function __construct(string $name, ?string $default = null, ?string $sqlType = null, bool $null = true)
     {
         $this->name      = $name;
         $this->sqlType   = $sqlType;
@@ -109,28 +110,28 @@ class Column
         }
 
         switch ($this->type) {
-        case 'string':
-        case 'text':
-            return $value;
-        case 'integer':
-            return strlen($value) ? (int)$value : null;
-        case 'float':
-            return strlen($value) ? (float)$value : null;
-        case 'decimal':
-            return $this->valueToDecimal($value);
-        case 'datetime':
-        case 'timestamp':
-            return $this->stringToTime($value);
-        case 'time':
-            return $this->stringToDummyTime($value);
-        case 'date':
-            return $this->stringToDate($value);
-        case 'binary':
-            return $this->binaryToString($value);
-        case 'boolean':
-            return $this->valueToBoolean($value);
-        default:
-            return $value;
+            case 'string':
+            case 'text':
+                return $value;
+            case 'integer':
+                return strlen($value) ? (int) $value : null;
+            case 'float':
+                return strlen($value) ? (float) $value : null;
+            case 'decimal':
+                return $this->valueToDecimal($value);
+            case 'datetime':
+            case 'timestamp':
+                return $this->stringToTime($value);
+            case 'time':
+                return $this->stringToDummyTime($value);
+            case 'date':
+                return $this->stringToDate($value);
+            case 'binary':
+                return $this->binaryToString($value);
+            case 'boolean':
+                return $this->valueToBoolean($value);
+            default:
+                return $value;
         }
     }
 
@@ -228,7 +229,7 @@ class Column
      */
     public function binaryToString($value)
     {
-        return (string)$value;
+        return (string) $value;
     }
 
     /**
@@ -296,7 +297,7 @@ class Column
      */
     public function valueToDecimal($value)
     {
-        return (float)$value;
+        return (float) $value;
     }
 
 
@@ -311,7 +312,7 @@ class Column
     protected function extractLimit($sqlType)
     {
         if (preg_match("/\((.*)\)/", $sqlType, $matches)) {
-            return (int)$matches[1];
+            return (int) $matches[1];
         }
         return null;
     }
@@ -323,7 +324,7 @@ class Column
     protected function extractPrecision($sqlType)
     {
         if (preg_match("/^(numeric|decimal|number)\((\d+)(,\d+)?\)/i", $sqlType, $matches)) {
-            return (int)$matches[2];
+            return (int) $matches[2];
         }
         return null;
     }
@@ -343,10 +344,10 @@ class Column
                 $sqlType,
                 $match
             ):
-                return (int)$match[4];
+                return (int) $match[4];
             default:
-               return 0;
-         }
+                return 0;
+        }
     }
 
     /**
@@ -355,7 +356,7 @@ class Column
      */
     protected function extractUnsigned($sqlType)
     {
-        return (bool)preg_match('/^int.*unsigned/i', $sqlType);
+        return (bool) preg_match('/^int.*unsigned/i', $sqlType);
     }
 
     /**
@@ -363,39 +364,39 @@ class Column
     protected function setSimplifiedType()
     {
         switch (true) {
-        case preg_match('/int/i', $this->sqlType):
-            $this->type = 'integer';
-            return;
-        case preg_match('/float|double/i', $this->sqlType):
-            $this->type = 'float';
-            return;
-        case preg_match('/decimal|numeric|number/i', $this->sqlType):
-            $this->type = $this->scale == 0 ? 'integer' : 'decimal';
-            return;
-        case preg_match('/datetime/i', $this->sqlType):
-            $this->type = 'datetime';
-            return;
-        case preg_match('/timestamp/i', $this->sqlType):
-            $this->type = 'timestamp';
-            return;
-        case preg_match('/time/i', $this->sqlType):
-            $this->type = 'time';
-            return;
-        case preg_match('/date/i', $this->sqlType):
-            $this->type = 'date';
-            return;
-        case preg_match('/clob|text/i', $this->sqlType):
-            $this->type = 'text';
-            return;
-        case preg_match('/blob|binary/i', $this->sqlType):
-            $this->type = 'binary';
-            return;
-        case preg_match('/char|string/i', $this->sqlType):
-            $this->type = 'string';
-            return;
-        case preg_match('/boolean/i', $this->sqlType):
-            $this->type = 'boolean';
-            return;
+            case preg_match('/int/i', $this->sqlType):
+                $this->type = 'integer';
+                return;
+            case preg_match('/float|double/i', $this->sqlType):
+                $this->type = 'float';
+                return;
+            case preg_match('/decimal|numeric|number/i', $this->sqlType):
+                $this->type = $this->scale == 0 ? 'integer' : 'decimal';
+                return;
+            case preg_match('/datetime/i', $this->sqlType):
+                $this->type = 'datetime';
+                return;
+            case preg_match('/timestamp/i', $this->sqlType):
+                $this->type = 'timestamp';
+                return;
+            case preg_match('/time/i', $this->sqlType):
+                $this->type = 'time';
+                return;
+            case preg_match('/date/i', $this->sqlType):
+                $this->type = 'date';
+                return;
+            case preg_match('/clob|text/i', $this->sqlType):
+                $this->type = 'text';
+                return;
+            case preg_match('/blob|binary/i', $this->sqlType):
+                $this->type = 'binary';
+                return;
+            case preg_match('/char|string/i', $this->sqlType):
+                $this->type = 'string';
+                return;
+            case preg_match('/boolean/i', $this->sqlType):
+                $this->type = 'boolean';
+                return;
         }
     }
 }

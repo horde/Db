@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -42,7 +43,7 @@ use Horde_String;
  * @license    http://www.horde.org/licenses/bsd
  * @package    Db
  * @subpackage Adapter
- * 
+ *
  * @method cacheWrite($key, $value)
  */
 abstract class Schema
@@ -80,7 +81,7 @@ abstract class Schema
 
     /**
      * Setter for a Horde\Db\Adapter instance.
-     * 
+     *
      * This is mostly for the __wakeup call, maybe we should rethink this
      *
      * @param Adapter $adapter  A Horde\Db\Adapter instance.
@@ -201,7 +202,7 @@ abstract class Schema
     public function __call($method, $args)
     {
         if (isset($this->adapterMethods[$method])) {
-            return call_user_func_array(array($this->adapter, $method), $args);
+            return call_user_func_array([$this->adapter, $method], $args);
         }
 
         throw new BadMethodCallException('Call to undeclared method "' . $method . '"');
@@ -245,7 +246,7 @@ abstract class Schema
      */
     public function quote($value, $column = null)
     {
-        if (is_object($value) && is_callable(array($value, 'quotedId'))) {
+        if (is_object($value) && is_callable([$value, 'quotedId'])) {
             return $value->quotedId();
         }
 
@@ -270,7 +271,7 @@ abstract class Schema
                                                 ? $value->format('U')
                                                 : $value->format('Y-m-d H:i:s'));
         } elseif ($type == 'integer') {
-            return (int)$value;
+            return (int) $value;
         } elseif ($type == 'float') {
             return sprintf('%F', $value);
         } else {
@@ -288,7 +289,7 @@ abstract class Schema
      */
     public function quoteString($string)
     {
-        return "'" . str_replace(array('\\', '\''), array('\\\\', '\\\''), $string) . "'";
+        return "'" . str_replace(['\\', '\''], ['\\\\', '\\\''], $string) . "'";
     }
 
     /**
@@ -346,7 +347,7 @@ abstract class Schema
      */
     public function quoteDate($value)
     {
-        return $this->quoteString((string)$value);
+        return $this->quoteString((string) $value);
     }
 
     /**
@@ -648,10 +649,10 @@ abstract class Schema
         $this->clearTableCache($tableName);
 
         $options = array_merge(
-            array('limit'     => null,
-                  'precision' => null,
-                  'scale'     => null,
-                  'unsigned'  => null),
+            ['limit'     => null,
+                'precision' => null,
+                'scale'     => null,
+                'unsigned'  => null],
             $options
         );
 
@@ -733,7 +734,7 @@ abstract class Schema
     public function addPrimaryKey($tableName, $columns)
     {
         $this->clearTableCache($tableName);
-        $columns = (array)$columns;
+        $columns = (array) $columns;
         $sql = sprintf(
             'ALTER TABLE %s ADD PRIMARY KEY (%s)',
             $this->quoteTableName($tableName),
@@ -810,9 +811,9 @@ abstract class Schema
     {
         $this->clearTableCache($tableName);
 
-        $columnNames = (array)$columnName;
+        $columnNames = (array) $columnName;
         $indexName = empty($options['name'])
-            ? $this->indexName($tableName, array('column' => $columnNames))
+            ? $this->indexName($tableName, ['column' => $columnNames])
             : $this->indexName($tableName, $options);
         foreach ($columnNames as &$colName) {
             $colName = $this->quoteColumnName($colName);
@@ -888,10 +889,10 @@ abstract class Schema
     public function indexName($tableName, $options = [])
     {
         if (!is_array($options)) {
-            $options = array('column' => $options);
+            $options = ['column' => $options];
         }
         if (isset($options['column'])) {
-            $columns = (array)$options['column'];
+            $columns = (array) $options['column'];
             return "index_{$tableName}_on_" . implode('_and_', $columns);
         }
         if (isset($options['name'])) {
@@ -954,7 +955,7 @@ abstract class Schema
         $unsigned = null
     ) {
         $natives = $this->nativeDatabaseTypes();
-        $native = isset($natives[$type]) ? $natives[$type] : null;
+        $native = $natives[$type] ?? null;
         if (empty($native)) {
             return $type;
         }
@@ -963,8 +964,8 @@ abstract class Schema
         if ($type == 'decimal' ||
             is_array($native) && (isset($native['precision']) || isset($native['scale'])) ||
             isset($precision) || isset($scale)) {
-            $nativePrec  = isset($native['precision']) ? $native['precision'] : null;
-            $nativeScale = isset($native['scale']) ? $native['scale'] : null;
+            $nativePrec  = $native['precision'] ?? null;
+            $nativeScale = $native['scale'] ?? null;
 
             $precision = !empty($precision) ? $precision : $nativePrec;
             $scale     = !empty($scale) ? $scale : $nativeScale;
@@ -1013,7 +1014,7 @@ abstract class Schema
 
         if (isset($options['default'])) {
             $default = $options['default'];
-            $column  = isset($options['column']) ? $options['column'] : null;
+            $column  = $options['column'] ?? null;
             $sql .= ' DEFAULT ' . $this->quote($default, $column);
         }
 
@@ -1116,79 +1117,79 @@ abstract class Schema
     ) {
         $lhs = $this->escapePrepare($lhs);
         switch ($op) {
-        case '|':
-        case '&':
-            if ($bind) {
-                return array($lhs . ' ' . $op . ' ?',
-                             array((int)$rhs));
-            }
-            return $lhs . ' ' . $op . ' ' . (int)$rhs;
+            case '|':
+            case '&':
+                if ($bind) {
+                    return [$lhs . ' ' . $op . ' ?',
+                        [(int) $rhs]];
+                }
+                return $lhs . ' ' . $op . ' ' . (int) $rhs;
 
-        case '~':
-            if ($bind) {
-                return array($lhs . ' ' . $op . ' ?', array($rhs));
-            }
-            return $lhs . ' ' . $op . ' ' . $rhs;
+            case '~':
+                if ($bind) {
+                    return [$lhs . ' ' . $op . ' ?', [$rhs]];
+                }
+                return $lhs . ' ' . $op . ' ' . $rhs;
 
-        case 'IN':
-            if ($bind) {
+            case 'IN':
+                if ($bind) {
+                    if (is_array($rhs)) {
+                        return [$lhs . ' IN (?' . str_repeat(', ?', count($rhs) - 1) . ')', $rhs];
+                    }
+                    /* We need to bind each member of the IN clause separately to
+                     * ensure proper quoting. */
+                    if (substr($rhs, 0, 1) == '(') {
+                        $rhs = substr($rhs, 1);
+                    }
+                    if (substr($rhs, -1) == ')') {
+                        $rhs = substr($rhs, 0, -1);
+                    }
+
+                    $ids = preg_split('/\s*,\s*/', $rhs);
+
+                    return [$lhs . ' IN (?' . str_repeat(', ?', count($ids) - 1) . ')', $ids];
+                }
                 if (is_array($rhs)) {
-                    return array($lhs . ' IN (?' . str_repeat(', ?', count($rhs) - 1) . ')', $rhs);
+                    return $lhs . ' IN ' . implode(', ', $rhs);
                 }
-                /* We need to bind each member of the IN clause separately to
-                 * ensure proper quoting. */
-                if (substr($rhs, 0, 1) == '(') {
-                    $rhs = substr($rhs, 1);
+                return $lhs . ' IN ' . $rhs;
+
+            case 'LIKE':
+                $query = 'LOWER(%s) LIKE LOWER(%s)';
+                if ($bind) {
+                    if (empty($params['begin'])) {
+                        return [sprintf($query, $lhs, '?'),
+                            ['%' . $rhs . '%']];
+                    }
+                    return [sprintf(
+                        '(' . $query . ' OR ' . $query . ')',
+                        $lhs,
+                        '?',
+                        $lhs,
+                        '?'
+                    ),
+                        [$rhs . '%', '% ' . $rhs . '%']];
                 }
-                if (substr($rhs, -1) == ')') {
-                    $rhs = substr($rhs, 0, -1);
-                }
-
-                $ids = preg_split('/\s*,\s*/', $rhs);
-
-                return array($lhs . ' IN (?' . str_repeat(', ?', count($ids) - 1) . ')', $ids);
-            }
-            if (is_array($rhs)) {
-                return $lhs . ' IN ' . implode(', ', $rhs);
-            }
-            return $lhs . ' IN ' . $rhs;
-
-        case 'LIKE':
-            $query = 'LOWER(%s) LIKE LOWER(%s)';
-            if ($bind) {
                 if (empty($params['begin'])) {
-                    return array(sprintf($query, $lhs, '?'),
-                                 array('%' . $rhs . '%'));
+                    return sprintf(
+                        $query,
+                        $lhs,
+                        $this->escapePrepare($this->quote('%' . $rhs . '%'))
+                    );
                 }
-                return array(sprintf(
+                return sprintf(
                     '(' . $query . ' OR ' . $query . ')',
                     $lhs,
-                    '?',
+                    $this->escapePrepare($this->quote($rhs . '%')),
                     $lhs,
-                    '?'
-                ),
-                             array($rhs . '%', '% ' . $rhs . '%'));
-            }
-            if (empty($params['begin'])) {
-                return sprintf(
-                    $query,
-                    $lhs,
-                    $this->escapePrepare($this->quote('%' . $rhs . '%'))
+                    $this->escapePrepare($this->quote('% ' . $rhs . '%'))
                 );
-            }
-            return sprintf(
-                '(' . $query . ' OR ' . $query . ')',
-                $lhs,
-                $this->escapePrepare($this->quote($rhs . '%')),
-                $lhs,
-                $this->escapePrepare($this->quote('% ' . $rhs . '%'))
-            );
 
-        default:
-            if ($bind) {
-                return array($lhs . ' ' . $this->escapePrepare($op) . ' ?', array($rhs));
-            }
-            return $lhs . ' ' . $this->escapePrepare($op . ' ' . $this->quote($rhs));
+            default:
+                if ($bind) {
+                    return [$lhs . ' ' . $this->escapePrepare($op) . ' ?', [$rhs]];
+                }
+                return $lhs . ' ' . $this->escapePrepare($op . ' ' . $this->quote($rhs));
         }
     }
 

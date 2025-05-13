@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
@@ -56,8 +57,7 @@ class Column extends BaseColumn
         $length = null,
         $precision = null,
         $scale = null
-    )
-    {
+    ) {
         $this->name      = $name;
         $this->sqlType   = Horde_String::lower($sqlType);
         $this->null      = $null;

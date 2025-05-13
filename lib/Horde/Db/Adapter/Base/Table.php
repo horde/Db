@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -92,7 +93,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      */
     public function getColumn($column)
     {
-        return isset($this->_columns[$column]) ? $this->_columns[$column] : null;
+        return $this->_columns[$column] ?? null;
     }
 
     /**
@@ -100,7 +101,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      */
     public function getColumnNames()
     {
-        $names = array();
+        $names = [];
         foreach ($this->_columns as $column) {
             $names[] = $column->getName();
         }
@@ -120,7 +121,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      */
     public function getIndexNames()
     {
-        $names = array();
+        $names = [];
         foreach ($this->_indexes as $index) {
             $names[] = $index->getName();
         }
@@ -178,9 +179,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      * @param   mixed   $value
      */
     #[\ReturnTypeWillChange]
-    public function offsetSet($offset, $value)
-    {
-    }
+    public function offsetSet($offset, $value) {}
 
     /**
      * ArrayAccess: remove element
@@ -188,9 +187,7 @@ class Horde_Db_Adapter_Base_Table implements ArrayAccess, IteratorAggregate
      * @param   int     $offset
      */
     #[\ReturnTypeWillChange]
-    public function offsetUnset($offset)
-    {
-    }
+    public function offsetUnset($offset) {}
 
 
     /*##########################################################################

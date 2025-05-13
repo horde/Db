@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -114,22 +115,22 @@ class Schema extends BaseSchema
      */
     public function nativeDatabaseTypes()
     {
-        return array(
+        return [
             'autoincrementKey' => 'int(10) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-            'string'           => array('name' => 'varchar',    'limit' => 255),
-            'text'             => array('name' => 'text',       'limit' => null),
-            'mediumtext'       => array('name' => 'mediumtext', 'limit' => null),
-            'longtext'         => array('name' => 'longtext',   'limit' => null),
-            'integer'          => array('name' => 'int',        'limit' => 11),
-            'float'            => array('name' => 'float',      'limit' => null),
-            'decimal'          => array('name' => 'decimal',    'limit' => null),
-            'datetime'         => array('name' => 'datetime',   'limit' => null),
-            'timestamp'        => array('name' => 'datetime',   'limit' => null),
-            'time'             => array('name' => 'time',       'limit' => null),
-            'date'             => array('name' => 'date',       'limit' => null),
-            'binary'           => array('name' => 'longblob',   'limit' => null),
-            'boolean'          => array('name' => 'tinyint',    'limit' => 1),
-        );
+            'string'           => ['name' => 'varchar',    'limit' => 255],
+            'text'             => ['name' => 'text',       'limit' => null],
+            'mediumtext'       => ['name' => 'mediumtext', 'limit' => null],
+            'longtext'         => ['name' => 'longtext',   'limit' => null],
+            'integer'          => ['name' => 'int',        'limit' => 11],
+            'float'            => ['name' => 'float',      'limit' => null],
+            'decimal'          => ['name' => 'decimal',    'limit' => null],
+            'datetime'         => ['name' => 'datetime',   'limit' => null],
+            'timestamp'        => ['name' => 'datetime',   'limit' => null],
+            'time'             => ['name' => 'time',       'limit' => null],
+            'date'             => ['name' => 'date',       'limit' => null],
+            'binary'           => ['name' => 'longblob',   'limit' => null],
+            'boolean'          => ['name' => 'tinyint',    'limit' => 1],
+        ];
     }
 
     /**
@@ -164,7 +165,7 @@ class Schema extends BaseSchema
             $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
-        $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, array());
+        $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, []);
         foreach ($rows as $row) {
             if ($row['Key'] == 'PRI') {
                 $pk->columns[] = $row['Field'];
@@ -182,7 +183,7 @@ class Schema extends BaseSchema
      *
      * @return array  A list of Horde_Db_Adapter_Base_Index objects.
      */
-    public function indexes($tableName, $name=null)
+    public function indexes($tableName, $name = null)
     {
         $indexes = @unserialize($this->adapter->cacheRead("tables/indexes/$tableName"));
 
@@ -200,7 +201,7 @@ class Schema extends BaseSchema
                         $row['Key_name'],
                         false,
                         $row['Non_unique'] == '0',
-                        array()
+                        []
                     );
                 }
                 $indexes[count($indexes) - 1]->columns[] = $row['Column_name'];
@@ -220,7 +221,7 @@ class Schema extends BaseSchema
      *
      * @return array  A list of Horde_Db_Adapter_Base_Column objects.
      */
-    public function columns($tableName, $name=null)
+    public function columns($tableName, $name = null)
     {
         $rows = @unserialize($this->adapter->cacheRead("tables/columns/$tableName"));
 
@@ -265,7 +266,7 @@ class Schema extends BaseSchema
             }
             $opts = 'ENGINE=InnoDB DEFAULT CHARSET=' . $options['charset'];
         }
-        return parent::endTable($name, array_merge(array('options' => $opts), $options));
+        return parent::endTable($name, array_merge(['options' => $opts], $options));
     }
 
     /**
@@ -307,10 +308,10 @@ class Schema extends BaseSchema
         $quotedColumnName = $this->quoteColumnName($columnName);
 
         $options = array_merge(
-            array('limit'     => null,
-                  'precision' => null,
-                  'scale'     => null,
-                  'unsigned'  => null),
+            ['limit'     => null,
+                'precision' => null,
+                'scale'     => null,
+                'unsigned'  => null],
             $options
         );
 
@@ -515,7 +516,7 @@ class Schema extends BaseSchema
         // integers.
         if ($type == 'integer' && !empty($unsigned) && empty($limit)) {
             $natives = $this->nativeDatabaseTypes();
-            $native = isset($natives[$type]) ? $natives[$type] : null;
+            $native = $natives[$type] ?? null;
             if (empty($native)) {
                 return $type;
             }
@@ -582,12 +583,12 @@ class Schema extends BaseSchema
         $params = []
     ) {
         switch ($op) {
-        case '~':
-            if ($bind) {
-                return array($lhs . ' REGEXP ?', array($rhs));
-            } else {
-                return $lhs . ' REGEXP ' . $rhs;
-            }
+            case '~':
+                if ($bind) {
+                    return [$lhs . ' REGEXP ?', [$rhs]];
+                } else {
+                    return $lhs . ' REGEXP ' . $rhs;
+                }
         }
         return parent::buildClause($lhs, $op, $rhs, $bind, $params);
     }
@@ -629,8 +630,8 @@ class Schema extends BaseSchema
     public function mysqlCharsetName($charset)
     {
         $charset = preg_replace(
-            array('/[^a-z0-9]/', '/iso8859(\d)/'),
-            array('', 'latin$1'),
+            ['/[^a-z0-9]/', '/iso8859(\d)/'],
+            ['', 'latin$1'],
             Horde_String::lower($charset)
         );
         $validCharsets = $this->adapter->selectValues('SHOW CHARACTER SET');

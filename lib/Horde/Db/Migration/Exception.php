@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
@@ -28,6 +29,4 @@
  * @package    Db
  * @subpackage Migration
  */
-class Horde_Db_Migration_Exception extends Horde_Db_Exception
-{
-}
+class Horde_Db_Migration_Exception extends Horde_Db_Exception {}

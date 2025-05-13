@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
@@ -61,8 +62,7 @@ class Schema extends BaseSchema
         $length = null,
         $precision = null,
         $scale = null
-    )
-    {
+    ) {
         return new Column(
             $name,
             $default,
@@ -136,40 +136,40 @@ class Schema extends BaseSchema
      */
     public function nativeDatabaseTypes()
     {
-        return array(
-            'autoincrementKey' => array('name' => 'number NOT NULL PRIMARY KEY',
-                                        'limit' => null,
-                                        'null' => null),
-            'string'           => array('name' => 'varchar2',
-                                        'limit' => 255),
-            'text'             => array('name' => 'clob',
-                                        'limit' => null),
-            'mediumtext'       => array('name' => 'clob',
-                                        'limit' => null),
-            'longtext'         => array('name' => 'clob',
-                                        'limit' => null),
-            'integer'          => array('name' => 'number',
-                                        'limit' => null),
-            'bigint'           => array('name' => 'number',
-                                        'limit' => null),
-            'float'            => array('name' => 'float',
-                                        'limit' => null),
-            'decimal'          => array('name' => 'number',
-                                        'limit' => null),
-            'datetime'         => array('name' => 'date',
-                                        'limit' => null),
-            'timestamp'        => array('name' => 'date',
-                                        'limit' => null),
-            'time'             => array('name' => 'varchar2',
-                                        'limit' => 8),
-            'date'             => array('name' => 'date',
-                                        'limit' => null),
-            'binary'           => array('name' => 'blob',
-                                        'limit' => null),
-            'boolean'          => array('name' => 'number',
-                                        'precision' => 1,
-                                        'scale' => 0),
-        );
+        return [
+            'autoincrementKey' => ['name' => 'number NOT NULL PRIMARY KEY',
+                'limit' => null,
+                'null' => null],
+            'string'           => ['name' => 'varchar2',
+                'limit' => 255],
+            'text'             => ['name' => 'clob',
+                'limit' => null],
+            'mediumtext'       => ['name' => 'clob',
+                'limit' => null],
+            'longtext'         => ['name' => 'clob',
+                'limit' => null],
+            'integer'          => ['name' => 'number',
+                'limit' => null],
+            'bigint'           => ['name' => 'number',
+                'limit' => null],
+            'float'            => ['name' => 'float',
+                'limit' => null],
+            'decimal'          => ['name' => 'number',
+                'limit' => null],
+            'datetime'         => ['name' => 'date',
+                'limit' => null],
+            'timestamp'        => ['name' => 'date',
+                'limit' => null],
+            'time'             => ['name' => 'varchar2',
+                'limit' => 8],
+            'date'             => ['name' => 'date',
+                'limit' => null],
+            'binary'           => ['name' => 'blob',
+                'limit' => null],
+            'boolean'          => ['name' => 'number',
+                'precision' => 1,
+                'scale' => 0],
+        ];
     }
 
     /**
@@ -202,7 +202,7 @@ class Schema extends BaseSchema
     public function tables()
     {
         return array_map(
-            array('Horde_String', 'lower'),
+            ['Horde_String', 'lower'],
             $this->adapter->selectValues('SELECT table_name FROM USER_TABLES')
         );
     }
@@ -222,7 +222,7 @@ class Schema extends BaseSchema
             'PRIMARY',
             true,
             true,
-            array()
+            []
         );
 
         $rows = @unserialize($this->adapter->cacheRead("tables/primarykeys/$tableName"));
@@ -230,16 +230,16 @@ class Schema extends BaseSchema
         if (!$rows) {
             $constraint = $this->adapter->selectOne(
                 'SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE TABLE_NAME = ? AND CONSTRAINT_TYPE = \'P\'',
-                array(Horde_String::upper($tableName)),
+                [Horde_String::upper($tableName)],
                 $name
             );
             if ($constraint['constraint_name']) {
                 $pk->name = $constraint['constraint_name'];
                 $rows = $this->adapter->selectValues(
                     'SELECT DISTINCT COLUMN_NAME FROM USER_CONS_COLUMNS WHERE CONSTRAINT_NAME = ?',
-                    array($constraint['constraint_name'])
+                    [$constraint['constraint_name']]
                 );
-                $rows = array_map(array('Horde_String', 'lower'), $rows);
+                $rows = array_map(['Horde_String', 'lower'], $rows);
                 $this->adapter->cacheWrite("tables/primarykeys/$tableName", serialize($rows));
             } else {
                 $rows = [];
@@ -266,7 +266,7 @@ class Schema extends BaseSchema
         if (!$rows) {
             $rows = $this->adapter->selectAll(
                 'SELECT INDEX_NAME, UNIQUENESS FROM USER_INDEXES WHERE TABLE_NAME = ? AND INDEX_NAME NOT IN (SELECT INDEX_NAME FROM USER_LOBS)',
-                array(Horde_String::upper($tableName)),
+                [Horde_String::upper($tableName)],
                 $name
             );
 
@@ -282,14 +282,14 @@ class Schema extends BaseSchema
             }
             $columns = $this->adapter->selectValues(
                 'SELECT DISTINCT COLUMN_NAME FROM USER_IND_COLUMNS WHERE INDEX_NAME = ?',
-                array($row['index_name'])
+                [$row['index_name']]
             );
             $indexes[] = $this->makeIndex(
                 $tableName,
                 Horde_String::lower($row['index_name']),
                 false,
                 $row['uniqueness'] == 'UNIQUE',
-                array_map(array('Horde_String', 'lower'), $columns)
+                array_map(['Horde_String', 'lower'], $columns)
             );
         }
 
@@ -311,7 +311,7 @@ class Schema extends BaseSchema
         if (!$rows) {
             $rows = $this->adapter->selectAll(
                 'SELECT COLUMN_NAME, DATA_DEFAULT, DATA_TYPE, NULLABLE, DATA_LENGTH, DATA_PRECISION, DATA_SCALE FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ?',
-                array(Horde_String::upper($tableName)),
+                [Horde_String::upper($tableName)],
                 $name
             );
 
@@ -380,15 +380,14 @@ class Schema extends BaseSchema
         $columnName,
         $type,
         $options = []
-    )
-    {
+    ) {
         $this->clearTableCache($tableName);
 
         $options = array_merge(
-            array('limit'     => null,
-                  'precision' => null,
-                  'scale'     => null,
-                  'unsigned'  => null),
+            ['limit'     => null,
+                'precision' => null,
+                'scale'     => null,
+                'unsigned'  => null],
             $options
         );
 
@@ -446,12 +445,12 @@ class Schema extends BaseSchema
     public function changeColumn($tableName, $columnName, $type, $options = [])
     {
         $options = array_merge(
-            array(
+            [
                 'limit'     => null,
                 'precision' => null,
                 'scale'     => null,
-                'unsigned'  => null
-            ),
+                'unsigned'  => null,
+            ],
             $options
         );
 
@@ -462,10 +461,10 @@ class Schema extends BaseSchema
             return;
         }
 
-        $columnOptions = array(
+        $columnOptions = [
             'limit' => $column->getLimit(),
             'default' => $column->getDefault(),
-        );
+        ];
         if (!$column->isNull()) {
             $columnOptions['null'] = false;
         }
@@ -510,7 +509,7 @@ class Schema extends BaseSchema
                         $column->scale(),
                         $column->isUnsigned()
                     );
-                $sql = $this->addColumnOptions($sql, array('null' => true));
+                $sql = $this->addColumnOptions($sql, ['null' => true]);
                 $sql = sprintf(
                     'ALTER TABLE %s MODIFY (%s)',
                     $this->quoteTableName($tableName),
@@ -877,7 +876,7 @@ END;
 
         if (isset($options['default'])) {
             $default = $options['default'];
-            $column  = isset($options['column']) ? $options['column'] : null;
+            $column  = $options['column'] ?? null;
             $sql .= ' DEFAULT ' . $this->quote($default, $column);
         }
 
@@ -914,22 +913,21 @@ END;
         $rhs,
         $bind = false,
         $params = []
-    )
-    {
+    ) {
         $lhs = $this->escapePrepare($lhs);
         switch ($op) {
-        case '|':
-            if ($bind) {
-                return array($lhs . ' + ? - BITAND(' . $lhs . ', ?)',
-                             array((int)$rhs, (int)$rhs));
-            }
-            return $lhs . ' + ' . (int)$rhs . ' - BITAND(' . $lhs . ', ' . (int)$rhs . ')';
-        case '&':
-            if ($bind) {
-                return array('BITAND(' . $lhs . ', ?)',
-                             array((int)$rhs));
-            }
-            return 'BITAND(' . $lhs . ', ' . (int)$rhs . ')';
+            case '|':
+                if ($bind) {
+                    return [$lhs . ' + ? - BITAND(' . $lhs . ', ?)',
+                        [(int) $rhs, (int) $rhs]];
+                }
+                return $lhs . ' + ' . (int) $rhs . ' - BITAND(' . $lhs . ', ' . (int) $rhs . ')';
+            case '&':
+                if ($bind) {
+                    return ['BITAND(' . $lhs . ', ?)',
+                        [(int) $rhs]];
+                }
+                return 'BITAND(' . $lhs . ', ' . (int) $rhs . ')';
         }
         return parent::buildClause($lhs, $op, $rhs, $bind, $params);
     }

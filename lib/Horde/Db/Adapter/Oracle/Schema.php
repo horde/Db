@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -46,12 +47,23 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
      *
      * @return Horde_Db_Adapter_Base_Column  A column object.
      */
-    public function makeColumn($name, $default, $sqlType = null, $null = true,
-                               $length = null, $precision = null, $scale = null)
-    {
+    public function makeColumn(
+        $name,
+        $default,
+        $sqlType = null,
+        $null = true,
+        $length = null,
+        $precision = null,
+        $scale = null
+    ) {
         return new Horde_Db_Adapter_Oracle_Column(
-            $name, $default, $sqlType, $null,
-            $length, $precision, $scale
+            $name,
+            $default,
+            $sqlType,
+            $null,
+            $length,
+            $precision,
+            $scale
         );
     }
 
@@ -60,7 +72,7 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
      *
      * @return Horde_Db_Adapter_Base_TableDefinition  A table definition object.
      */
-    public function makeTableDefinition($name, $base, $options = array())
+    public function makeTableDefinition($name, $base, $options = [])
     {
         return new Horde_Db_Adapter_Oracle_TableDefinition($name, $base, $options);
     }
@@ -117,40 +129,40 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function nativeDatabaseTypes()
     {
-        return array(
-            'autoincrementKey' => array('name' => 'number NOT NULL PRIMARY KEY',
-                                        'limit' => null,
-                                        'null' => null),
-            'string'           => array('name' => 'varchar2',
-                                        'limit' => 255),
-            'text'             => array('name' => 'clob',
-                                        'limit' => null),
-            'mediumtext'       => array('name' => 'clob',
-                                        'limit' => null),
-            'longtext'         => array('name' => 'clob',
-                                        'limit' => null),
-            'integer'          => array('name' => 'number',
-                                        'limit' => null),
-            'bigint'           => array('name' => 'number',
-                                        'limit' => null),
-            'float'            => array('name' => 'float',
-                                        'limit' => null),
-            'decimal'          => array('name' => 'number',
-                                        'limit' => null),
-            'datetime'         => array('name' => 'date',
-                                        'limit' => null),
-            'timestamp'        => array('name' => 'date',
-                                        'limit' => null),
-            'time'             => array('name' => 'varchar2',
-                                        'limit' => 8),
-            'date'             => array('name' => 'date',
-                                        'limit' => null),
-            'binary'           => array('name' => 'blob',
-                                        'limit' => null),
-            'boolean'          => array('name' => 'number',
-                                        'precision' => 1,
-                                        'scale' => 0),
-        );
+        return [
+            'autoincrementKey' => ['name' => 'number NOT NULL PRIMARY KEY',
+                'limit' => null,
+                'null' => null],
+            'string'           => ['name' => 'varchar2',
+                'limit' => 255],
+            'text'             => ['name' => 'clob',
+                'limit' => null],
+            'mediumtext'       => ['name' => 'clob',
+                'limit' => null],
+            'longtext'         => ['name' => 'clob',
+                'limit' => null],
+            'integer'          => ['name' => 'number',
+                'limit' => null],
+            'bigint'           => ['name' => 'number',
+                'limit' => null],
+            'float'            => ['name' => 'float',
+                'limit' => null],
+            'decimal'          => ['name' => 'number',
+                'limit' => null],
+            'datetime'         => ['name' => 'date',
+                'limit' => null],
+            'timestamp'        => ['name' => 'date',
+                'limit' => null],
+            'time'             => ['name' => 'varchar2',
+                'limit' => 8],
+            'date'             => ['name' => 'date',
+                'limit' => null],
+            'binary'           => ['name' => 'blob',
+                'limit' => null],
+            'boolean'          => ['name' => 'number',
+                'precision' => 1,
+                'scale' => 0],
+        ];
     }
 
     /**
@@ -183,7 +195,7 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
     public function tables()
     {
         return array_map(
-            array('Horde_String', 'lower'),
+            ['Horde_String', 'lower'],
             $this->selectValues('SELECT table_name FROM USER_TABLES')
         );
     }
@@ -203,7 +215,7 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
             'PRIMARY',
             true,
             true,
-            array()
+            []
         );
 
         $rows = @unserialize($this->cacheRead("tables/primarykeys/$tableName"));
@@ -211,19 +223,19 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
         if (!$rows) {
             $constraint = $this->selectOne(
                 'SELECT CONSTRAINT_NAME FROM USER_CONSTRAINTS WHERE TABLE_NAME = ? AND CONSTRAINT_TYPE = \'P\'',
-                array(Horde_String::upper($tableName)),
+                [Horde_String::upper($tableName)],
                 $name
             );
             if ($constraint['constraint_name']) {
                 $pk->name = $constraint['constraint_name'];
                 $rows = $this->selectValues(
                     'SELECT DISTINCT COLUMN_NAME FROM USER_CONS_COLUMNS WHERE CONSTRAINT_NAME = ?',
-                    array($constraint['constraint_name'])
+                    [$constraint['constraint_name']]
                 );
-                $rows = array_map(array('Horde_String', 'lower'), $rows);
+                $rows = array_map(['Horde_String', 'lower'], $rows);
                 $this->cacheWrite("tables/primarykeys/$tableName", serialize($rows));
             } else {
-                $rows = array();
+                $rows = [];
             }
         }
 
@@ -247,14 +259,14 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
         if (!$rows) {
             $rows = $this->selectAll(
                 'SELECT INDEX_NAME, UNIQUENESS FROM USER_INDEXES WHERE TABLE_NAME = ? AND INDEX_NAME NOT IN (SELECT INDEX_NAME FROM USER_LOBS)',
-                array(Horde_String::upper($tableName)),
+                [Horde_String::upper($tableName)],
                 $name
             );
 
             $this->cacheWrite("tables/indexes/$tableName", serialize($rows));
         }
 
-        $indexes = array();
+        $indexes = [];
         $primary = $this->primaryKey($tableName);
 
         foreach ($rows as $row) {
@@ -263,14 +275,14 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
             }
             $columns = $this->selectValues(
                 'SELECT DISTINCT COLUMN_NAME FROM USER_IND_COLUMNS WHERE INDEX_NAME = ?',
-                array($row['index_name'])
+                [$row['index_name']]
             );
             $indexes[] = $this->makeIndex(
                 $tableName,
                 Horde_String::lower($row['index_name']),
                 false,
                 $row['uniqueness'] == 'UNIQUE',
-                array_map(array('Horde_String', 'lower'), $columns)
+                array_map(['Horde_String', 'lower'], $columns)
             );
         }
 
@@ -292,7 +304,7 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
         if (!$rows) {
             $rows = $this->selectAll(
                 'SELECT COLUMN_NAME, DATA_DEFAULT, DATA_TYPE, NULLABLE, DATA_LENGTH, DATA_PRECISION, DATA_SCALE FROM USER_TAB_COLUMNS WHERE TABLE_NAME = ?',
-                array(Horde_String::upper($tableName)),
+                [Horde_String::upper($tableName)],
                 $name
             );
 
@@ -300,7 +312,7 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
         }
 
         // Create columns from rows.
-        $columns = array();
+        $columns = [];
         foreach ($rows as $row) {
             $column = Horde_String::lower($row['column_name']);
             $columns[$column] = $this->makeColumn(
@@ -356,17 +368,21 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    public function addColumn($tableName, $columnName, $type,
-                              $options = array())
-    {
+    public function addColumn(
+        $tableName,
+        $columnName,
+        $type,
+        $options = []
+    ) {
         $this->_clearTableCache($tableName);
 
         $options = array_merge(
-            array('limit'     => null,
-                  'precision' => null,
-                  'scale'     => null,
-                  'unsigned'  => null),
-            $options);
+            ['limit'     => null,
+                'precision' => null,
+                'scale'     => null,
+                'unsigned'  => null],
+            $options
+        );
 
         $sql = $this->quoteColumnName($columnName)
             . ' '
@@ -400,9 +416,11 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
     public function removeColumn($tableName, $columnName)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s DROP COLUMN %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName));
+        $sql = sprintf(
+            'ALTER TABLE %s DROP COLUMN %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName)
+        );
         $this->removeAutoincrementTrigger($tableName, $columnName);
         return $this->execute($sql);
     }
@@ -417,15 +435,15 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    public function changeColumn($tableName, $columnName, $type, $options = array())
+    public function changeColumn($tableName, $columnName, $type, $options = [])
     {
         $options = array_merge(
-            array(
+            [
                 'limit'     => null,
                 'precision' => null,
                 'scale'     => null,
-                'unsigned'  => null
-            ),
+                'unsigned'  => null,
+            ],
             $options
         );
 
@@ -436,10 +454,10 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
             return;
         }
 
-        $columnOptions = array(
+        $columnOptions = [
             'limit' => $column->getLimit(),
             'default' => $column->getDefault(),
-        );
+        ];
         if (!$column->isNull()) {
             $columnOptions['null'] = false;
         }
@@ -484,7 +502,7 @@ class Horde_Db_Adapter_Oracle_Schema extends Horde_Db_Adapter_Base_Schema
                         $column->scale(),
                         $column->isUnsigned()
                     );
-                $sql = $this->addColumnOptions($sql, array('null' => true));
+                $sql = $this->addColumnOptions($sql, ['null' => true]);
                 $sql = sprintf(
                     'ALTER TABLE %s MODIFY (%s)',
                     $this->quoteTableName($tableName),
@@ -706,10 +724,12 @@ END;
     public function changeColumnDefault($tableName, $columnName, $default)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s MODIFY (%s DEFAULT %s)',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $this->quote($default));
+        $sql = sprintf(
+            'ALTER TABLE %s MODIFY (%s DEFAULT %s)',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $this->quote($default)
+        );
         return $this->execute($sql);
     }
 
@@ -723,10 +743,12 @@ END;
     public function renameColumn($tableName, $columnName, $newColumnName)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s RENAME COLUMN %s TO %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $this->quoteColumnName($newColumnName));
+        $sql = sprintf(
+            'ALTER TABLE %s RENAME COLUMN %s TO %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $this->quoteColumnName($newColumnName)
+        );
         return $this->execute($sql);
     }
 
@@ -740,8 +762,10 @@ END;
     public function removePrimaryKey($tableName)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s DROP PRIMARY KEY',
-                       $this->quoteTableName($tableName));
+        $sql = sprintf(
+            'ALTER TABLE %s DROP PRIMARY KEY',
+            $this->quoteTableName($tableName)
+        );
         return $this->execute($sql);
     }
 
@@ -753,13 +777,15 @@ END;
      *                               - name: (string) the index name.
      *                               - column: (string|array) column name(s).
      */
-    public function removeIndex($tableName, $options = array())
+    public function removeIndex($tableName, $options = [])
     {
         $this->_clearTableCache($tableName);
 
         $index = $this->indexName($tableName, $options);
-        $sql = sprintf('DROP INDEX %s',
-                       $this->quoteColumnName($index));
+        $sql = sprintf(
+            'DROP INDEX %s',
+            $this->quoteColumnName($index)
+        );
 
         return $this->execute($sql);
     }
@@ -776,7 +802,7 @@ END;
      *                               - name: (string) the index name to fall
      *                                 back to if no column names specified.
      */
-    public function indexName($tableName, $options = array())
+    public function indexName($tableName, $options = [])
     {
         $index = parent::indexName($tableName, $options);
         if (strlen($index) <= 30) {
@@ -794,7 +820,7 @@ END;
      * @param string $name    A database name.
      * @param array $options  Database options.
      */
-    public function createDatabase($name, $options = array())
+    public function createDatabase($name, $options = [])
     {
         return $this->execute(sprintf('CREATE DATABASE %s', $this->quoteTableName($name)));
     }
@@ -843,7 +869,7 @@ END;
 
         if (isset($options['default'])) {
             $default = $options['default'];
-            $column  = isset($options['column']) ? $options['column'] : null;
+            $column  = $options['column'] ?? null;
             $sql .= ' DEFAULT ' . $this->quote($default, $column);
         }
 
@@ -874,23 +900,27 @@ END;
      * @return string|array  The SQL test fragment, or an array containing the
      *                       query and a list of values if $bind is true.
      */
-    public function buildClause($lhs, $op, $rhs, $bind = false,
-                                $params = array())
-    {
+    public function buildClause(
+        $lhs,
+        $op,
+        $rhs,
+        $bind = false,
+        $params = []
+    ) {
         $lhs = $this->_escapePrepare($lhs);
         switch ($op) {
-        case '|':
-            if ($bind) {
-                return array($lhs . ' + ? - BITAND(' . $lhs . ', ?)',
-                             array((int)$rhs, (int)$rhs));
-            }
-            return $lhs . ' + ' . (int)$rhs . ' - BITAND(' . $lhs . ', ' . (int)$rhs . ')';
-        case '&':
-            if ($bind) {
-                return array('BITAND(' . $lhs . ', ?)',
-                             array((int)$rhs));
-            }
-            return 'BITAND(' . $lhs . ', ' . (int)$rhs . ')';
+            case '|':
+                if ($bind) {
+                    return [$lhs . ' + ? - BITAND(' . $lhs . ', ?)',
+                        [(int) $rhs, (int) $rhs]];
+                }
+                return $lhs . ' + ' . (int) $rhs . ' - BITAND(' . $lhs . ', ' . (int) $rhs . ')';
+            case '&':
+                if ($bind) {
+                    return ['BITAND(' . $lhs . ', ?)',
+                        [(int) $rhs]];
+                }
+                return 'BITAND(' . $lhs . ', ' . (int) $rhs . ')';
         }
         return parent::buildClause($lhs, $op, $rhs, $bind, $params);
     }
@@ -927,8 +957,7 @@ END;
             $name = implode(
                 '_',
                 array_map(
-                    function($t)
-                    {
+                    function ($t) {
                         return substr($t, 0, 3);
                     },
                     explode('_', $name)

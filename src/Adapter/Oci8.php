@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
@@ -11,16 +12,19 @@
  * @package    Db
  * @subpackage Adapter
  */
+
 namespace Horde\Db\Adapter;
-use \Horde\Db\Adapter;
-use \Horde\Db\Adapter\Oracle\Schema;
-use \Horde\Db\DbException;
-use \Horde\Db\Adapter\Oracle\Result;
-use \Horde\Db\Value;
-use \Horde\Db\Value\Text;
-use \Horde\Db\Value\Binary;
-use \Horde_Support_Timer;
-use \Horde_String;
+
+use Horde\Db\Adapter;
+use Horde\Db\Adapter\Oracle\Schema;
+use Horde\Db\DbException;
+use Horde\Db\Adapter\Oracle\Result;
+use Horde\Db\Value;
+use Horde\Db\Value\Text;
+use Horde\Db\Value\Binary;
+use Horde_Support_Timer;
+use Horde_String;
+
 /**
  *
  *
@@ -81,7 +85,7 @@ class Oci8 extends Base
             return;
         }
 
-        $this->checkRequiredConfig(array('username'));
+        $this->checkRequiredConfig(['username']);
 
         if (!isset($this->config['tns']) && empty($this->config['host'])) {
             throw new DbException('Either a TNS name or a host name must be specified');
@@ -106,7 +110,7 @@ class Oci8 extends Base
         }
         $oci = oci_connect(
             $this->config['username'],
-            isset($this->config['password']) ? $this->config['password'] : '',
+            $this->config['password'] ?? '',
             $connection,
             $this->oracleCharsetName($this->config['charset'])
         );
@@ -304,7 +308,7 @@ class Oci8 extends Base
             $arg1 = [];
         }
 
-        $t = new Horde_Support_Timer;
+        $t = new Horde_Support_Timer();
         $t->push();
 
         $this->lastQuery = $query;
@@ -318,7 +322,8 @@ class Oci8 extends Base
 
         $flags = $lobs
             ? OCI_DEFAULT
-            : ($this->transactionStarted
+            : (
+                $this->transactionStarted
                ? OCI_NO_AUTO_COMMIT
                : OCI_COMMIT_ON_SUCCESS
             );
@@ -370,9 +375,14 @@ class Oci8 extends Base
      * @return int  Last inserted ID.
      * @throws DbException
      */
-    public function insert($sql, $arg1 = null, $arg2 = null, $pk = null,
-                           $idValue = null, $sequenceName = null)
-    {
+    public function insert(
+        $sql,
+        $arg1 = null,
+        $arg2 = null,
+        $pk = null,
+        $idValue = null,
+        $sequenceName = null
+    ) {
         $this->execute($sql, $arg1, $arg2);
         return $idValue
             ? $idValue
@@ -398,12 +408,12 @@ class Oci8 extends Base
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
     {
-        list($fields, $blobs, $locators) = $this->prepareBlobs($fields);
+        [$fields, $blobs, $locators] = $this->prepareBlobs($fields);
 
         $sql = 'INSERT INTO ' . $this->quoteTableName($table) . ' ('
             . implode(
                 ', ',
-                array_map(array($this, 'quoteColumnName'), array_keys($fields))
+                array_map([$this, 'quoteColumnName'], array_keys($fields))
             )
             . ') VALUES (' . implode(', ', $fields) . ')';
 
@@ -437,7 +447,7 @@ class Oci8 extends Base
      */
     public function updateBlob($table, $fields, $where = null)
     {
-        list($fields, $blobs, $locators) = $this->prepareBlobs($fields);
+        [$fields, $blobs, $locators] = $this->prepareBlobs($fields);
 
         if (is_array($where)) {
             $where = $this->replaceParameters($where[0], $where[1]);
@@ -457,7 +467,8 @@ class Oci8 extends Base
 
         // Protect against empty values for blobs.
         if (!empty($blobs)) {
-            $sql .= sprintf(' RETURNING %s INTO %s',
+            $sql .= sprintf(
+                ' RETURNING %s INTO %s',
                 implode(', ', array_keys($blobs)),
                 implode(', ', $locators)
             );
@@ -492,7 +503,7 @@ class Oci8 extends Base
                 $field = $this->quote($field);
             }
         }
-        return array($fields, $blobs, $locators);
+        return [$fields, $blobs, $locators];
     }
 
     /**
@@ -544,7 +555,7 @@ class Oci8 extends Base
     public function addLimitOffset($sql, $options)
     {
         if (isset($options['limit'])) {
-            $offset = isset($options['offset']) ? $options['offset'] : 0;
+            $offset = $options['offset'] ?? 0;
             $limit = $options['limit'] + $offset;
             if ($limit) {
                 $sql = "SELECT a.*, ROWNUM rnum FROM ($sql) a WHERE ROWNUM <= $limit";
@@ -571,7 +582,7 @@ class Oci8 extends Base
     public function oracleCharsetName($charset)
     {
         return str_replace(
-            array(
+            [
                 'iso-8859-1',
                 'iso-8859-2',
                 'iso-8859-4',
@@ -597,8 +608,8 @@ class Oci8 extends Base
                 'windows-1257',
                 'windows-1258',
                 'utf-8',
-            ),
-            array(
+            ],
+            [
                 'WE8ISO8859P1',
                 'EE8ISO8859P2',
                 'NEE8ISO8859P4',
@@ -624,7 +635,7 @@ class Oci8 extends Base
                 'BLT8MSWIN1257',
                 'VN8MSWIN1258',
                 'AL32UTF8',
-            ),
+            ],
             Horde_String::lower($charset)
         );
     }
@@ -657,7 +668,7 @@ class Oci8 extends Base
         $error = oci_error($resource);
         $this->logError(
             $error['message'],
-            'Horde_Db_Adapter_Oci8::' . $method. '()'
+            'Horde_Db_Adapter_Oci8::' . $method . '()'
         );
         throw new DbException(
             $this->errorMessage($error),

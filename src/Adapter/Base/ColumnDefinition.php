@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -86,8 +87,8 @@ class ColumnDefinition
     public function toSql()
     {
         $sql = $this->base->quoteColumnName($this->name) . ' ' . $this->getSqlType();
-        return $this->addColumnOptions($sql, array('null'     => $this->null,
-                                                    'default'  => $this->default));
+        return $this->addColumnOptions($sql, ['null'     => $this->null,
+            'default'  => $this->default]);
     }
 
     /**
@@ -272,7 +273,7 @@ class ColumnDefinition
     {
         return $this->base->addColumnOptions(
             $sql,
-            array_merge($options, array('column' => $this))
+            array_merge($options, ['column' => $this])
         );
     }
 }

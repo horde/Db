@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -36,8 +37,8 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
     protected $_columns = null;
     protected $_primaryKey = null;
 
-    protected $_columntypes = array('string', 'text', 'integer', 'float',
-        'datetime', 'timestamp', 'time', 'date', 'binary', 'boolean');
+    protected $_columntypes = ['string', 'text', 'integer', 'float',
+        'datetime', 'timestamp', 'time', 'date', 'binary', 'boolean'];
 
     /**
      * Constructor.
@@ -46,12 +47,12 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param Horde_Db_Adapter_Base_Schema $base
      * @param array $options
      */
-    public function __construct($name, $base, $options = array())
+    public function __construct($name, $base, $options = [])
     {
         $this->_name    = $name;
         $this->_base    = $base;
         $this->_options = $options;
-        $this->_columns = array();
+        $this->_columns = [];
     }
 
     /**
@@ -123,21 +124,22 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      *
      * @return Horde_Db_Adapter_Base_TableDefinition  This object.
      */
-    public function column($name, $type, $options = array())
+    public function column($name, $type, $options = [])
     {
         if ($name == $this->_primaryKey) {
             throw new LogicException($name . ' has already been added as a primary key');
         }
 
         $options = array_merge(
-            array('limit'         => null,
-                  'precision'     => null,
-                  'scale'         => null,
-                  'unsigned'      => null,
-                  'default'       => null,
-                  'null'          => null,
-                  'autoincrement' => null),
-            $options);
+            ['limit'         => null,
+                'precision'     => null,
+                'scale'         => null,
+                'unsigned'      => null,
+                'default'       => null,
+                'null'          => null,
+                'autoincrement' => null],
+            $options
+        );
 
         $column = $this->_base->makeColumnDefinition(
             $this->_base,
@@ -173,7 +175,9 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      */
     public function belongsTo($columns)
     {
-        if (!is_array($columns)) { $columns = array($columns); }
+        if (!is_array($columns)) {
+            $columns = [$columns];
+        }
         foreach ($columns as $col) {
             $this->column($col . '_id', 'integer');
         }
@@ -200,10 +204,13 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
             throw new BadMethodCallException('Call to undeclared method "' . $method . '"');
         }
         if (count($arguments) > 0 && count($arguments) < 3) {
-            return $this->column($arguments[0], $method,
-                                 isset($arguments[1]) ? $arguments[1] : array());
+            return $this->column(
+                $arguments[0],
+                $method,
+                $arguments[1] ?? []
+            );
         }
-        throw new BadMethodCallException('Method "'.$method.'" takes two arguments');
+        throw new BadMethodCallException('Method "' . $method . '" takes two arguments');
     }
 
     /**
@@ -223,7 +230,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      */
     public function toSql()
     {
-        $cols = array();
+        $cols = [];
         foreach ($this->_columns as $col) {
             $cols[] = $col->toSql();
         }
@@ -231,7 +238,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
 
         // Specify composite primary keys as well
         if (is_array($this->_primaryKey)) {
-            $pk = array();
+            $pk = [];
             foreach ($this->_primaryKey as $pkColumn) {
                 $pk[] = $this->_base->quoteColumnName($pkColumn);
             }
@@ -261,7 +268,9 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
     public function offsetExists($offset)
     {
         foreach ($this->_columns as $column) {
-            if ($column->getName() == $offset) return true;
+            if ($column->getName() == $offset) {
+                return true;
+            }
         }
         return false;
     }
@@ -296,7 +305,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
     #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
-        foreach ($this->_columns as $key=>$column) {
+        foreach ($this->_columns as $key => $column) {
             if ($column->getName() == $offset) {
                 $this->_columns[$key] = $value;
             }
@@ -311,7 +320,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
     #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
-        foreach ($this->_columns as $key=>$column) {
+        foreach ($this->_columns as $key => $column) {
             if ($column->getName() == $offset) {
                 unset($this->_columns[$key]);
             }

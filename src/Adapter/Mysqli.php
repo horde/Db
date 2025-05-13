@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -211,7 +212,7 @@ class Mysqli extends Base
      */
     public function quoteString($string)
     {
-        return "'".$this->connection->real_escape_string($string)."'";
+        return "'" . $this->connection->real_escape_string($string) . "'";
     }
 
 
@@ -228,7 +229,7 @@ class Mysqli extends Base
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      * @return  Result
      */
-    public function select($sql, $arg1=null, $arg2=null)
+    public function select($sql, $arg1 = null, $arg2 = null)
     {
         return new Result($this, $sql, $arg1, $arg2);
     }
@@ -241,7 +242,7 @@ class Mysqli extends Base
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectAll($sql, $arg1=null, $arg2=null)
+    public function selectAll($sql, $arg1 = null, $arg2 = null)
     {
         $result = $this->execute($sql, $arg1, $arg2);
         if ($this->hasMysqliFetchAll) {
@@ -282,7 +283,7 @@ class Mysqli extends Base
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      * @return  string
      */
-    public function selectValue($sql, $arg1=null, $arg2=null)
+    public function selectValue($sql, $arg1 = null, $arg2 = null)
     {
         $result = $this->selectOne($sql, $arg1, $arg2);
         return $result ? current($result) : null;
@@ -296,7 +297,7 @@ class Mysqli extends Base
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectValues($sql, $arg1=null, $arg2=null)
+    public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
         $values = [];
         $result = $this->execute($sql, $arg1, $arg2);
@@ -322,7 +323,7 @@ class Mysqli extends Base
      * @return mysqli_result
      * @throws DbException
      */
-    public function execute($sql, $arg1=null, $arg2=null)
+    public function execute($sql, $arg1 = null, $arg2 = null)
     {
         if (is_array($arg1)) {
             $query = $this->replaceParameters($sql, $arg1);
@@ -366,10 +367,10 @@ class Mysqli extends Base
      * @param   int     $idValue
      * @param   string  $sequenceName
      */
-    public function insert($sql, $arg1=null, $arg2=null, $pk=null, $idValue=null, $sequenceName=null)
+    public function insert($sql, $arg1 = null, $arg2 = null, $pk = null, $idValue = null, $sequenceName = null)
     {
         $this->execute($sql, $arg1, $arg2);
-        return isset($idValue) ? $idValue : $this->insertId;
+        return $idValue ?? $this->insertId;
     }
 
     /**
@@ -434,9 +435,9 @@ class Mysqli extends Base
      */
     protected function parseConfig()
     {
-        $this->checkRequiredConfig(array('username'));
+        $this->checkRequiredConfig(['username']);
 
-        $rails2mysqli = array('database' => 'dbname');
+        $rails2mysqli = ['database' => 'dbname'];
         foreach ($rails2mysqli as $from => $to) {
             if (isset($this->config[$from])) {
                 $this->config[$to] = $this->config[$from];

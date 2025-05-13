@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -33,7 +34,7 @@ class Horde_Db_Adapter_Mysql_Column extends Horde_Db_Adapter_Base_Column
     /**
      * @var array
      */
-    protected $_hasEmptyStringDefault = array('binary', 'string', 'text');
+    protected $_hasEmptyStringDefault = ['binary', 'string', 'text'];
 
     /**
      * @var string
@@ -47,7 +48,7 @@ class Horde_Db_Adapter_Mysql_Column extends Horde_Db_Adapter_Base_Column
      * @param   string  $sqlType
      * @param   boolean $null
      */
-    public function __construct($name, $default, $sqlType=null, $null=true)
+    public function __construct($name, $default, $sqlType = null, $null = true)
     {
         $this->_originalDefault = $default;
         parent::__construct($name, $default, $sqlType, $null);

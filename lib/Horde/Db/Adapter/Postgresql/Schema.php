@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -173,7 +174,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         /* MUST escape zero octet(0), single quote (39), and backslash (92).
          * MAY escape non-printable octets, but they are required in some
          * instances so it is best to escape all. */
-        return "E'" . preg_replace_callback("/[\\x00-\\x1f\\x27\\x5c\\x7f-\\xff]/", array($this, '_quoteBinaryCallback'), $value) . "'";
+        return "E'" . preg_replace_callback("/[\\x00-\\x1f\\x27\\x5c\\x7f-\\xff]/", [$this, '_quoteBinaryCallback'], $value) . "'";
     }
 
     /**
@@ -206,35 +207,35 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function nativeDatabaseTypes()
     {
-        return array(
+        return [
             'autoincrementKey' => 'serial primary key',
-            'string'           => array('name' => 'character varying',
-                                        'limit' => 255),
-            'text'             => array('name' => 'text',
-                                        'limit' => null),
-            'mediumtext'       => array('name' => 'text',
-                                        'limit' => null),
-            'longtext'         => array('name' => 'text',
-                                        'limit' => null),
-            'integer'          => array('name' => 'integer',
-                                        'limit' => null),
-            'float'            => array('name' => 'float',
-                                        'limit' => null),
-            'decimal'          => array('name' => 'decimal',
-                                        'limit' => null),
-            'datetime'         => array('name' => 'timestamp',
-                                        'limit' => null),
-            'timestamp'        => array('name' => 'timestamp',
-                                        'limit' => null),
-            'time'             => array('name' => 'time',
-                                        'limit' => null),
-            'date'             => array('name' => 'date',
-                                        'limit' => null),
-            'binary'           => array('name' => 'bytea',
-                                        'limit' => null),
-            'boolean'          => array('name' => 'boolean',
-                                        'limit' => null),
-        );
+            'string'           => ['name' => 'character varying',
+                'limit' => 255],
+            'text'             => ['name' => 'text',
+                'limit' => null],
+            'mediumtext'       => ['name' => 'text',
+                'limit' => null],
+            'longtext'         => ['name' => 'text',
+                'limit' => null],
+            'integer'          => ['name' => 'integer',
+                'limit' => null],
+            'float'            => ['name' => 'float',
+                'limit' => null],
+            'decimal'          => ['name' => 'decimal',
+                'limit' => null],
+            'datetime'         => ['name' => 'timestamp',
+                'limit' => null],
+            'timestamp'        => ['name' => 'timestamp',
+                'limit' => null],
+            'time'             => ['name' => 'time',
+                'limit' => null],
+            'date'             => ['name' => 'date',
+                'limit' => null],
+            'binary'           => ['name' => 'bytea',
+                'limit' => null],
+            'boolean'          => ['name' => 'boolean',
+                'limit' => null],
+        ];
     }
 
     /**
@@ -247,7 +248,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function tableAliasLength()
     {
-        return (int)$this->selectValue('SHOW max_identifier_length');
+        return (int) $this->selectValue('SHOW max_identifier_length');
     }
 
     /**
@@ -278,9 +279,11 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
                                        FROM information_schema.table_constraints
                                        WHERE table_name = ?
                                            AND constraint_type = ?)';
-        $pk = $this->selectValues($sql,
-                                  array($tableName, $tableName, 'PRIMARY KEY'),
-                                  $name);
+        $pk = $this->selectValues(
+            $sql,
+            [$tableName, $tableName, 'PRIMARY KEY'],
+            $name
+        );
 
         return $this->makeIndex($tableName, 'PRIMARY', true, true, $pk);
     }
@@ -319,13 +322,18 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
             $result = $this->select($sql, $name);
 
             $currentIndex = null;
-            $indexes = array();
+            $indexes = [];
 
             foreach ($result as $row) {
                 if ($currentIndex != $row['relname']) {
                     $currentIndex = $row['relname'];
                     $indexes[] = $this->makeIndex(
-                        $tableName, $row['relname'], false, $row['indisunique'] == 't', array());
+                        $tableName,
+                        $row['relname'],
+                        false,
+                        $row['indisunique'] == 't',
+                        []
+                    );
                 }
                 $indexes[count($indexes) - 1]->columns[] = $row['attname'];
             }
@@ -355,10 +363,14 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         }
 
         // Create columns from rows.
-        $columns = array();
+        $columns = [];
         foreach ($rows as $row) {
             $columns[$row['attname']] = $this->makeColumn(
-                $row['attname'], $row['adsrc'], $row['format_type'], !(boolean)$row['attnotnull']);
+                $row['attname'],
+                $row['adsrc'],
+                $row['format_type'],
+                !(bool) $row['attnotnull']
+            );
         }
         return $columns;
     }
@@ -420,56 +432,74 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    public function addColumn($tableName, $columnName, $type,
-                              $options = array())
-    {
+    public function addColumn(
+        $tableName,
+        $columnName,
+        $type,
+        $options = []
+    ) {
         $this->_clearTableCache($tableName);
 
         $options = array_merge(
-            array('autoincrement' => null,
-                  'limit'         => null,
-                  'precision'     => null,
-                  'scale'         => null),
-            $options);
+            ['autoincrement' => null,
+                'limit'         => null,
+                'precision'     => null,
+                'scale'         => null],
+            $options
+        );
 
-        $sqltype = $this->typeToSql($type, $options['limit'],
-                                    $options['precision'], $options['scale']);
+        $sqltype = $this->typeToSql(
+            $type,
+            $options['limit'],
+            $options['precision'],
+            $options['scale']
+        );
 
         /* Convert to SERIAL type if needed. */
         if ($options['autoincrement']) {
             switch ($sqltype) {
-            case 'bigint':
-                $sqltype = 'BIGSERIAL';
-                break;
+                case 'bigint':
+                    $sqltype = 'BIGSERIAL';
+                    break;
 
-            case 'integer':
-            default:
-                $sqltype = 'SERIAL';
-                break;
+                case 'integer':
+                default:
+                    $sqltype = 'SERIAL';
+                    break;
             }
         }
 
         // Add the column.
-        $sql = sprintf('ALTER TABLE %s ADD COLUMN %s %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $sqltype);
+        $sql = sprintf(
+            'ALTER TABLE %s ADD COLUMN %s %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $sqltype
+        );
         $this->execute($sql);
 
         if (array_key_exists('default', $options)) {
-            $sql = sprintf('UPDATE %s SET %s = %s',
-                           $this->quoteTableName($tableName),
-                           $this->quoteColumnName($columnName),
-                           $this->quote($options['default']));
+            $sql = sprintf(
+                'UPDATE %s SET %s = %s',
+                $this->quoteTableName($tableName),
+                $this->quoteColumnName($columnName),
+                $this->quote($options['default'])
+            );
             $this->execute($sql);
-            $this->changeColumnDefault($tableName, $columnName,
-                                       $options['default']);
+            $this->changeColumnDefault(
+                $tableName,
+                $columnName,
+                $options['default']
+            );
         }
 
         if (isset($options['null']) && $options['null'] === false) {
             $this->changeColumnNull(
-                $tableName, $columnName, false,
-                isset($options['default']) ? $options['default'] : null);
+                $tableName,
+                $columnName,
+                false,
+                $options['default'] ?? null
+            );
         }
     }
 
@@ -483,17 +513,21 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      *                            Horde_Db_Adapter_Base_TableDefinition#column()
      *                            for details.
      */
-    public function changeColumn($tableName, $columnName, $type,
-                                 $options = array())
-    {
+    public function changeColumn(
+        $tableName,
+        $columnName,
+        $type,
+        $options = []
+    ) {
         $this->_clearTableCache($tableName);
 
         $options = array_merge(
-            array('autoincrement' => null,
-                  'limit'         => null,
-                  'precision'     => null,
-                  'scale'         => null),
-            $options);
+            ['autoincrement' => null,
+                'limit'         => null,
+                'precision'     => null,
+                'scale'         => null],
+            $options
+        );
 
         $quotedTableName = $this->quoteTableName($tableName);
 
@@ -508,13 +542,17 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
             }
         }
 
-        $sql = sprintf('ALTER TABLE %s ALTER COLUMN %s TYPE %s',
-                       $quotedTableName,
-                       $this->quoteColumnName($columnName),
-                       $this->typeToSql($type,
-                                        $options['limit'],
-                                        $options['precision'],
-                                        $options['scale']));
+        $sql = sprintf(
+            'ALTER TABLE %s ALTER COLUMN %s TYPE %s',
+            $quotedTableName,
+            $this->quoteColumnName($columnName),
+            $this->typeToSql(
+                $type,
+                $options['limit'],
+                $options['precision'],
+                $options['scale']
+            )
+        );
         try {
             $this->execute($sql);
         } catch (Horde_Db_Exception $e) {
@@ -527,27 +565,35 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
 
                 $this->beginDbTransaction();
 
-                $tmpColumnName = $columnName.'_change_tmp';
+                $tmpColumnName = $columnName . '_change_tmp';
                 $this->addColumn($tableName, $tmpColumnName, $type, $options);
 
                 if ($oldType == 'boolean') {
-                    $sql = sprintf('UPDATE %s SET %s = CAST(CASE WHEN %s IS TRUE THEN 1 ELSE 0 END AS %s)',
-                                   $quotedTableName,
-                                   $this->quoteColumnName($tmpColumnName),
-                                   $this->quoteColumnName($columnName),
-                                   $this->typeToSql($type,
-                                                    $options['limit'],
-                                                    $options['precision'],
-                                                    $options['scale']));
+                    $sql = sprintf(
+                        'UPDATE %s SET %s = CAST(CASE WHEN %s IS TRUE THEN 1 ELSE 0 END AS %s)',
+                        $quotedTableName,
+                        $this->quoteColumnName($tmpColumnName),
+                        $this->quoteColumnName($columnName),
+                        $this->typeToSql(
+                            $type,
+                            $options['limit'],
+                            $options['precision'],
+                            $options['scale']
+                        )
+                    );
                 } else {
-                    $sql = sprintf('UPDATE %s SET %s = CAST(%s AS %s)',
-                                   $quotedTableName,
-                                   $this->quoteColumnName($tmpColumnName),
-                                   $this->quoteColumnName($columnName),
-                                   $this->typeToSql($type,
-                                                    $options['limit'],
-                                                    $options['precision'],
-                                                    $options['scale']));
+                    $sql = sprintf(
+                        'UPDATE %s SET %s = CAST(%s AS %s)',
+                        $quotedTableName,
+                        $this->quoteColumnName($tmpColumnName),
+                        $this->quoteColumnName($columnName),
+                        $this->typeToSql(
+                            $type,
+                            $options['limit'],
+                            $options['precision'],
+                            $options['scale']
+                        )
+                    );
                 }
                 $this->execute($sql);
                 $this->removeColumn($tableName, $columnName);
@@ -564,7 +610,8 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
             $seq_name = $this->defaultSequenceName($tableName, $columnName);
             try {
                 $this->execute('DROP SEQUENCE ' . $seq_name . ' CASCADE');
-            } catch (Horde_Db_Exception $e) {}
+            } catch (Horde_Db_Exception $e) {
+            }
             $this->execute('CREATE SEQUENCE ' . $seq_name);
             $this->resetPkSequence($tableName, $columnName, $seq_name);
 
@@ -572,19 +619,26 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
              * default value (NEXTVAL is a postgres keyword, not a text
              * value). */
             $this->_clearTableCache($tableName);
-            $sql = sprintf('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT NEXTVAL(%s)',
-                           $this->quoteTableName($tableName),
-                           $this->quoteColumnName($columnName),
-                           $this->quoteSequenceName($seq_name));
+            $sql = sprintf(
+                'ALTER TABLE %s ALTER COLUMN %s SET DEFAULT NEXTVAL(%s)',
+                $this->quoteTableName($tableName),
+                $this->quoteColumnName($columnName),
+                $this->quoteSequenceName($seq_name)
+            );
             $this->execute($sql);
-            $sql = sprintf('ALTER SEQUENCE %s OWNED BY %s.%s',
-                           $seq_name,
-                           $this->quoteTableName($tableName),
-                           $this->quoteColumnName($columnName));
+            $sql = sprintf(
+                'ALTER SEQUENCE %s OWNED BY %s.%s',
+                $seq_name,
+                $this->quoteTableName($tableName),
+                $this->quoteColumnName($columnName)
+            );
             $this->execute($sql);
         } elseif (array_key_exists('default', $options)) {
-            $this->changeColumnDefault($tableName, $columnName,
-                                       $options['default']);
+            $this->changeColumnDefault(
+                $tableName,
+                $columnName,
+                $options['default']
+            );
         }
 
         if ($primaryKey) {
@@ -593,8 +647,11 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
 
         if (array_key_exists('null', $options)) {
             $this->changeColumnNull(
-                $tableName, $columnName, $options['null'],
-                isset($options['default']) ? $options['default'] : null);
+                $tableName,
+                $columnName,
+                $options['null'],
+                $options['default'] ?? null
+            );
         }
     }
 
@@ -611,10 +668,12 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     public function changeColumnDefault($tableName, $columnName, $default)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $this->quote($default));
+        $sql = sprintf(
+            'ALTER TABLE %s ALTER COLUMN %s SET DEFAULT %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $this->quote($default)
+        );
         return $this->execute($sql);
     }
 
@@ -626,22 +685,29 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      * @param boolean $null       Whether NULL values are allowed.
      * @param mixed $default      The new default value.
      */
-    public function changeColumnNull($tableName, $columnName, $null,
-                                     $default = null)
-    {
+    public function changeColumnNull(
+        $tableName,
+        $columnName,
+        $null,
+        $default = null
+    ) {
         $this->_clearTableCache($tableName);
         if (!$null && !is_null($default)) {
-            $sql = sprintf('UPDATE %s SET %s = %s WHERE %s IS NULL',
-                           $this->quoteTableName($tableName),
-                           $this->quoteColumnName($columnName),
-                           $this->quote($default),
-                           $this->quoteColumnName($columnName));
+            $sql = sprintf(
+                'UPDATE %s SET %s = %s WHERE %s IS NULL',
+                $this->quoteTableName($tableName),
+                $this->quoteColumnName($columnName),
+                $this->quote($default),
+                $this->quoteColumnName($columnName)
+            );
             $this->execute($sql);
         }
-        $sql = sprintf('ALTER TABLE %s ALTER %s %s NOT NULL',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $null ? 'DROP' : 'SET');
+        $sql = sprintf(
+            'ALTER TABLE %s ALTER %s %s NOT NULL',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $null ? 'DROP' : 'SET'
+        );
         return $this->execute($sql);
     }
 
@@ -655,10 +721,12 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     public function renameColumn($tableName, $columnName, $newColumnName)
     {
         $this->_clearTableCache($tableName);
-        $sql = sprintf('ALTER TABLE %s RENAME COLUMN %s TO %s',
-                       $this->quoteTableName($tableName),
-                       $this->quoteColumnName($columnName),
-                       $this->quoteColumnName($newColumnName));
+        $sql = sprintf(
+            'ALTER TABLE %s RENAME COLUMN %s TO %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $this->quoteColumnName($newColumnName)
+        );
         return $this->execute($sql);
     }
 
@@ -677,11 +745,14 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
              FROM information_schema.table_constraints
              WHERE table_name = ?
                  AND constraint_type = ?',
-            array($tableName, 'PRIMARY KEY'));
+            [$tableName, 'PRIMARY KEY']
+        );
         if ($keyName) {
-            $sql = sprintf('ALTER TABLE %s DROP CONSTRAINT %s CASCADE',
-                           $this->quoteTableName($tableName),
-                           $this->quoteColumnName($keyName));
+            $sql = sprintf(
+                'ALTER TABLE %s DROP CONSTRAINT %s CASCADE',
+                $this->quoteTableName($tableName),
+                $this->quoteColumnName($keyName)
+            );
             return $this->execute($sql);
         }
     }
@@ -696,7 +767,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      *                               - name: (string) the index name.
      *                               - column: (string|array) column name(s).
      */
-    public function removeIndex($tableName, $options = array())
+    public function removeIndex($tableName, $options = [])
     {
         $this->_clearTableCache($tableName);
         return $this->execute('DROP INDEX ' . $this->indexName($tableName, $options));
@@ -709,27 +780,27 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      * @param array $options  Database options: owner, template, charset,
      *                        tablespace, and connection_limit.
      */
-    public function createDatabase($name, $options = array())
+    public function createDatabase($name, $options = [])
     {
-        $options = array_merge(array('charset' => 'utf8'), $options);
+        $options = array_merge(['charset' => 'utf8'], $options);
 
         $optionString = '';
         foreach ($options as $key => $value) {
             switch ($key) {
-            case 'owner':
-                $optionString .= " OWNER = '$value'";
-                break;
-            case 'template':
-                $optionString .= " TEMPLATE = $value";
-                break;
-            case 'charset':
-                $optionString .= " ENCODING = '$value'";
-                break;
-            case 'tablespace':
-                $optionString .= " TABLESPACE = $value";
-                break;
-            case 'connection_limit':
-                $optionString .= " CONNECTION LIMIT = $value";
+                case 'owner':
+                    $optionString .= " OWNER = '$value'";
+                    break;
+                case 'template':
+                    $optionString .= " TEMPLATE = $value";
+                    break;
+                case 'charset':
+                    $optionString .= " ENCODING = '$value'";
+                    break;
+                case 'tablespace':
+                    $optionString .= " TABLESPACE = $value";
+                    break;
+                case 'connection_limit':
+                    $optionString .= " CONNECTION LIMIT = $value";
             }
         }
 
@@ -769,28 +840,32 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      * @return string  The SQL definition. If $type is not one of the
      *                 internally supported types, $type is returned unchanged.
      */
-    public function typeToSql($type, $limit = null, $precision = null,
-                              $scale = null, $unsigned = null)
-    {
+    public function typeToSql(
+        $type,
+        $limit = null,
+        $precision = null,
+        $scale = null,
+        $unsigned = null
+    ) {
         if ($type != 'integer') {
             return parent::typeToSql($type, $limit, $precision, $scale);
         }
 
         switch ($limit) {
-        case 1:
-        case 2:
-            return 'smallint';
+            case 1:
+            case 2:
+                return 'smallint';
 
-        case 3:
-        case 4:
-        case null:
-            return 'integer';
+            case 3:
+            case 4:
+            case null:
+                return 'integer';
 
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-            return 'bigint';
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                return 'bigint';
         }
 
         throw new Horde_Db_Exception("No integer type has byte size $limit. Use a numeric with precision 0 instead.");
@@ -819,7 +894,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
 
         // Construct a clean list of column names from the ORDER BY clause,
         // removing any ASC/DESC modifiers.
-        $orderColumns = array();
+        $orderColumns = [];
         foreach (preg_split('/\s*,\s*/', $orderBy, -1, PREG_SPLIT_NO_EMPTY) as $orderByClause) {
             $orderColumns[] = current(preg_split('/\s+/', $orderByClause, -1, PREG_SPLIT_NO_EMPTY)) . ' AS alias_' . count($orderColumns);
         }
@@ -827,8 +902,12 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         // Return a DISTINCT ON() clause that's distinct on the columns we want
         // but includes all the required columns for the ORDER BY to work
         // properly.
-        return sprintf('DISTINCT ON (%s) %s, %s',
-                       $columns, $columns, implode(', ', $orderColumns));
+        return sprintf(
+            'DISTINCT ON (%s) %s, %s',
+            $columns,
+            $columns,
+            implode(', ', $orderColumns)
+        );
     }
 
     /**
@@ -850,7 +929,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
             return $sql;
         }
 
-        $order = array();
+        $order = [];
         foreach (preg_split('/\s*,\s*/', $options['order'], -1, PREG_SPLIT_NO_EMPTY) as $s) {
             if (preg_match('/\bdesc$/i', $s)) {
                 $s = 'DESC';
@@ -859,8 +938,11 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         }
         $order = implode(', ', $order);
 
-        return sprintf('SELECT * FROM (%s) AS id_list ORDER BY %s',
-                       $sql, $order);
+        return sprintf(
+            'SELECT * FROM (%s) AS id_list ORDER BY %s',
+            $sql,
+            $order
+        );
     }
 
     /**
@@ -894,11 +976,13 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         if (!is_int($amount)) {
             throw new InvalidArgumentException('$amount parameter must be an integer');
         }
-        return sprintf('%s %s INTERVAL \'%s %s\'',
-                       $reference,
-                       $operator,
-                       $amount,
-                       $interval);
+        return sprintf(
+            '%s %s INTERVAL \'%s %s\'',
+            $reference,
+            $operator,
+            $amount,
+            $interval
+        );
     }
 
     /**
@@ -914,44 +998,58 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      * @return string|array  The SQL test fragment, or an array containing the
      *                       query and a list of values if $bind is true.
      */
-    public function buildClause($lhs, $op, $rhs, $bind = false,
-                                $params = array())
-    {
+    public function buildClause(
+        $lhs,
+        $op,
+        $rhs,
+        $bind = false,
+        $params = []
+    ) {
         $lhs = $this->_escapePrepare($lhs);
         switch ($op) {
-        case '|':
-        case '&':
-            /* Only PgSQL 7.3+ understands SQL99 'SIMILAR TO'; use ~ for
-             * greater backwards compatibility. */
-            $query = 'CASE WHEN CAST(%s AS VARCHAR) ~ \'^-?[0-9]+$\' THEN (CAST(%s AS INTEGER) %s %s) ELSE 0 END';
-            if ($bind) {
-                return array(sprintf($query, $lhs, $lhs, $op, '?'),
-                             array((int)$rhs));
-            } else {
-                return sprintf($query, $lhs, $lhs, $op, (int)$rhs);
-            }
-
-        case 'LIKE':
-            $query = '%s ILIKE %s';
-            if ($bind) {
-                if (empty($params['begin'])) {
-                    return array(sprintf($query, $lhs, '?'),
-                                 array('%' . $rhs . '%'));
+            case '|':
+            case '&':
+                /* Only PgSQL 7.3+ understands SQL99 'SIMILAR TO'; use ~ for
+                 * greater backwards compatibility. */
+                $query = 'CASE WHEN CAST(%s AS VARCHAR) ~ \'^-?[0-9]+$\' THEN (CAST(%s AS INTEGER) %s %s) ELSE 0 END';
+                if ($bind) {
+                    return [sprintf($query, $lhs, $lhs, $op, '?'),
+                        [(int) $rhs]];
+                } else {
+                    return sprintf($query, $lhs, $lhs, $op, (int) $rhs);
                 }
-                return array(sprintf('(' . $query . ' OR ' . $query . ')',
-                                     $lhs, '?', $lhs, '?'),
-                             array($rhs . '%', '% ' . $rhs . '%'));
-            }
-            if (empty($params['begin'])) {
-                return sprintf($query,
-                               $lhs,
-                               $this->_escapePrepare($this->quote('%' . $rhs . '%')));
-            }
-            return sprintf('(' . $query . ' OR ' . $query . ')',
-                           $lhs,
-                           $this->_escapePrepare($this->quote($rhs . '%')),
-                           $lhs,
-                           $this->_escapePrepare($this->quote('% ' . $rhs . '%')));
+
+                // no break
+            case 'LIKE':
+                $query = '%s ILIKE %s';
+                if ($bind) {
+                    if (empty($params['begin'])) {
+                        return [sprintf($query, $lhs, '?'),
+                            ['%' . $rhs . '%']];
+                    }
+                    return [sprintf(
+                        '(' . $query . ' OR ' . $query . ')',
+                        $lhs,
+                        '?',
+                        $lhs,
+                        '?'
+                    ),
+                        [$rhs . '%', '% ' . $rhs . '%']];
+                }
+                if (empty($params['begin'])) {
+                    return sprintf(
+                        $query,
+                        $lhs,
+                        $this->_escapePrepare($this->quote('%' . $rhs . '%'))
+                    );
+                }
+                return sprintf(
+                    '(' . $query . ' OR ' . $query . ')',
+                    $lhs,
+                    $this->_escapePrepare($this->quote($rhs . '%')),
+                    $lhs,
+                    $this->_escapePrepare($this->quote('% ' . $rhs . '%'))
+                );
         }
 
         return parent::buildClause($lhs, $op, $rhs, $bind, $params);
@@ -971,7 +1069,8 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     {
         return $this->selectValue(
             'SELECT pg_encoding_to_char(pg_database.encoding) FROM pg_database
-             WHERE pg_database.datname LIKE ' . $this->quote($this->currentDatabase()));
+             WHERE pg_database.datname LIKE ' . $this->quote($this->currentDatabase())
+        );
     }
 
     /**
@@ -1027,7 +1126,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function defaultSequenceName($tableName, $pk = null)
     {
-        list($defaultPk, $defaultSeq) = $this->pkAndSequenceFor($tableName);
+        [$defaultPk, $defaultSeq] = $this->pkAndSequenceFor($tableName);
         if (!$defaultSeq) {
             $defaultSeq = $tableName . '_' . ($pk ? $pk : ($defaultPk ? $defaultPk : 'id')) . '_seq';
         }
@@ -1049,7 +1148,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
     public function resetPkSequence($table, $pk = null, $sequence = null)
     {
         if (!$pk || !$sequence) {
-            list($defaultPk, $defaultSequence) = $this->pkAndSequenceFor($table);
+            [$defaultPk, $defaultSequence] = $this->pkAndSequenceFor($table);
             if (!$pk) {
                 $pk = $defaultPk;
             }
@@ -1064,7 +1163,8 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
                 $quotedTable = $this->quoteTableName($table);
                 $quotedPk = $this->quoteColumnName($pk);
                 if ($this->postgresqlVersion() >= 100000) {
-                    $sql = sprintf('
+                    $sql = sprintf(
+                        '
                         SELECT setval(
                             %s,
                             (SELECT COALESCE(
@@ -1073,11 +1173,11 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
                              ) FROM %s),
                              false
                          )',
-                         $quotedSequence,
-                         $quotedPk,
-                         $quotedSequence,
-                         $quotedSequence,
-                         $quotedTable
+                        $quotedSequence,
+                        $quotedPk,
+                        $quotedSequence,
+                        $quotedSequence,
+                        $quotedTable
                     );
                 } else {
                     $sql = sprintf(
@@ -1135,20 +1235,20 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
               LEFT JOIN information_schema.table_constraints AS t
                 ON t.constraint_name = c.constraint_name
               WHERE t.table_name = '$table' AND t.constraint_type = 'PRIMARY KEY';";
-             $result = $this->selectAll($sql, 'PK and custom sequence');
+            $result = $this->selectAll($sql, 'PK and custom sequence');
 
             // Return null if no results or multiple rows
             // (multiple rows means composite PK with multiple columns where autoincrement is not supported )
             if (!$results || count($results) > 1) {
-                return array(null, null);
+                return [null, null];
             }
-            
+
             $result = $results[0];
         }
 
-         // Only warn about missing sequences for plain integer primary keys
-        if (isset($result['data_type']) && 
-            (strpos($result['data_type'], 'int') !== false || 
+        // Only warn about missing sequences for plain integer primary keys
+        if (isset($result['data_type']) &&
+            (strpos($result['data_type'], 'int') !== false ||
              strpos($result['data_type'], 'serial') !== false)) {
             if ($this->_logger && !$result['relname']) {
                 $this->_logger->warn(sprintf('%s has Primary key %s with no default sequence', $table, $result['attname']));
@@ -1156,7 +1256,7 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
         }
 
         // [primary_key, sequence]
-        return array($result['attname'], $result['relname']);
+        return [$result['attname'], $result['relname']];
     }
 
     /**

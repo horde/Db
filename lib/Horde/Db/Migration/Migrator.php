@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
@@ -66,10 +67,11 @@ class Horde_Db_Migration_Migrator
      *
      * @throws Horde_Db_Migration_Exception
      */
-    public function __construct(Horde_Db_Adapter $connection,
-                                Horde_Log_Logger $logger = null,
-                                array $options = array())
-    {
+    public function __construct(
+        Horde_Db_Adapter $connection,
+        ?Horde_Log_Logger $logger = null,
+        array $options = []
+    ) {
         if (!$connection->supportsMigrations()) {
             throw new Horde_Db_Migration_Exception('This database does not yet support migrations');
         }
@@ -137,9 +139,9 @@ class Horde_Db_Migration_Migrator
      */
     public function getTargetVersion()
     {
-        $migrations = array();
+        $migrations = [];
         foreach ($this->_getMigrationFiles() as $migrationFile) {
-            list($version, $name) = $this->_getMigrationVersionAndName($migrationFile);
+            [$version, $name] = $this->_getMigrationVersionAndName($migrationFile);
             $this->_assertUniqueMigrationVersion($migrations, $version);
             $migrations[$version] = $name;
         }
@@ -199,10 +201,10 @@ class Horde_Db_Migration_Migrator
      */
     protected function _getMigrationClasses()
     {
-        $migrations = array();
+        $migrations = [];
         foreach ($this->_getMigrationFiles() as $migrationFile) {
             require_once $migrationFile;
-            list($version, $name) = $this->_getMigrationVersionAndName($migrationFile);
+            [$version, $name] = $this->_getMigrationVersionAndName($migrationFile);
             $this->_assertUniqueMigrationVersion($migrations, $version);
             $migrations[$version] = $this->_getMigrationClass($name, $version);
         }
@@ -275,7 +277,7 @@ class Horde_Db_Migration_Migrator
     protected function _getMigrationVersionAndName($migrationFile)
     {
         preg_match_all('/([0-9]+)_([_a-z0-9]*).php/', $migrationFile, $matches);
-        return array($matches[1][0], $matches[2][0]);
+        return [$matches[1][0], $matches[2][0]];
     }
 
     /**
@@ -286,7 +288,7 @@ class Horde_Db_Migration_Migrator
         if (in_array($this->_schemaTableName, $this->_connection->tables())) {
             return;
         }
-        $schemaTable = $this->_connection->createTable($this->_schemaTableName, array('autoincrementKey' => false));
+        $schemaTable = $this->_connection->createTable($this->_schemaTableName, ['autoincrementKey' => false]);
         $schemaTable->column('version', 'integer');
         $schemaTable->end();
         $this->_connection->insert('INSERT INTO ' . $this->_schemaTableName . ' (version) VALUES (0)', null, null, null, 1);
@@ -299,7 +301,7 @@ class Horde_Db_Migration_Migrator
     {
         $version = $this->_isDown() ? $version - 1 : $version;
         if ($version) {
-            $sql = 'UPDATE ' . $this->_schemaTableName . ' SET version = ' . (int)$version;
+            $sql = 'UPDATE ' . $this->_schemaTableName . ' SET version = ' . (int) $version;
             $this->_connection->update($sql);
         } else {
             $this->_connection->dropTable($this->_schemaTableName);

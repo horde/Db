@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -26,47 +27,27 @@ namespace Horde\Db\Test\Adapter;
  */
 class TestTableDefinition
 {
-    public function testConstruct()
-    {
-    }
+    public function testConstruct() {}
 
-    public function testName()
-    {
-    }
+    public function testName() {}
 
-    public function testGetOptions()
-    {
-    }
+    public function testGetOptions() {}
 
-    public function testPrimaryKey()
-    {
-    }
+    public function testPrimaryKey() {}
 
-    public function testColumn()
-    {
-    }
+    public function testColumn() {}
 
-    public function testToSql()
-    {
-    }
+    public function testToSql() {}
 
     /*##########################################################################
     # Array Access
     ##########################################################################*/
 
-    public function testOffsetExists()
-    {
-    }
+    public function testOffsetExists() {}
 
-    public function testOffsetGet()
-    {
-    }
+    public function testOffsetGet() {}
 
-    public function testOffsetSet()
-    {
-    }
+    public function testOffsetSet() {}
 
-    public function testOffsetUnset()
-    {
-    }
+    public function testOffsetUnset() {}
 }

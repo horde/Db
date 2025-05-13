@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -75,7 +76,7 @@ class SplitRead implements Adapter
      */
     public function __call($method, $args)
     {
-        $result = call_user_func_array(array($this->write, $method), $args);
+        $result = call_user_func_array([$this->write, $method], $args);
         $this->lastQuery = $this->write->getLastQuery();
         return $result;
     }
@@ -369,8 +370,7 @@ class SplitRead implements Adapter
         $pk = null,
         $idValue = null,
         $sequenceName = null
-    )
-    {
+    ) {
         $result = $this->write->insert($sql, $arg1, $arg2, $pk, $idValue, $sequenceName);
         $this->lastQuery = $this->write->getLastQuery();
 
@@ -542,7 +542,7 @@ class SplitRead implements Adapter
     /**
      * Appends a locking clause to an SQL statement.
      * This method *modifies* the +sql+ parameter.
-     * 
+     *
      * TODO: BC Break refactor to return changed string
      *
      *   # SELECT * FROM suppliers FOR UPDATE
@@ -589,7 +589,7 @@ class SplitRead implements Adapter
      *
      * The key is automatically prefixed to avoid collisions when using
      * different adapters or different configurations.
-     * 
+     *
      * Implementing this for the split adapter makes limited sense but it
      * makes the relation between the Adapter interface and the Base adapter
      * less of a hassle.

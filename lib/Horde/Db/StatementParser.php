@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
  *
@@ -89,8 +90,12 @@ class Horde_Db_StatementParser implements Iterator
         $this->_currentStatement = '';
         while (!$this->_file->eof()) {
             $line = $this->_file->fgets();
-            if (!trim($line)) { continue; }
-            if (!$this->_currentStatement && substr($line, 0, 2) == '--') { continue; }
+            if (!trim($line)) {
+                continue;
+            }
+            if (!$this->_currentStatement && substr($line, 0, 2) == '--') {
+                continue;
+            }
 
             $trimmedline = rtrim($line);
             if (substr($trimmedline, -1) == ';') {

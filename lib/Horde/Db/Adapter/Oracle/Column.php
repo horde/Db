@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -43,10 +44,15 @@ class Horde_Db_Adapter_Oracle_Column extends Horde_Db_Adapter_Base_Column
      * @param integer $scale      Number of digits to the right of the decimal
      *                            point in a number.
      */
-    public function __construct($name, $default, $sqlType = null, $null = true,
-                                $length = null, $precision = null,
-                                $scale = null)
-    {
+    public function __construct(
+        $name,
+        $default,
+        $sqlType = null,
+        $null = true,
+        $length = null,
+        $precision = null,
+        $scale = null
+    ) {
         $this->_name      = $name;
         $this->_sqlType   = Horde_String::lower($sqlType);
         $this->_null      = $null;

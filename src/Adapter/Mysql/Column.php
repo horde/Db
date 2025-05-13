@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -38,7 +39,7 @@ class Column extends BaseColumn
     /**
      * @var array
      */
-    protected $hasEmptyStringDefault = array('binary', 'string', 'text');
+    protected $hasEmptyStringDefault = ['binary', 'string', 'text'];
 
     /**
      * @var string|null
@@ -52,7 +53,7 @@ class Column extends BaseColumn
      * @param   string|null  $sqlType optional
      * @param   bool $null optional
      */
-    public function __construct(string $name, string $default = null, string $sqlType=null, bool $null=true)
+    public function __construct(string $name, ?string $default = null, ?string $sqlType = null, bool $null = true)
     {
         $this->originalDefault = $default;
         parent::__construct($name, $default, $sqlType, $null);

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -14,8 +15,11 @@
  * @package    Db
  * @subpackage Migration
  */
+
 namespace Horde\Db\Migration;
-use \Horde\Db\DbException;
+
+use Horde\Db\DbException;
+
 /**
  *
  *
@@ -29,6 +33,4 @@ use \Horde\Db\DbException;
  * @package    Db
  * @subpackage Migration
  */
-class MigrationException extends DbException
-{
-}
+class MigrationException extends DbException {}

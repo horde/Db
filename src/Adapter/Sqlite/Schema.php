@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -15,12 +16,14 @@
  * @package    Db
  * @subpackage Adapter
  */
+
 namespace Horde\Db\Adapter\Sqlite;
-use \Horde\Db\DbException;
-use \Horde\Db\Adapter\Base\Schema as BaseSchema;
-use \Horde\Db\Adapter\Base\Index;
-use \PDO;
-use \InvalidArgumentException;
+
+use Horde\Db\DbException;
+use Horde\Db\Adapter\Base\Schema as BaseSchema;
+use Horde\Db\Adapter\Base\Index;
+use PDO;
+use InvalidArgumentException;
 
 /**
  * Class for SQLite-specific managing of database schemes and handling of SQL
@@ -77,7 +80,7 @@ class Schema extends BaseSchema
      */
     public function quoteBinary($value)
     {
-        return "'" . str_replace(array("'", '%', "\0"), array("''", '%25', '%00'), $value) . "'";
+        return "'" . str_replace(["'", '%', "\0"], ["''", '%25', '%00'], $value) . "'";
     }
 
 
@@ -98,22 +101,22 @@ class Schema extends BaseSchema
      */
     public function nativeDatabaseTypes()
     {
-        return array(
+        return [
             'autoincrementKey' => $this->defaultPrimaryKeyType(),
-            'string'     => array('name' => 'varchar',  'limit' => 255),
-            'text'       => array('name' => 'text',     'limit' => null),
-            'mediumtext' => array('name' => 'text',     'limit' => null),
-            'longtext'   => array('name' => 'text',     'limit' => null),
-            'integer'    => array('name' => 'int',      'limit' => null),
-            'float'      => array('name' => 'float',    'limit' => null),
-            'decimal'    => array('name' => 'decimal',  'limit' => null),
-            'datetime'   => array('name' => 'datetime', 'limit' => null),
-            'timestamp'  => array('name' => 'datetime', 'limit' => null),
-            'time'       => array('name' => 'time',     'limit' => null),
-            'date'       => array('name' => 'date',     'limit' => null),
-            'binary'     => array('name' => 'blob',     'limit' => null),
-            'boolean'    => array('name' => 'boolean',  'limit' => null),
-        );
+            'string'     => ['name' => 'varchar',  'limit' => 255],
+            'text'       => ['name' => 'text',     'limit' => null],
+            'mediumtext' => ['name' => 'text',     'limit' => null],
+            'longtext'   => ['name' => 'text',     'limit' => null],
+            'integer'    => ['name' => 'int',      'limit' => null],
+            'float'      => ['name' => 'float',    'limit' => null],
+            'decimal'    => ['name' => 'decimal',  'limit' => null],
+            'datetime'   => ['name' => 'datetime', 'limit' => null],
+            'timestamp'  => ['name' => 'datetime', 'limit' => null],
+            'time'       => ['name' => 'time',     'limit' => null],
+            'date'       => ['name' => 'date',     'limit' => null],
+            'binary'     => ['name' => 'blob',     'limit' => null],
+            'boolean'    => ['name' => 'boolean',  'limit' => null],
+        ];
     }
 
     /**
@@ -145,7 +148,7 @@ class Schema extends BaseSchema
             $this->adapter->cacheWrite("tables/columns/$tableName", serialize($rows));
         }
 
-        $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, array());
+        $pk = $this->makeIndex($tableName, 'PRIMARY', true, true, []);
         foreach ($rows as $row) {
             if ($row['pk']) {
                 $pk->columns[] = $row['name'];
@@ -175,7 +178,12 @@ class Schema extends BaseSchema
                     continue;
                 }
                 $index = $this->makeIndex(
-                    $tableName, $row['name'], false, (bool)$row['unique'], array());
+                    $tableName,
+                    $row['name'],
+                    false,
+                    (bool) $row['unique'],
+                    []
+                );
                 foreach ($this->adapter->select('PRAGMA index_info(' . $this->quoteColumnName($index->name) . ')') as $field) {
                     $index->columns[] = $field['name'];
                 }
@@ -210,7 +218,11 @@ class Schema extends BaseSchema
         $columns = [];
         foreach ($rows as $row) {
             $columns[$row['name']] = $this->makeColumn(
-                $row['name'], $row['dflt_value'], $row['type'], !(bool)$row['notnull']);
+                $row['name'],
+                $row['dflt_value'],
+                $row['type'],
+                !(bool) $row['notnull']
+            );
         }
 
         return $columns;
@@ -225,9 +237,11 @@ class Schema extends BaseSchema
     public function renameTable($name, $newName)
     {
         $this->clearTableCache($name);
-        $sql = sprintf('ALTER TABLE %s RENAME TO %s',
-                       $this->quoteTableName($name),
-                       $this->quoteTableName($newName));
+        $sql = sprintf(
+            'ALTER TABLE %s RENAME TO %s',
+            $this->quoteTableName($name),
+            $this->quoteTableName($newName)
+        );
         return $this->adapter->execute($sql);
     }
 
@@ -296,7 +310,7 @@ class Schema extends BaseSchema
     {
         $this->clearTableCache($tableName);
 
-        $defs = array(
+        $defs = [
             function ($definition) use ($columnName, $type) {
                 $definition[$columnName]->setType($type);
             },
@@ -304,8 +318,8 @@ class Schema extends BaseSchema
                 if ($type == 'autoincrementKey') {
                     $definition->primaryKey(false);
                 }
-            }
-        );
+            },
+        ];
         if (isset($options['limit'])) {
             $defs[] = function ($definition) use ($columnName, $options) {
                 $definition[$columnName]->setLimit($options['limit']);
@@ -313,7 +327,7 @@ class Schema extends BaseSchema
         }
         if (isset($options['null'])) {
             $defs[] = function ($definition) use ($columnName, $options) {
-                $definition[$columnName]->setNull((bool)$options['null']);
+                $definition[$columnName]->setNull((bool) $options['null']);
             };
         }
         if (isset($options['precision'])) {
@@ -380,7 +394,8 @@ class Schema extends BaseSchema
 
         return $this->alterTable(
             $tableName,
-            array('rename' => array($columnName => $newColumnName)));
+            ['rename' => [$columnName => $newColumnName]]
+        );
     }
 
     /**
@@ -394,7 +409,7 @@ class Schema extends BaseSchema
     public function addPrimaryKey($tableName, $columns)
     {
         $this->clearTableCache($tableName);
-        $columns = (array)$columns;
+        $columns = (array) $columns;
         $callback = function ($definition) use ($columns) {
             $definition->primaryKey($columns);
         };
@@ -427,7 +442,7 @@ class Schema extends BaseSchema
      *                               - name: (string) the index name.
      *                               - column: (string|array) column name(s).
      */
-    public function removeIndex($tableName, $options=array())
+    public function removeIndex($tableName, $options = [])
     {
         $this->clearTableCache($tableName);
 
@@ -472,7 +487,7 @@ class Schema extends BaseSchema
     {
         // TODO: Broken implementation. config is never created
         return '';
-//        return $this->config['dbname'];
+        //        return $this->config['dbname'];
     }
 
     /**
@@ -494,26 +509,26 @@ class Schema extends BaseSchema
             throw new InvalidArgumentException('$amount parameter must be an integer');
         }
         switch ($interval) {
-        case 'YEAR':
-            $interval = 'years';
-            break;
-        case 'MONTH':
-            $interval = 'months';
-            break;
-        case 'DAY':
-            $interval = 'days';
-            break;
-        case 'HOUR':
-            $interval = 'hours';
-            break;
-        case 'MINUTE':
-            $interval = 'minutes';
-            break;
-        case 'SECOND':
-            $interval = 'seconds';
-            break;
-        default:
-            break;
+            case 'YEAR':
+                $interval = 'years';
+                break;
+            case 'MONTH':
+                $interval = 'months';
+                break;
+            case 'DAY':
+                $interval = 'days';
+                break;
+            case 'HOUR':
+                $interval = 'hours';
+                break;
+            case 'MINUTE':
+                $interval = 'minutes';
+                break;
+            case 'SECOND':
+                $interval = 'seconds';
+                break;
+            default:
+                break;
         }
 
         return 'datetime(' . $reference . ', \'' . $operator . $amount . ' '
@@ -559,13 +574,17 @@ class Schema extends BaseSchema
         $this->adapter->beginDbTransaction();
 
         $alteredTableName = 'altered_' . $tableName;
-        $this->moveTable($tableName,
-                          $alteredTableName,
-                          array_merge($options, array('temporary' => true)));
-        $this->moveTable($alteredTableName,
-                          $tableName,
-                          [],
-                          $callback);
+        $this->moveTable(
+            $tableName,
+            $alteredTableName,
+            array_merge($options, ['temporary' => true])
+        );
+        $this->moveTable(
+            $alteredTableName,
+            $tableName,
+            [],
+            $callback
+        );
 
         $this->adapter->commitDbTransaction();
     }
@@ -586,9 +605,12 @@ class Schema extends BaseSchema
      *                            Horde_Db_Adapter_Base_TableDefinition object
      *                            available in $definition. See _copyTable().
      */
-    protected function moveTable($from, $to, $options = [],
-                                  $callback = null)
-    {
+    protected function moveTable(
+        $from,
+        $to,
+        $options = [],
+        $callback = null
+    ) {
         $this->copyTable($from, $to, $options, $callback);
         $this->dropTable($from);
     }
@@ -608,17 +630,22 @@ class Schema extends BaseSchema
      *                            Horde_Db_Adapter_Base_TableDefinition object
      *                            available in $definition.
      */
-    protected function copyTable($from, $to, $options = [],
-                                  $callback = null)
-    {
+    protected function copyTable(
+        $from,
+        $to,
+        $options = [],
+        $callback = null
+    ) {
         $fromColumns = $this->columns($from);
         $pk = $this->primaryKey($from);
         if ($pk && count($pk->columns) == 1) {
             /* A primary key is not necessarily what matches the pseudo type
              * "autoincrementKey". We need to parse the table definition to
              * find out if the column is AUTOINCREMENT too. */
-            $tableDefinition = $this->adapter->selectValue('SELECT sql FROM sqlite_master WHERE name = ? UNION ALL SELECT sql FROM sqlite_temp_master WHERE name = ?',
-                                                  array($from, $from));
+            $tableDefinition = $this->adapter->selectValue(
+                'SELECT sql FROM sqlite_master WHERE name = ? UNION ALL SELECT sql FROM sqlite_temp_master WHERE name = ?',
+                [$from, $from]
+            );
             if (strpos($tableDefinition, $this->quoteColumnName($pk->columns[0]) . ' INTEGER PRIMARY KEY AUTOINCREMENT')) {
                 $pkColumn = $pk->columns[0];
             } else {
@@ -627,7 +654,7 @@ class Schema extends BaseSchema
         } else {
             $pkColumn = null;
         }
-        $options = array_merge($options, array('autoincrementKey' => false));
+        $options = array_merge($options, ['autoincrementKey' => false]);
 
         $copyPk = true;
         $definition = $this->createTable($to, $options);
@@ -638,7 +665,7 @@ class Schema extends BaseSchema
             $columnType = $column->getName() == $pkColumn
                 ? 'autoincrementKey'
                 : $column->getType();
-            $columnOptions = array('limit' => $column->getLimit());
+            $columnOptions = ['limit' => $column->getLimit()];
 
             if ($columnType == 'autoincrementKey') {
                 $copyPk = false;
@@ -663,15 +690,17 @@ class Schema extends BaseSchema
         $this->copyTableIndexes(
             $from,
             $to,
-            isset($options['rename']) ? $options['rename'] : array());
+            $options['rename'] ?? []
+        );
         $this->copyTableContents(
             $from,
             $to,
             array_map(
-                function($c) { return $c->getName(); },
+                function ($c) { return $c->getName(); },
                 iterator_to_array($definition)
             ),
-            isset($options['rename']) ? $options['rename'] : array());
+            $options['rename'] ?? []
+        );
     }
 
     /**
@@ -709,7 +738,7 @@ class Schema extends BaseSchema
 
             if (!empty($columns)) {
                 // Index name can't be the same
-                $opts = array('name' => str_replace('_' . $from . '_', '_' . $to . '_', $name));
+                $opts = ['name' => str_replace('_' . $from . '_', '_' . $to . '_', $name)];
                 if ($index->unique) {
                     $opts['unique'] = true;
                 }
@@ -728,9 +757,12 @@ class Schema extends BaseSchema
      *                        original names as keys and the new names as
      *                        values.
      */
-    protected function copyTableContents($from, $to, $columns,
-                                          $rename = [])
-    {
+    protected function copyTableContents(
+        $from,
+        $to,
+        $columns,
+        $rename = []
+    ) {
         $columnMappings = array_combine($columns, $columns);
 
         foreach ($rename as $renameFrom => $renameTo) {
@@ -756,16 +788,18 @@ class Schema extends BaseSchema
         }
 
         $quotedTo = $this->quoteTableName($to);
-        $quotedToColumns = implode(', ', array_map(array($this, 'quoteColumnName'), $columns));
+        $quotedToColumns = implode(', ', array_map([$this, 'quoteColumnName'], $columns));
 
         $quotedFrom = $this->quoteTableName($from);
-        $quotedFromColumns = implode(', ', array_map(array($this, 'quoteColumnName'), $fromColumns));
+        $quotedFromColumns = implode(', ', array_map([$this, 'quoteColumnName'], $fromColumns));
 
-        $sql = sprintf('INSERT INTO %s (%s) SELECT %s FROM %s',
-                       $quotedTo,
-                       $quotedToColumns,
-                       $quotedFromColumns,
-                       $quotedFrom);
+        $sql = sprintf(
+            'INSERT INTO %s (%s) SELECT %s FROM %s',
+            $quotedTo,
+            $quotedToColumns,
+            $quotedFromColumns,
+            $quotedFrom
+        );
         $this->adapter->execute($sql);
     }
 }

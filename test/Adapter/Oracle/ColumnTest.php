@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -21,6 +22,7 @@ use Horde\Db\Adapter\Oracle\Column;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class ColumnTest extends ColumnBase
 {

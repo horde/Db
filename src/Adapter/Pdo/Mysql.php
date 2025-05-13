@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -98,7 +99,7 @@ class Mysql extends Base
     {
         $this->config['adapter'] = 'mysql';
 
-        $this->checkRequiredConfig(array('adapter', 'username'));
+        $this->checkRequiredConfig(['adapter', 'username']);
 
         if (!empty($this->config['socket'])) {
             $this->config['unix_socket'] = $this->config['socket'];
@@ -118,10 +119,10 @@ class Mysql extends Base
         // Collect options to build PDO Data Source Name (DSN) string.
         $dsnOpts = $this->config;
         unset($dsnOpts['adapter'],
-              $dsnOpts['username'],
-              $dsnOpts['password'],
-              $dsnOpts['charset'],
-              $dsnOpts['phptype']);
+            $dsnOpts['username'],
+            $dsnOpts['password'],
+            $dsnOpts['charset'],
+            $dsnOpts['phptype']);
         $dsnOpts = $this->normalizeConfig($dsnOpts);
 
         if (isset($dsnOpts['port'])) {
@@ -138,9 +139,9 @@ class Mysql extends Base
         }
 
         // Return DSN and user/pass for connection.
-        return array(
+        return [
             $this->buildDsnString($dsnOpts),
             $this->config['username'],
-            $this->config['password']);
+            $this->config['password']];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -54,7 +55,7 @@ abstract class Base extends BaseAdapter
             return;
         }
 
-        list($dsn, $user, $pass) = $this->parseConfig();
+        [$dsn, $user, $pass] = $this->parseConfig();
 
         try {
             $pdo = @new PDO($dsn, $user, $pass);
@@ -122,7 +123,7 @@ abstract class Base extends BaseAdapter
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectAll($sql, $arg1=null, $arg2=null)
+    public function selectAll($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -164,7 +165,7 @@ abstract class Base extends BaseAdapter
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      * @return  string
      */
-    public function selectValue($sql, $arg1=null, $arg2=null)
+    public function selectValue($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -184,7 +185,7 @@ abstract class Base extends BaseAdapter
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectValues($sql, $arg1=null, $arg2=null)
+    public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -206,7 +207,7 @@ abstract class Base extends BaseAdapter
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
      */
-    public function selectAssoc($sql, $arg1=null, $arg2=null)
+    public function selectAssoc($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
         if (!$stmt) {
@@ -342,7 +343,7 @@ abstract class Base extends BaseAdapter
         $query = sprintf(
             'INSERT INTO %s (%s) VALUES (%s)',
             $this->quoteTableName($table),
-            implode(', ', array_map(array($this, 'quoteColumnName'), array_keys($fields))),
+            implode(', ', array_map([$this, 'quoteColumnName'], array_keys($fields))),
             implode(', ', $placeholders)
         );
 
@@ -524,8 +525,8 @@ abstract class Base extends BaseAdapter
     protected function normalizeConfig($params)
     {
         // Normalize config parameters to what PDO expects.
-        $normalize = array('database' => 'dbname',
-                           'hostspec' => 'host');
+        $normalize = ['database' => 'dbname',
+            'hostspec' => 'host'];
 
         foreach ($normalize as $from => $to) {
             if (isset($params[$from])) {
@@ -556,7 +557,7 @@ abstract class Base extends BaseAdapter
      */
     protected function parseConfig()
     {
-        $this->checkRequiredConfig(array('adapter', 'username'));
+        $this->checkRequiredConfig(['adapter', 'username']);
 
         // try an empty password if it's not set.
         if (!isset($this->config['password'])) {
@@ -577,9 +578,9 @@ abstract class Base extends BaseAdapter
         );
 
         // return DSN and user/pass for connection
-        return array(
+        return [
             $this->buildDsnString($this->normalizeConfig($dsnOpts)),
             $this->config['username'],
-            $this->config['password']);
+            $this->config['password']];
     }
 }

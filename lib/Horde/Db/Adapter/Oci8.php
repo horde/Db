@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -72,7 +73,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
             return;
         }
 
-        $this->_checkRequiredConfig(array('username'));
+        $this->_checkRequiredConfig(['username']);
 
         if (!isset($this->_config['tns']) && empty($this->_config['host'])) {
             throw new Horde_Db_Exception('Either a TNS name or a host name must be specified');
@@ -97,7 +98,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
         }
         $oci = oci_connect(
             $this->_config['username'],
-            isset($this->_config['password']) ? $this->_config['password'] : '',
+            $this->_config['password'] ?? '',
             $connection,
             $this->_oracleCharsetName($this->_config['charset'])
         );
@@ -261,7 +262,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
     public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
         $stmt = $this->execute($sql, $arg1, $arg2);
-        $values = array();
+        $values = [];
         while (oci_fetch($stmt)) {
             if (($result = oci_result($stmt, 1)) === false) {
                 $this->_handleError($stmt, 'selectValues');
@@ -283,7 +284,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
      * @return resource
      * @throws Horde_Db_Exception
      */
-    public function execute($sql, $arg1 = null, $arg2 = null, $lobs = array())
+    public function execute($sql, $arg1 = null, $arg2 = null, $lobs = [])
     {
         if (is_array($arg1)) {
             $query = $this->_replaceParameters($sql, $arg1);
@@ -291,16 +292,16 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
         } else {
             $name = $arg1;
             $query = $sql;
-            $arg1 = array();
+            $arg1 = [];
         }
 
-        $t = new Horde_Support_Timer;
+        $t = new Horde_Support_Timer();
         $t->push();
 
         $this->_lastQuery = $query;
         $stmt = @oci_parse($this->_connection, $query);
 
-        $descriptors = array();
+        $descriptors = [];
         foreach ($lobs as $name => $lob) {
             $descriptors[$name] = oci_new_descriptor($this->_connection, OCI_DTYPE_LOB);
             oci_bind_by_name($stmt, ':' . $name, $descriptors[$name], -1, $lob instanceof Horde_Db_Value_Text ? OCI_B_CLOB : OCI_B_BLOB);
@@ -308,7 +309,8 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
 
         $flags = $lobs
             ? OCI_DEFAULT
-            : ($this->_transactionStarted
+            : (
+                $this->_transactionStarted
                ? OCI_NO_AUTO_COMMIT
                : OCI_COMMIT_ON_SUCCESS
             );
@@ -360,9 +362,14 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
      * @return integer  Last inserted ID.
      * @throws Horde_Db_Exception
      */
-    public function insert($sql, $arg1 = null, $arg2 = null, $pk = null,
-                           $idValue = null, $sequenceName = null)
-    {
+    public function insert(
+        $sql,
+        $arg1 = null,
+        $arg2 = null,
+        $pk = null,
+        $idValue = null,
+        $sequenceName = null
+    ) {
         $this->execute($sql, $arg1, $arg2);
         return $idValue
             ? $idValue
@@ -388,12 +395,12 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
      */
     public function insertBlob($table, $fields, $pk = null, $idValue = null)
     {
-        list($fields, $blobs, $locators) = $this->_prepareBlobs($fields);
+        [$fields, $blobs, $locators] = $this->_prepareBlobs($fields);
 
         $sql = 'INSERT INTO ' . $this->quoteTableName($table) . ' ('
             . implode(
                 ', ',
-                array_map(array($this, 'quoteColumnName'), array_keys($fields))
+                array_map([$this, 'quoteColumnName'], array_keys($fields))
             )
             . ') VALUES (' . implode(', ', $fields) . ')';
 
@@ -427,13 +434,13 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
      */
     public function updateBlob($table, $fields, $where = null)
     {
-        list($fields, $blobs, $locators) = $this->_prepareBlobs($fields);
+        [$fields, $blobs, $locators] = $this->_prepareBlobs($fields);
 
         if (is_array($where)) {
             $where = $this->_replaceParameters($where[0], $where[1]);
         }
 
-        $fnames = array();
+        $fnames = [];
         foreach ($fields as $field => $value) {
             $fnames[] = $this->quoteColumnName($field) . ' = ' . $value;
         }
@@ -447,7 +454,8 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
 
         // Protect against empty values for blobs.
         if (!empty($blobs)) {
-            $sql .= sprintf(' RETURNING %s INTO %s',
+            $sql .= sprintf(
+                ' RETURNING %s INTO %s',
                 implode(', ', array_keys($blobs)),
                 implode(', ', $locators)
             );
@@ -469,7 +477,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
      */
     protected function _prepareBlobs($fields)
     {
-        $blobs = $locators = array();
+        $blobs = $locators = [];
         foreach ($fields as $column => &$field) {
             if ($field instanceof Horde_Db_Value_Binary ||
                 $field instanceof Horde_Db_Value_Text) {
@@ -482,7 +490,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
                 $field = $this->quote($field);
             }
         }
-        return array($fields, $blobs, $locators);
+        return [$fields, $blobs, $locators];
     }
 
     /**
@@ -534,7 +542,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
     public function addLimitOffset($sql, $options)
     {
         if (isset($options['limit'])) {
-            $offset = isset($options['offset']) ? $options['offset'] : 0;
+            $offset = $options['offset'] ?? 0;
             $limit = $options['limit'] + $offset;
             if ($limit) {
                 $sql = "SELECT a.*, ROWNUM rnum FROM ($sql) a WHERE ROWNUM <= $limit";
@@ -561,7 +569,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
     public function _oracleCharsetName($charset)
     {
         return str_replace(
-            array(
+            [
                 'iso-8859-1',
                 'iso-8859-2',
                 'iso-8859-4',
@@ -587,8 +595,8 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
                 'windows-1257',
                 'windows-1258',
                 'utf-8',
-            ),
-            array(
+            ],
+            [
                 'WE8ISO8859P1',
                 'EE8ISO8859P2',
                 'NEE8ISO8859P4',
@@ -614,7 +622,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
                 'BLT8MSWIN1257',
                 'VN8MSWIN1258',
                 'AL32UTF8',
-            ),
+            ],
             Horde_String::lower($charset)
         );
     }
@@ -647,7 +655,7 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
         $error = oci_error($resource);
         $this->_logError(
             $error['message'],
-            'Horde_Db_Adapter_Oci8::' . $method. '()'
+            'Horde_Db_Adapter_Oci8::' . $method . '()'
         );
         throw new Horde_Db_Exception(
             $this->_errorMessage($error),

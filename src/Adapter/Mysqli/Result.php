@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
@@ -43,11 +44,11 @@ class Result extends BaseResult
      *
      * @var array
      */
-    protected $map = array(
+    protected $map = [
         Constants::FETCH_ASSOC => MYSQLI_ASSOC,
         Constants::FETCH_NUM   => MYSQLI_NUM,
-        Constants::FETCH_BOTH  => MYSQLI_BOTH
-    );
+        Constants::FETCH_BOTH  => MYSQLI_BOTH,
+    ];
 
     /**
      * Returns a row from a resultset.

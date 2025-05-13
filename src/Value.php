@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
  *
@@ -10,6 +11,7 @@
  * @license  http://www.horde.org/licenses/bsd
  * @package  Db
  */
+
 namespace Horde\Db;
 
 /**

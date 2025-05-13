@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -68,7 +69,7 @@ class Horde_Db_Adapter_SplitRead implements Horde_Db_Adapter
      */
     public function __call($method, $args)
     {
-        $result = call_user_func_array(array($this->_write, $method), $args);
+        $result = call_user_func_array([$this->_write, $method], $args);
         $this->_lastQuery = $this->_write->getLastQuery();
         return $result;
     }
@@ -355,9 +356,14 @@ class Horde_Db_Adapter_SplitRead implements Horde_Db_Adapter
      * @return integer  Last inserted ID.
      * @throws Horde_Db_Exception
      */
-    public function insert($sql, $arg1 = null, $arg2 = null, $pk = null,
-                           $idValue = null, $sequenceName = null)
-    {
+    public function insert(
+        $sql,
+        $arg1 = null,
+        $arg2 = null,
+        $pk = null,
+        $idValue = null,
+        $sequenceName = null
+    ) {
         $result = $this->_write->insert($sql, $arg1, $arg2, $pk, $idValue, $sequenceName);
         $this->_lastQuery = $this->_write->getLastQuery();
 
@@ -537,7 +543,7 @@ class Horde_Db_Adapter_SplitRead implements Horde_Db_Adapter
      * @param string &$sql    SQL statment.
      * @param array $options  TODO.
      */
-    public function addLock(&$sql, array $options = array())
+    public function addLock(&$sql, array $options = [])
     {
         $this->_write->addLock($sql, $options);
         $this->_lastQuery = $this->_write->getLastQuery();

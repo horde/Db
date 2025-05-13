@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2006-2021 Horde LLC (http://www.horde.org/)
  *
@@ -10,8 +11,10 @@
  * @license  http://www.horde.org/licenses/bsd
  * @package  Db
  */
+
 namespace Horde\Db\Value;
-use \Horde\Db\Adapter;
+
+use Horde\Db\Adapter;
 
 /**
  * Encapsulation object for binary values to be used in SQL statements to

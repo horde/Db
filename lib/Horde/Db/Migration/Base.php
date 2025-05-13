@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
@@ -73,10 +74,10 @@ class Horde_Db_Migration_Base
      */
     public function __call($method, $args)
     {
-        $a = array();
+        $a = [];
         foreach ($args as $arg) {
             if (is_array($arg)) {
-                $vals = array();
+                $vals = [];
                 foreach ($arg as $key => $value) {
                     $vals[] = var_export($key, true) . ' => ' . var_export($value, true);
                 }
@@ -90,7 +91,7 @@ class Horde_Db_Migration_Base
         // benchmark method call
         $t = new Horde_Support_Timer();
         $t->push();
-            $result = call_user_func_array(array($this->_connection, $method), $args);
+        $result = call_user_func_array([$this->_connection, $method], $args);
         $time = $t->pop();
 
         // print stats
@@ -117,15 +118,21 @@ class Horde_Db_Migration_Base
      */
     public function migrate($direction)
     {
-        if (!method_exists($this, $direction)) { return; }
+        if (!method_exists($this, $direction)) {
+            return;
+        }
 
-        if ($direction == 'up')   { $this->announce("migrating"); }
-        if ($direction == 'down') { $this->announce("reverting"); }
+        if ($direction == 'up') {
+            $this->announce("migrating");
+        }
+        if ($direction == 'down') {
+            $this->announce("reverting");
+        }
 
         $result = null;
         $t = new Horde_Support_Timer();
         $t->push();
-            $result = $this->$direction();
+        $result = $this->$direction();
         $time = $t->pop();
 
         if ($direction == 'up') {

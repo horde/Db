@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
@@ -98,7 +99,7 @@ class Table implements ArrayAccess, IteratorAggregate
      */
     public function getColumn($column)
     {
-        return isset($this->columns[$column]) ? $this->columns[$column] : null;
+        return $this->columns[$column] ?? null;
     }
 
     /**
@@ -181,18 +182,14 @@ class Table implements ArrayAccess, IteratorAggregate
      * @param   int     $offset
      * @param   mixed   $value
      */
-    public function offsetSet($offset, $value)
-    {
-    }
+    public function offsetSet($offset, $value) {}
 
     /**
      * ArrayAccess: remove element
      *
      * @param   int     $offset
      */
-    public function offsetUnset($offset)
-    {
-    }
+    public function offsetUnset($offset) {}
 
 
     /*##########################################################################

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
  *
@@ -118,7 +119,9 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
         $this->_index = null;
         $this->_eof = true;
         $this->_result = $this->_adapter->execute(
-            $this->_sql, $this->_arg1, $this->_arg2
+            $this->_sql,
+            $this->_arg1,
+            $this->_arg2
         );
 
         $this->next();

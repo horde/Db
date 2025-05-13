@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -44,11 +45,18 @@ class Horde_Db_Adapter_Base_ColumnDefinition
     /**
      * Constructor.
      */
-    public function __construct($base, $name, $type, $limit = null,
-                                $precision = null, $scale = null,
-                                $unsigned = null, $default = null,
-                                $null = null, $autoincrement = null)
-    {
+    public function __construct(
+        $base,
+        $name,
+        $type,
+        $limit = null,
+        $precision = null,
+        $scale = null,
+        $unsigned = null,
+        $default = null,
+        $null = null,
+        $autoincrement = null
+    ) {
         // Protected
         $this->_base      = $base;
 
@@ -75,8 +83,8 @@ class Horde_Db_Adapter_Base_ColumnDefinition
     public function toSql()
     {
         $sql = $this->_base->quoteColumnName($this->_name) . ' ' . $this->getSqlType();
-        return $this->_addColumnOptions($sql, array('null'     => $this->_null,
-                                                    'default'  => $this->_default));
+        return $this->_addColumnOptions($sql, ['null'     => $this->_null,
+            'default'  => $this->_default]);
     }
 
     /**
@@ -259,8 +267,9 @@ class Horde_Db_Adapter_Base_ColumnDefinition
      */
     protected function _addColumnOptions($sql, $options)
     {
-        return $this->_base->addColumnOptions($sql,
-            array_merge($options, array('column' => $this))
+        return $this->_base->addColumnOptions(
+            $sql,
+            array_merge($options, ['column' => $this])
         );
     }
 }

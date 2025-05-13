@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2013-2021 Horde LLC (http://www.horde.org/)
  *
@@ -35,11 +36,11 @@ class Result extends BaseResult
      *
      * @var array
      */
-    protected $map = array(
+    protected $map = [
         Constants::FETCH_ASSOC => OCI_ASSOC,
         Constants::FETCH_NUM   => OCI_NUM,
-        Constants::FETCH_BOTH  => OCI_BOTH
-    );
+        Constants::FETCH_BOTH  => OCI_BOTH,
+    ];
 
     /**
      * Returns a row from a resultset.

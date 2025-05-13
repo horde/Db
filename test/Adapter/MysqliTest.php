@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Copyright 2007 Maintainable Software, LLC
  * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
@@ -37,6 +38,7 @@ use Horde\Test\TestCase;
  * @category   Horde
  * @package    Db
  * @subpackage UnitTests
+ * @coversNothing
  */
 class MysqliTest extends MysqlBase
 {
@@ -45,15 +47,15 @@ class MysqliTest extends MysqlBase
         return extension_loaded('mysqli');
     }
 
-    protected static function _getConnection($overrides = array())
+    protected static function _getConnection($overrides = [])
     {
         $config = TestCase::getConfig(
             'DB_ADAPTER_MYSQLI_TEST_CONFIG',
             null,
-            array('host' => 'localhost',
-                                                   'username' => '',
-                                                   'password' => '',
-                                                   'dbname' => 'test')
+            ['host' => 'localhost',
+                'username' => '',
+                'password' => '',
+                'dbname' => 'test']
         );
         if (isset($config['db']['adapter']['mysqli']['test']) &&
             is_array($config['db']['adapter']['mysqli']['test'])) {
@@ -70,7 +72,7 @@ class MysqliTest extends MysqlBase
         $cache = new Horde_Cache(new Horde_Cache_Storage_Mock());
         $conn->setCache($cache);
 
-        return array($conn, $cache);
+        return [$conn, $cache];
     }
 
 

@@ -6,11 +6,14 @@ use Horde\Test\TestCase;
 use SplFileObject;
 use Horde_Db_StatementParser;
 
+/**
+ * @coversNothing
+ */
 class StatementParserTest extends TestCase
 {
     public function testParserFindsMultilineCreateStatement()
     {
-        $expected = array(
+        $expected = [
             'DROP TABLE IF EXISTS `exp_actions`',
             'SET @saved_cs_client     = @@character_set_client',
             'SET character_set_client = utf8',
@@ -21,7 +24,7 @@ class StatementParserTest extends TestCase
               PRIMARY KEY  (`action_id`)
             ) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=latin1',
             'SET character_set_client = @saved_cs_client',
-        );
+        ];
         $this->assertParser($expected, 'drop_create_table.sql');
     }
 
