@@ -1,16 +1,18 @@
 ---
-3.0.0alpha5:
-  api: 3.0.0
+3.0.0-alpha5:
+  api: 3.0.0-alpha1
   state:
     release: alpha
     api: alpha
-  date: 2022-10-08
+  date: 2025-05-13
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |+
-    
-3.0.0alpha4:
+  notes: |
+    style: Apply php-cs-fixer
+    ci: Add php-cs-fixer preset
+    fix: Mysql and MariaDB no longer support aliasing utf8mb4 as utf8 and just fail on older configs
+3.0.0-alpha4:
   api: 3.0.0
   state:
     release: alpha
@@ -20,9 +22,10 @@
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
   notes: |
+    Original version string was 3.0.0alpha4
     [rla] Improved PHP 8.1 compatibility.
     |+
-3.0.0alpha3:
+3.0.0-alpha3:
   api: 3.0.0
   state:
     release: alpha
@@ -31,7 +34,9 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |+
+  notes: |-
+    Original version string was 3.0.0alpha3
+    |+
 2.4.2:
   api: 2.4.0
   state:
@@ -304,6 +309,45 @@
     uri: http://www.horde.org/licenses/bsd
   notes: |
     [mms] Use new Horde_Test layout.
+2.0.0-beta1:
+  api: 1.2.0
+  state:
+    release: beta
+    api: stable
+  date: 2012-07-19
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 2.0.0beta1
+    First beta release for Horde 5.
+    [jan] Allow for nested transactions.
+2.0.0-alpha1:
+  api: 1.2.0
+  state:
+    release: alpha
+    api: stable
+  date: 2012-07-05
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 2.0.0alpha1
+    First alpha release for Horde 5.
+2.0.0-RC1:
+  api: 1.2.0
+  state:
+    release: beta
+    api: stable
+  date: 2012-10-26
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 2.0.0RC1
+    [mms] Fix resetting postgresql error reporting.
+    [mms] Fix Horde_Db_Adapter_Base_Table#offsetExists().
+    [mms] Fix addLock() command.
 2.0.0:
   api: 1.2.0
   state:
@@ -315,42 +359,6 @@
     uri: http://www.horde.org/licenses/bsd
   notes: |
     First stable release for Horde 5.
-2.0.0RC1:
-  api: 1.2.0
-  state:
-    release: beta
-    api: stable
-  date: 2012-10-26
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mms] Fix resetting postgresql error reporting.
-    [mms] Fix Horde_Db_Adapter_Base_Table#offsetExists().
-    [mms] Fix addLock() command.
-2.0.0beta1:
-  api: 1.2.0
-  state:
-    release: beta
-    api: stable
-  date: 2012-07-19
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    First beta release for Horde 5.
-    [jan] Allow for nested transactions.
-2.0.0alpha1:
-  api: 1.2.0
-  state:
-    release: alpha
-    api: stable
-  date: 2012-07-05
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    First alpha release for Horde 5.
 1.2.2:
   api: 1.2.0
   state:
@@ -488,6 +496,58 @@
   notes: |
     [jan] Fix migration detection on Windows.
     [jan] Fix setting incorrect charset in PDO drivers.
+1.0.0-beta1:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-16
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 1.0.0beta1
+    Drop schema table when migrating down to schema version 0.
+    Don't try to create schema tables if they exist, to avoid irritating log entries.
+1.0.0-alpha1:
+  api: 1.0.0
+  state:
+    release: alpha
+    api: alpha
+  date: 2011-03-08
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 1.0.0alpha1
+    First alpha release for Horde 4.
+    Add support for adding autoincrement to a column.
+1.0.0-RC2:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-29
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 1.0.0RC2
+    Second release candidate for Horde 4.
+    [jan] Don't throw exception when setting port number while using localhost in PDO MySQL driver (Bug #9738).
+    [jan] Rename pseudo-type primaryKey to autoincrementKey.
+1.0.0-RC1:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-22
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    Original version string was 1.0.0RC1
+    First release candidate for Horde 4.
 1.0.0:
   api: 1.0.0
   state:
@@ -500,54 +560,6 @@
   notes: |
     First stable release for Horde 4.
     [jan] Add buildClause() from obsolete Horde_Sql.
-1.0.0RC2:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-29
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Second release candidate for Horde 4.
-    [jan] Don't throw exception when setting port number while using localhost in PDO MySQL driver (Bug #9738).
-    [jan] Rename pseudo-type primaryKey to autoincrementKey.
-1.0.0RC1:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-22
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    First release candidate for Horde 4.
-1.0.0beta1:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-16
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Drop schema table when migrating down to schema version 0.
-    Don't try to create schema tables if they exist, to avoid irritating log entries.
-1.0.0alpha1:
-  api: 1.0.0
-  state:
-    release: alpha
-    api: alpha
-  date: 2011-03-08
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    First alpha release for Horde 4.
-    Add support for adding autoincrement to a column.
 0.1.0:
   api: 0.1.0
   state:
