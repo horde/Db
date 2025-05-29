@@ -344,7 +344,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
             $typeSql
         );
         if ($type != 'autoincrementKey') {
-            $sql = $this->addColumnOptions($sql, $options);
+            $sql = $this->addColumnOptions($sql, $options, $typeSql);
         }
 
         $this->execute($sql);
@@ -355,7 +355,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
         string $type
         ){
         if (in_array (strtoupper($type), [
-            'TEXT', 'TINYTEXT', ' MEDIUMTEXT', 'LONGTEXT',
+            'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT',
             'BLOB', 'TINYBLOB', 'MEDIUMBLOB', 'LONGBLOB',
             'GEOMETRY',
             'JSON',
