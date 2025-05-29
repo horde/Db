@@ -550,7 +550,7 @@ class Schema extends BaseSchema
      *
      * @return string  The manipulated SQL definition.
      */
-    public function addColumnOptions($sql, $options)
+    public function addColumnOptions($sql, $options, string $sqlType = '')
     {
         $sql = parent::addColumnOptions($sql, $options);
         if (isset($options['after'])) {

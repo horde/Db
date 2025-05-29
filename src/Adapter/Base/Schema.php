@@ -1003,7 +1003,7 @@ abstract class Schema
      *
      * @return string  The manipulated SQL definition.
      */
-    public function addColumnOptions($sql, $options)
+    public function addColumnOptions($sql, $options, string $sqlType = '')
     {
         /* 'autoincrement' is not handled here - it varies too much between
          * DBs. Do autoincrement-specific handling in the driver. */

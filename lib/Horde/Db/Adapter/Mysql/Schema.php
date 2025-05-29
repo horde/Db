@@ -566,11 +566,14 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      *
      * @return string  The manipulated SQL definition.
      */
-    public function addColumnOptions($sql, $options)
+    public function addColumnOptions($sql, $options, string $sqlType = '')
     {
-        $sql = parent::addColumnOptions($sql, $options);
+        $sql = parent::addColumnOptions($sql, $options, $sqlType);
         if (isset($options['after'])) {
             $sql .= ' AFTER ' . $this->quoteColumnName($options['after']);
+        }
+        if (isset($options['default'])) {
+            $options['default'] = self::filterDefault($options['default'], $sqlType);
         }
         if (!empty($options['autoincrement'])) {
             $sql .= ' AUTO_INCREMENT';

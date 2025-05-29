@@ -638,20 +638,21 @@ abstract class Horde_Db_Adapter_Base_Schema
                 'unsigned'  => null],
             $options
         );
-
-        $sql = sprintf(
-            'ALTER TABLE %s ADD %s %s',
-            $this->quoteTableName($tableName),
-            $this->quoteColumnName($columnName),
-            $this->typeToSql(
+        $sqlType = $this->typeToSql(
                 $type,
                 $options['limit'],
                 $options['precision'],
                 $options['scale'],
                 $options['unsigned']
-            )
         );
-        $sql = $this->addColumnOptions($sql, $options);
+
+        $sql = sprintf(
+            'ALTER TABLE %s ADD %s %s',
+            $this->quoteTableName($tableName),
+            $this->quoteColumnName($columnName),
+            $sqlType
+        );
+        $sql = $this->addColumnOptions($sql, $options, $sqlType);
 
         return $this->execute($sql);
     }
@@ -986,7 +987,7 @@ abstract class Horde_Db_Adapter_Base_Schema
      *
      * @return string  The manipulated SQL definition.
      */
-    public function addColumnOptions($sql, $options)
+    public function addColumnOptions($sql, $options, string $sqlType = '')
     {
         /* 'autoincrement' is not handled here - it varies too much between
          * DBs. Do autoincrement-specific handling in the driver. */
