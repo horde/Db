@@ -999,7 +999,13 @@ abstract class Horde_Db_Adapter_Base_Schema
         if (isset($options['default'])) {
             $default = $options['default'];
             $column  = $options['column'] ?? null;
-            $sql .= ' DEFAULT ' . $this->quote($default, $column);
+            // If the default is a string that looks like an expression, do not try to quote it.
+            if (is_string($default) && (strlen($default) >= 4) && (substr($default, 0, 2) == '(\'') && (substr($default, -2, 2) == '\')')) {
+                // TODO: Emit some kind of feedback that a default was not quoted because it was an expression
+                // TODO: Mysql allows CURRENT_TIMESTAMP function as a default value for some field types, so we should not quote it.
+            } else {
+                 $sql .= ' DEFAULT ' . $this->quote($default, $column);
+            }
         }
 
         return $sql;

@@ -367,7 +367,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
                     /* Bug #15172 For mysql 8.0.13 and greater, the default value for TEXT, JSON and BLOB may only be stated as an expression but not as a literal.
                     Older mysql 8.x just don't allow defaults at all.
                     Modern mariadb versions seem to support both. */
-                    $default = "($default)";
+                    $default = "('$default')";
                 }
         }
         return $default;
@@ -568,12 +568,12 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function addColumnOptions($sql, $options, string $sqlType = '')
     {
+        if (isset($options['default']) and $sqlType != '') {
+            $options['default'] = self::filterDefault($options['default'], $sqlType);
+        }
         $sql = parent::addColumnOptions($sql, $options, $sqlType);
         if (isset($options['after'])) {
             $sql .= ' AFTER ' . $this->quoteColumnName($options['after']);
-        }
-        if (isset($options['default'])) {
-            $options['default'] = self::filterDefault($options['default'], $sqlType);
         }
         if (!empty($options['autoincrement'])) {
             $sql .= ' AUTO_INCREMENT';
