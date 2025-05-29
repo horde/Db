@@ -55,6 +55,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
      */
     public function makeColumn($name, $default, $sqlType = null, $null = true)
     {
+        $default = self::filterDefault($default, $sqlType);
         return new Horde_Db_Adapter_Mysql_Column($name, $default, $sqlType, $null);
     }
 
@@ -349,6 +350,28 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
         $this->execute($sql);
     }
 
+    public static function filterDefault(
+        ?string $default, 
+        string $type
+        ){
+        if (in_array (strtoupper($type), [
+            'TEXT', 'TINYTEXT', ' MEDIUMTEXT', 'LONGTEXT',
+            'BLOB', 'TINYBLOB', 'MEDIUMBLOB', 'LONGBLOB',
+            'GEOMETRY',
+            'JSON',
+            ])) {
+                if ($default === null || $default === 'NULL') {
+                    return $default;
+                }
+                if ($default[0] !== '(') {
+                    /* Bug #15172 For mysql 8.0.13 and greater, the default value for TEXT, JSON and BLOB may only be stated as an expression but not as a literal.
+                    Older mysql 8.x just don't allow defaults at all.
+                    Modern mariadb versions seem to support both. */
+                    $default = "($default)";
+                }
+        }
+        return $default;
+    }
     /**
      * Sets a new default value for a column.
      *
@@ -372,6 +395,7 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
             $this->quoteString($columnName)
         );
         $res = $this->selectOne($sql);
+        $default = self::filterDefault($default, $res['Type']);
         $column = $this->makeColumn($columnName, $res['Default'], $res['Type'], $res['Null'] == 'YES');
 
         $default = $this->quote($default, $column);
