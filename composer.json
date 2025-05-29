@@ -21,7 +21,7 @@
             "role": "lead"
         }
     ],
-    "time": "2025-05-13",
+    "time": "2025-05-29",
     "repositories": [],
     "require": {
         "php": "^7.4 || ^8",
@@ -55,7 +55,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Horde\\Db\\Test\\": "test/"
+            "Horde\\Db\\Test\\": "test/",
+            "Horde\\Db\\Test\\Fixtures\\": "test/fixtures/"
         }
     },
     "bin": [
@@ -63,5 +64,10 @@
     ],
     "config": {
         "allow-plugins": {}
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-FRAMEWORK_6_0": "3.x-dev"
+        }
     }
 }

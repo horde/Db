@@ -1,4 +1,18 @@
 ---
+3.0.0-alpha6:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-05-29
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: |
+    fix: Also apply defaults filter when changing an existing column's type
+    fix: Special case default field values must not be quoted if they are expressions
+    feat: Optionally supply sqlType to addColumnOptions
+    fix: #15172 Add a filter to support column defaults on mysql >= 8.0.13 for TEXT, BLOB and JSON format
 3.0.0-alpha5:
   api: 3.0.0-alpha1
   state:
