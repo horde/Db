@@ -1239,11 +1239,11 @@ class Horde_Db_Adapter_Postgresql_Schema extends Horde_Db_Adapter_Base_Schema
 
             // Return null if no results or multiple rows
             // (multiple rows means composite PK with multiple columns where autoincrement is not supported )
-            if (!$results || count($results) > 1) {
+            if (!$result || count($result) > 1) {
                 return [null, null];
             }
 
-            $result = $results[0];
+            $result = $result[0];
         }
 
         // Only warn about missing sequences for plain integer primary keys
