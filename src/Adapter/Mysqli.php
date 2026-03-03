@@ -170,7 +170,12 @@ class Mysqli extends Base
 
         // Set the default charset. http://dev.mysql.com/doc/refman/5.1/en/charset-connection.html
         if (!empty($config['charset'])) {
-            $this->schema->setCharset($config['charset']);
+            $charset = $config['charset'];
+            // Modern MySQL/MariaDB no longer alias utf8 to utf8mb4, auto-upgrade
+            if ($charset === 'utf8') {
+                $charset = 'utf8mb4';
+            }
+            $this->schema->setCharset($charset);
         }
 
         $this->hasMysqliFetchAll = function_exists('mysqli_fetch_all');
