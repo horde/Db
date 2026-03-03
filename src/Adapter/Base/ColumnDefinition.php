@@ -197,9 +197,9 @@ class ColumnDefinition
     }
 
     /**
-     * @param string $default
+     * @param string|null $default
      */
-    public function setDefault(string $default): void
+    public function setDefault(?string $default): void
     {
         $this->default = $default;
     }
@@ -213,49 +213,49 @@ class ColumnDefinition
     }
 
     /**
-     * @param int $limit
+     * @param int|null $limit
      */
-    public function setLimit(int $limit): void
+    public function setLimit(?int $limit): void
     {
         $this->limit = $limit;
     }
 
     /**
-     * @param int $precision
+     * @param int|null $precision
      */
-    public function setPrecision($precision): void
+    public function setPrecision(?int $precision): void
     {
         $this->precision = $precision;
     }
 
     /**
-     * @param int $scale
+     * @param int|null $scale
      */
-    public function setScale($scale): void
+    public function setScale(?int $scale): void
     {
         $this->scale = $scale;
     }
 
     /**
-     * @param bool $unsigned
+     * @param bool|null $unsigned
      */
-    public function setUnsigned($unsigned): void
+    public function setUnsigned(?bool $unsigned): void
     {
         $this->unsigned = $unsigned;
     }
 
     /**
-     * @param bool $null
+     * @param bool|null $null
      */
-    public function setNull(bool $null): void
+    public function setNull(?bool $null): void
     {
         $this->null = $null;
     }
 
     /**
-     * @param bool $autoincrement
+     * @param bool|null $autoincrement
      */
-    public function setAutoIncrement(bool $autoincrement): void
+    public function setAutoIncrement(?bool $autoincrement): void
     {
         $this->autoincrement = $autoincrement;
     }
