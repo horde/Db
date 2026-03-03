@@ -1,45 +1,45 @@
 <?php
 
+/**
+ * Copyright 2006-2026 Horde LLC (http://www.horde.org/)
+ *
+ * See the enclosed file LICENSE for license information (BSD). If you
+ * did not receive this file, see http://www.horde.org/licenses/bsd.
+ *
+ * This file has been split into two separate test files:
+ * - Psr0StatementParserTest.php - Tests the PSR-0 implementation (lib/)
+ * - Psr4StatementParserTest.php - Tests the PSR-4 implementation (src/)
+ *
+ * This file is kept for backward compatibility but contains no tests.
+ *
+ * @category Horde
+ * @package  Db
+ * @license  http://www.horde.org/licenses/bsd
+ * @deprecated Use Psr0StatementParserTest or Psr4StatementParserTest
+ */
+
+declare(strict_types=1);
+
 namespace Horde\Db\Test;
 
 use Horde\Test\TestCase;
-use SplFileObject;
-use Horde_Db_StatementParser;
 
 /**
+ * Deprecated: This test class has been split into PSR-0 and PSR-4 specific tests.
+ *
+ * @category Horde
+ * @package  Db
+ * @license  http://www.horde.org/licenses/bsd
+ * @deprecated Use Psr0StatementParserTest or Psr4StatementParserTest instead
  * @coversNothing
  */
 class StatementParserTest extends TestCase
 {
-    public function testParserFindsMultilineCreateStatement()
+    public function testDeprecationNotice(): void
     {
-        $expected = [
-            'DROP TABLE IF EXISTS `exp_actions`',
-            'SET @saved_cs_client     = @@character_set_client',
-            'SET character_set_client = utf8',
-            'CREATE TABLE `exp_actions` (
-              `action_id` int(4) unsigned NOT NULL auto_increment,
-              `class` varchar(50) NOT NULL,
-              `method` varchar(50) NOT NULL,
-              PRIMARY KEY  (`action_id`)
-            ) ENGINE=MyISAM AUTO_INCREMENT=20 DEFAULT CHARSET=latin1',
-            'SET character_set_client = @saved_cs_client',
-        ];
-        $this->assertParser($expected, 'drop_create_table.sql');
-    }
-
-    public function assertParser(array $expectedStatements, $filename)
-    {
-        $file = new SplFileObject(__DIR__ . '/fixtures/' . $filename, 'r');
-        $parser = new Horde_Db_StatementParser($file);
-
-        foreach ($expectedStatements as $i => $expected) {
-            // Strip any whitespace before comparing the strings.
-            $this->assertEquals(
-                preg_replace('/\s/', '', $expected),
-                preg_replace('/\s/', '', $parser->next()),
-                "Parser differs on statement #$i"
-            );
-        }
+        $this->markTestSkipped(
+            'This test class has been split into Psr0StatementParserTest and Psr4StatementParserTest. '
+            . 'Please use those classes directly.'
+        );
     }
 }
