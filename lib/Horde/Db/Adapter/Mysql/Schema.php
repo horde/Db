@@ -351,24 +351,24 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
     }
 
     public static function filterDefault(
-        ?string $default, 
+        ?string $default,
         string $type
-        ){
-        if (in_array (strtoupper($type), [
+    ) {
+        if (in_array(strtoupper($type), [
             'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT',
             'BLOB', 'TINYBLOB', 'MEDIUMBLOB', 'LONGBLOB',
             'GEOMETRY',
             'JSON',
-            ])) {
-                if ($default === null || $default === 'NULL') {
-                    return $default;
-                }
-                if ($default[0] !== '(') {
-                    /* Bug #15172 For mysql 8.0.13 and greater, the default value for TEXT, JSON and BLOB may only be stated as an expression but not as a literal.
-                    Older mysql 8.x just don't allow defaults at all.
-                    Modern mariadb versions seem to support both. */
-                    $default = "('$default')";
-                }
+        ])) {
+            if ($default === null || $default === 'NULL') {
+                return $default;
+            }
+            if ($default[0] !== '(') {
+                /* Bug #15172 For mysql 8.0.13 and greater, the default value for TEXT, JSON and BLOB may only be stated as an expression but not as a literal.
+                Older mysql 8.x just don't allow defaults at all.
+                Modern mariadb versions seem to support both. */
+                $default = "('$default')";
+            }
         }
         return $default;
     }
@@ -700,9 +700,11 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
 
     /**
      */
-    public function limitedUpdateConditions($whereSql, $quotedTableName,
-        $quotedPrimaryKey)
-    {
+    public function limitedUpdateConditions(
+        $whereSql,
+        $quotedTableName,
+        $quotedPrimaryKey
+    ) {
         return $whereSql;
     }
 }

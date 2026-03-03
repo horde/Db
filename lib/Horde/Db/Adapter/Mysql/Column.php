@@ -85,8 +85,8 @@ class Horde_Db_Adapter_Mysql_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _isMissingDefaultForgedAsEmptyString()
     {
-        return !$this->_null && $this->_originalDefault == '' &&
-            !in_array($this->_type, $this->_hasEmptyStringDefault);
+        return !$this->_null && $this->_originalDefault == ''
+            && !in_array($this->_type, $this->_hasEmptyStringDefault);
     }
 
 }

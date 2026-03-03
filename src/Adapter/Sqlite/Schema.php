@@ -696,7 +696,9 @@ class Schema extends BaseSchema
             $from,
             $to,
             array_map(
-                function ($c) { return $c->getName(); },
+                function ($c) {
+                    return $c->getName();
+                },
                 iterator_to_array($definition)
             ),
             $options['rename'] ?? []

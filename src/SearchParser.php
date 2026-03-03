@@ -173,8 +173,8 @@ class SearchParser
             return $lhs;
         }
 
-        if (substr($tokens[0], 0, 1) != '=' &&
-            substr($tokens[0], 0, 2) != '=.') {
+        if (substr($tokens[0], 0, 1) != '='
+            && substr($tokens[0], 0, 2) != '=.') {
             throw new DbException('Expected bare word or quoted search term');
         }
 

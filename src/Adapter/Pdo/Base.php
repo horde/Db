@@ -85,8 +85,8 @@ abstract class Base extends BaseAdapter
     {
         $this->lastQuery = $sql = 'SELECT 1';
         try {
-            return isset($this->connection) &&
-                $this->connection->query($sql);
+            return isset($this->connection)
+                && $this->connection->query($sql);
         } catch (PDOException $e) {
             throw new DbException($e);
         }

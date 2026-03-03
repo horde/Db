@@ -74,8 +74,8 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
     {
         $this->_lastQuery = $sql = 'SELECT 1';
         try {
-            return isset($this->_connection) &&
-                $this->_connection->query($sql);
+            return isset($this->_connection)
+                && $this->_connection->query($sql);
         } catch (PDOException $e) {
             throw new Horde_Db_Exception($e);
         }

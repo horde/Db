@@ -686,7 +686,9 @@ class Horde_Db_Adapter_Sqlite_Schema extends Horde_Db_Adapter_Base_Schema
             $from,
             $to,
             array_map(
-                function ($c) { return $c->getName(); },
+                function ($c) {
+                    return $c->getName();
+                },
                 iterator_to_array($definition)
             ),
             $options['rename'] ?? []

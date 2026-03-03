@@ -698,8 +698,8 @@ END;
     public function removeAutoincrementTrigger($tableName, $columnName = null)
     {
         $pk = $this->primaryKey($tableName);
-        if (count($pk->columns) == 1 &&
-            (!$columnName || $pk->columns[0] == $columnName)) {
+        if (count($pk->columns) == 1
+            && (!$columnName || $pk->columns[0] == $columnName)) {
             $prefix = $tableName . '_' . $pk->columns[0];
             try {
                 $this->adapter->execute(sprintf(
@@ -880,10 +880,10 @@ END;
             $sql .= ' DEFAULT ' . $this->quote($default, $column);
         }
 
-        if (isset($options['null']) &&
-            (!isset($options['column']) ||
-             ($options['column']->getType() != 'text' &&
-              $options['column']->getType() != 'binary'))) {
+        if (isset($options['null'])
+            && (!isset($options['column'])
+             || ($options['column']->getType() != 'text'
+              && $options['column']->getType() != 'binary'))) {
             if ($options['null']) {
                 $sql .= ' NULL';
             } else {

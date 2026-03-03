@@ -39,8 +39,8 @@ class MysqlTest extends MysqlBase
 {
     protected static function _available()
     {
-        return extension_loaded('pdo') &&
-            in_array('mysql', PDO::getAvailableDrivers());
+        return extension_loaded('pdo')
+            && in_array('mysql', PDO::getAvailableDrivers());
     }
 
     protected static function _getConnection($overrides = [])

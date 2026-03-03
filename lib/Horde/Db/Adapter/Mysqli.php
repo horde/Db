@@ -449,8 +449,8 @@ class Horde_Db_Adapter_Mysqli extends Horde_Db_Adapter_Base
             }
         }
 
-        if (!empty($this->_config['host']) &&
-            $this->_config['host'] == 'localhost') {
+        if (!empty($this->_config['host'])
+            && $this->_config['host'] == 'localhost') {
             $this->_config['host'] = '127.0.0.1';
         }
 

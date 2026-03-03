@@ -95,8 +95,8 @@ class Horde_Db_Adapter_Oracle_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _setSimplifiedType()
     {
-        if (Horde_String::lower($this->_sqlType) == 'number' &&
-            $this->_precision == 1) {
+        if (Horde_String::lower($this->_sqlType) == 'number'
+            && $this->_precision == 1) {
             $this->_type = 'boolean';
             return;
         }

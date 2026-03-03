@@ -107,8 +107,8 @@ class Schema extends BaseSchema
             return parent::quote($value, $column);
         }
 
-        if (is_string($value) &&
-            $column->getType() == 'binary') {
+        if (is_string($value)
+            && $column->getType() == 'binary') {
             return $this->quoteBinary($value);
         }
         if (is_string($value) && $column->getSqlType() == 'xml') {
@@ -1261,9 +1261,9 @@ class Schema extends BaseSchema
         }
 
         // Only warn about missing sequences for plain integer primary keys
-        if (isset($result['data_type']) &&
-            (strpos($result['data_type'], 'int') !== false ||
-             strpos($result['data_type'], 'serial') !== false)) {
+        if (isset($result['data_type'])
+            && (strpos($result['data_type'], 'int') !== false
+             || strpos($result['data_type'], 'serial') !== false)) {
             if ($this->_logger && !$result['relname']) {
                 $this->_logger->warn(sprintf('%s has Primary key %s with no default sequence', $table, $result['attname']));
             }

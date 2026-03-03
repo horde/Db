@@ -41,8 +41,8 @@ class SqliteTest extends TestBase
     public static function setUpBeforeClass(): void
     {
         self::$_reason = 'The sqlite adapter is not available';
-        if (extension_loaded('pdo') &&
-            in_array('sqlite', PDO::getAvailableDrivers())) {
+        if (extension_loaded('pdo')
+            && in_array('sqlite', PDO::getAvailableDrivers())) {
             self::$_skip = false;
             [$conn, ] = static::_getConnection();
             $conn->disconnect();

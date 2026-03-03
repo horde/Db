@@ -53,8 +53,8 @@ abstract class TestBase extends TestCase
 
     protected function setUp(): void
     {
-        if (self::$_skip ||
-            !($res = static::_getConnection())) {
+        if (self::$_skip
+            || !($res = static::_getConnection())) {
             $this->markTestSkipped(self::$_reason);
         }
 
@@ -782,8 +782,8 @@ abstract class TestBase extends TestCase
 
     public function testIndexNameByMultiColumn()
     {
-        $name = $this->conn->indexName('sports', ['column' =>
-                                                ['name', 'is_college']]);
+        $name = $this->conn->indexName('sports', ['column'
+                                                => ['name', 'is_college']]);
         $this->assertEquals('index_sports_on_name_and_is_college', $name);
     }
 

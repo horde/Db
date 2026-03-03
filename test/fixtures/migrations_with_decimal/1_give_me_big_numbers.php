@@ -5,11 +5,11 @@ class GiveMeBigNumbers extends Horde_Db_Migration_Base
     public function up()
     {
         $table = $this->createTable('big_numbers');
-            $table->column('bank_balance',        'decimal', array('precision' => 10, 'scale' => 2));
-            $table->column('big_bank_balance',    'decimal', array('precision' => 15, 'scale' => 2));
-            $table->column('world_population',    'decimal', array('precision' => 10));
-            $table->column('my_house_population', 'decimal', array('precision' => 2));
-            $table->column('value_of_e',          'decimal');
+        $table->column('bank_balance', 'decimal', ['precision' => 10, 'scale' => 2]);
+        $table->column('big_bank_balance', 'decimal', ['precision' => 15, 'scale' => 2]);
+        $table->column('world_population', 'decimal', ['precision' => 10]);
+        $table->column('my_house_population', 'decimal', ['precision' => 2]);
+        $table->column('value_of_e', 'decimal');
         $table->end();
     }
 

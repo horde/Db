@@ -333,8 +333,8 @@ class Horde_Db_Migration_Migrator
             return false;
         }
 
-        return ($this->_isUp()   && $version - 1 >= $this->_targetVersion) ||
-               ($this->_isDown() && $version     <= $this->_targetVersion);
+        return ($this->_isUp()   && $version - 1 >= $this->_targetVersion)
+               || ($this->_isDown() && $version     <= $this->_targetVersion);
     }
 
     /**
@@ -344,7 +344,7 @@ class Horde_Db_Migration_Migrator
      */
     protected function _isIrrelevantMigration($version)
     {
-        return ($this->_isUp()   && $version <= self::getCurrentVersion()) ||
-               ($this->_isDown() && $version >  self::getCurrentVersion());
+        return ($this->_isUp()   && $version <= self::getCurrentVersion())
+               || ($this->_isDown() && $version >  self::getCurrentVersion());
     }
 }

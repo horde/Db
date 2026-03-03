@@ -533,17 +533,17 @@ abstract class Horde_Db_Adapter_Base_Schema
         $tableDefinition = $this->makeTableDefinition($name, $this, $options);
 
         if (isset($options['autoincrementKey'])) {
-            if ($options['autoincrementKey'] === true ||
-                $options['autoincrementKey'] === 'true' ||
-                $options['autoincrementKey'] === 't' ||
-                $options['autoincrementKey'] === 1 ||
-                $options['autoincrementKey'] === '1') {
+            if ($options['autoincrementKey'] === true
+                || $options['autoincrementKey'] === 'true'
+                || $options['autoincrementKey'] === 't'
+                || $options['autoincrementKey'] === 1
+                || $options['autoincrementKey'] === '1') {
                 $pk = 'id';
-            } elseif ($options['autoincrementKey'] === false ||
-                      $options['autoincrementKey'] === 'false' ||
-                      $options['autoincrementKey'] === 'f' ||
-                      $options['autoincrementKey'] === 0 ||
-                      $options['autoincrementKey'] === '0') {
+            } elseif ($options['autoincrementKey'] === false
+                      || $options['autoincrementKey'] === 'false'
+                      || $options['autoincrementKey'] === 'f'
+                      || $options['autoincrementKey'] === 0
+                      || $options['autoincrementKey'] === '0') {
                 $pk = false;
             } else {
                 $pk = $options['autoincrementKey'];
@@ -639,11 +639,11 @@ abstract class Horde_Db_Adapter_Base_Schema
             $options
         );
         $sqlType = $this->typeToSql(
-                $type,
-                $options['limit'],
-                $options['precision'],
-                $options['scale'],
-                $options['unsigned']
+            $type,
+            $options['limit'],
+            $options['precision'],
+            $options['scale'],
+            $options['unsigned']
         );
 
         $sql = sprintf(
@@ -945,9 +945,9 @@ abstract class Horde_Db_Adapter_Base_Schema
         }
 
         $sql = is_array($native) ? $native['name'] : $native;
-        if ($type == 'decimal' ||
-            is_array($native) && (isset($native['precision']) || isset($native['scale'])) ||
-            isset($precision) || isset($scale)) {
+        if ($type == 'decimal'
+            || is_array($native) && (isset($native['precision']) || isset($native['scale']))
+            || isset($precision) || isset($scale)) {
             $nativePrec  = $native['precision'] ?? null;
             $nativeScale = $native['scale'] ?? null;
 
@@ -1004,7 +1004,7 @@ abstract class Horde_Db_Adapter_Base_Schema
                 // TODO: Emit some kind of feedback that a default was not quoted because it was an expression
                 // TODO: Mysql allows CURRENT_TIMESTAMP function as a default value for some field types, so we should not quote it.
             } else {
-                 $sql .= ' DEFAULT ' . $this->quote($default, $column);
+                $sql .= ' DEFAULT ' . $this->quote($default, $column);
             }
         }
 

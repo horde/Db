@@ -106,8 +106,8 @@ class Mysql extends Base
             unset($this->config['socket']);
         }
 
-        if (!empty($this->config['host']) &&
-            $this->config['host'] == 'localhost') {
+        if (!empty($this->config['host'])
+            && $this->config['host'] == 'localhost') {
             $this->config['host'] = '127.0.0.1';
         }
 
@@ -132,8 +132,8 @@ class Mysql extends Base
         }
 
         if (isset($dsnOpts['unix_socket'])) {
-            if (!empty($dsnOpts['host']) ||
-                !empty($dsnOpts['port'])) {
+            if (!empty($dsnOpts['host'])
+                || !empty($dsnOpts['port'])) {
                 throw new DbException('Host and port must not be set if using a UNIX socket');
             }
         }

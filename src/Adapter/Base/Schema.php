@@ -550,17 +550,17 @@ abstract class Schema
         $tableDefinition = $this->makeTableDefinition($name, $this, $options);
 
         if (isset($options['autoincrementKey'])) {
-            if ($options['autoincrementKey'] === true ||
-                $options['autoincrementKey'] === 'true' ||
-                $options['autoincrementKey'] === 't' ||
-                $options['autoincrementKey'] === 1 ||
-                $options['autoincrementKey'] === '1') {
+            if ($options['autoincrementKey'] === true
+                || $options['autoincrementKey'] === 'true'
+                || $options['autoincrementKey'] === 't'
+                || $options['autoincrementKey'] === 1
+                || $options['autoincrementKey'] === '1') {
                 $pk = 'id';
-            } elseif ($options['autoincrementKey'] === false ||
-                      $options['autoincrementKey'] === 'false' ||
-                      $options['autoincrementKey'] === 'f' ||
-                      $options['autoincrementKey'] === 0 ||
-                      $options['autoincrementKey'] === '0') {
+            } elseif ($options['autoincrementKey'] === false
+                      || $options['autoincrementKey'] === 'false'
+                      || $options['autoincrementKey'] === 'f'
+                      || $options['autoincrementKey'] === 0
+                      || $options['autoincrementKey'] === '0') {
                 $pk = false;
             } else {
                 $pk = $options['autoincrementKey'];
@@ -961,9 +961,9 @@ abstract class Schema
         }
 
         $sql = is_array($native) ? $native['name'] : $native;
-        if ($type == 'decimal' ||
-            is_array($native) && (isset($native['precision']) || isset($native['scale'])) ||
-            isset($precision) || isset($scale)) {
+        if ($type == 'decimal'
+            || is_array($native) && (isset($native['precision']) || isset($native['scale']))
+            || isset($precision) || isset($scale)) {
             $nativePrec  = $native['precision'] ?? null;
             $nativeScale = $native['scale'] ?? null;
 

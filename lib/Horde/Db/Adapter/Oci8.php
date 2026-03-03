@@ -314,8 +314,8 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
                ? OCI_NO_AUTO_COMMIT
                : OCI_COMMIT_ON_SUCCESS
             );
-        if (!$stmt ||
-            !@oci_execute($stmt, $flags)) {
+        if (!$stmt
+            || !@oci_execute($stmt, $flags)) {
             $error = oci_error($stmt ?: $this->_connection);
             if ($stmt) {
                 oci_free_statement($stmt);
@@ -479,8 +479,8 @@ class Horde_Db_Adapter_Oci8 extends Horde_Db_Adapter_Base
     {
         $blobs = $locators = [];
         foreach ($fields as $column => &$field) {
-            if ($field instanceof Horde_Db_Value_Binary ||
-                $field instanceof Horde_Db_Value_Text) {
+            if ($field instanceof Horde_Db_Value_Binary
+                || $field instanceof Horde_Db_Value_Text) {
                 $blobs[$this->quoteColumnName($column)] = $field;
                 $locators[] = ':' . $this->quoteColumnName($column);
                 $field = $field instanceof Horde_Db_Value_Text
