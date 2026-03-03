@@ -1015,7 +1015,21 @@ abstract class Schema
         if (isset($options['default'])) {
             $default = $options['default'];
             $column  = $options['column'] ?? null;
-            $sql .= ' DEFAULT ' . $this->quote($default, $column);
+
+            // Check if default is an expression (e.g., "('value')") - don't quote it
+            // MySQL 8.0.13+ requires TEXT/BLOB/JSON defaults as expressions
+            $isExpression = is_string($default) &&
+                           strlen($default) >= 4 &&
+                           substr($default, 0, 2) === '(\'' &&
+                           substr($default, -2) === '\')';
+
+            if ($isExpression) {
+                // Expression default - use as-is without quoting
+                $sql .= ' DEFAULT ' . $default;
+            } else {
+                // Regular literal default - quote it
+                $sql .= ' DEFAULT ' . $this->quote($default, $column);
+            }
         }
 
         return $sql;

@@ -63,7 +63,60 @@ class Schema extends BaseSchema
      */
     public function makeColumn($name, $default, $sqlType = null, $null = true)
     {
+        $default = self::filterDefault($default, $sqlType);
         return new Column($name, $default, $sqlType, $null);
+    }
+
+    /**
+     * Filter default values for TEXT, BLOB, JSON, and GEOMETRY columns.
+     *
+     * MySQL 8.0.13+ requires default values for TEXT, BLOB, JSON, and GEOMETRY
+     * columns to be specified as expressions, not literals. This method wraps
+     * literal default values in expression syntax: ('value') instead of 'value'.
+     *
+     * @param string|null $default  The default value to filter.
+     * @param string|null $type     The SQL type of the column.
+     *
+     * @return string|null  The filtered default value.
+     *
+     * @see https://bugs.horde.org/ticket/15172
+     * @since Horde_Db 3.0.0
+     */
+    public static function filterDefault(?string $default, ?string $type): ?string
+    {
+        if ($type === null) {
+            return $default;
+        }
+
+        // Check if this is a type that requires expression defaults
+        $typeUpper = strtoupper($type);
+        $requiresExpression = in_array($typeUpper, [
+            'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT',
+            'BLOB', 'TINYBLOB', 'MEDIUMBLOB', 'LONGBLOB',
+            'GEOMETRY',
+            'JSON',
+        ]);
+
+        if (!$requiresExpression) {
+            return $default;
+        }
+
+        // NULL and 'NULL' pass through unchanged
+        if ($default === null || $default === 'NULL') {
+            return $default;
+        }
+
+        // If already wrapped in expression syntax, don't double-wrap
+        if (strlen($default) >= 4 && $default[0] === '(' && substr($default, -1) === ')') {
+            return $default;
+        }
+
+        // Wrap in expression syntax for MySQL 8.0.13+
+        // Bug #15172: For MySQL 8.0.13 and greater, the default value for TEXT,
+        // JSON, and BLOB may only be stated as an expression but not as a literal.
+        // Older MySQL 8.x don't allow defaults at all.
+        // Modern MariaDB versions support both formats.
+        return "('" . $default . "')";
     }
 
 
@@ -351,7 +404,7 @@ class Schema extends BaseSchema
             $typeSql
         );
         if ($type != 'autoincrementKey') {
-            $sql = $this->addColumnOptions($sql, $options);
+            $sql = $this->addColumnOptions($sql, $options, $typeSql);
         }
 
         $this->adapter->execute($sql);
@@ -552,6 +605,11 @@ class Schema extends BaseSchema
      */
     public function addColumnOptions($sql, $options, string $sqlType = '')
     {
+        // Apply default value filter before calling parent
+        if (isset($options['default']) && $sqlType !== '') {
+            $options['default'] = self::filterDefault($options['default'], $sqlType);
+        }
+
         $sql = parent::addColumnOptions($sql, $options);
         if (isset($options['after'])) {
             $sql .= ' AFTER ' . $this->quoteColumnName($options['after']);
