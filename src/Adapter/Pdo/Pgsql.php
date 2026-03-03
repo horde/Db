@@ -174,9 +174,9 @@ class Pgsql extends Base
 
         // If a pk is given, fallback to default sequence name.
         // Don't fetch last insert id for a table without a pk.
-        if ($pk &&
-            ($sequenceName ||
-             $sequenceName = $this->schema->defaultSequenceName($table, $pk))) {
+        if ($pk
+            && ($sequenceName
+             || $sequenceName = $this->schema->defaultSequenceName($table, $pk))) {
             $this->schema->resetPkSequence($table, $pk, $sequenceName);
             return $this->lastInsertId($table, $sequenceName);
         }

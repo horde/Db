@@ -168,9 +168,9 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
 
         // If a pk is given, fallback to default sequence name.
         // Don't fetch last insert id for a table without a pk.
-        if ($pk &&
-            ($sequenceName ||
-             $sequenceName = $this->defaultSequenceName($table, $pk))) {
+        if ($pk
+            && ($sequenceName
+             || $sequenceName = $this->defaultSequenceName($table, $pk))) {
             $this->resetPkSequence($table, $pk, $sequenceName);
             return $this->_lastInsertId($table, $sequenceName);
         }

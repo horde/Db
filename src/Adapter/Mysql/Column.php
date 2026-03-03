@@ -90,7 +90,7 @@ class Column extends BaseColumn
      */
     protected function isMissingDefaultForgedAsEmptyString()
     {
-        return !$this->null && $this->originalDefault == '' &&
-            !in_array($this->type, $this->hasEmptyStringDefault);
+        return !$this->null && $this->originalDefault == ''
+            && !in_array($this->type, $this->hasEmptyStringDefault);
     }
 }

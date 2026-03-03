@@ -55,8 +55,8 @@ class Oci8Test extends TestBase
                 'password' => '',
                 'dbname' => 'test']
         );
-        if (isset($config['db']['adapter']['oci8']['test']) &&
-            is_array($config['db']['adapter']['oci8']['test'])) {
+        if (isset($config['db']['adapter']['oci8']['test'])
+            && is_array($config['db']['adapter']['oci8']['test'])) {
             $config = $config['db']['adapter']['oci8']['test'];
         } else {
             self::$_skip = true;
@@ -255,8 +255,8 @@ class Oci8Test extends TestBase
 
     public function testIndexNameByMultiColumn()
     {
-        $name = $this->conn->indexName('sports', ['column' =>
-                                                ['name', 'is_college']]);
+        $name = $this->conn->indexName('sports', ['column'
+                                                => ['name', 'is_college']]);
         $this->assertEquals('ind_sports_5ca2d9c7', $name);
     }
 

@@ -348,8 +348,8 @@ class Migrator
             return false;
         }
 
-        return ($this->isUp()   && $version - 1 >= $this->targetVersion) ||
-               ($this->isDown() && $version     <= $this->targetVersion);
+        return ($this->isUp()   && $version - 1 >= $this->targetVersion)
+               || ($this->isDown() && $version     <= $this->targetVersion);
     }
 
     /**
@@ -359,7 +359,7 @@ class Migrator
      */
     protected function isIrrelevantMigration($version)
     {
-        return ($this->isUp()   && $version <= self::getCurrentVersion()) ||
-               ($this->isDown() && $version >  self::getCurrentVersion());
+        return ($this->isUp()   && $version <= self::getCurrentVersion())
+               || ($this->isDown() && $version >  self::getCurrentVersion());
     }
 }

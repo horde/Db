@@ -233,9 +233,9 @@ class Horde_Db_Adapter_Base_Column
      */
     public function stringToDate($string)
     {
-        if (empty($string) ||
+        if (empty($string)
             // preserve '0000-00-00' (http://bugs.php.net/bug.php?id=45647)
-            preg_replace('/[^\d]/', '', $string) == 0) {
+            || preg_replace('/[^\d]/', '', $string) == 0) {
             return null;
         }
 
@@ -251,9 +251,9 @@ class Horde_Db_Adapter_Base_Column
      */
     public function stringToTime($string)
     {
-        if (empty($string) ||
+        if (empty($string)
             // preserve '0000-00-00 00:00:00' (http://bugs.php.net/bug.php?id=45647)
-            preg_replace('/[^\d]/', '', $string) == 0) {
+            || preg_replace('/[^\d]/', '', $string) == 0) {
             return null;
         }
 

@@ -100,8 +100,8 @@ class Column extends BaseColumn
      */
     protected function setSimplifiedType()
     {
-        if (Horde_String::lower($this->sqlType) == 'number' &&
-            $this->precision == 1) {
+        if (Horde_String::lower($this->sqlType) == 'number'
+            && $this->precision == 1) {
             $this->type = 'boolean';
             return;
         }

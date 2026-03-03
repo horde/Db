@@ -445,8 +445,8 @@ class Mysqli extends Base
             }
         }
 
-        if (!empty($this->config['host']) &&
-            $this->config['host'] == 'localhost') {
+        if (!empty($this->config['host'])
+            && $this->config['host'] == 'localhost') {
             $this->config['host'] = '127.0.0.1';
         }
 

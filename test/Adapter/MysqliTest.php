@@ -57,8 +57,8 @@ class MysqliTest extends MysqlBase
                 'password' => '',
                 'dbname' => 'test']
         );
-        if (isset($config['db']['adapter']['mysqli']['test']) &&
-            is_array($config['db']['adapter']['mysqli']['test'])) {
+        if (isset($config['db']['adapter']['mysqli']['test'])
+            && is_array($config['db']['adapter']['mysqli']['test'])) {
             $config = $config['db']['adapter']['mysqli']['test'];
         } else {
             self::$_skip = true;

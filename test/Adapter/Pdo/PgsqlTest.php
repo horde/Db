@@ -42,8 +42,8 @@ class PgsqlTest extends TestBase
     public static function setUpBeforeClass(): void
     {
         self::$_reason = 'The pgsql adapter is not available';
-        if (extension_loaded('pdo') &&
-            in_array('pgsql', PDO::getAvailableDrivers())) {
+        if (extension_loaded('pdo')
+            && in_array('pgsql', PDO::getAvailableDrivers())) {
             self::$_skip = false;
             [$conn, ] = static::_getConnection();
             if ($conn) {

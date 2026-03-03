@@ -327,8 +327,8 @@ class Oci8 extends Base
                ? OCI_NO_AUTO_COMMIT
                : OCI_COMMIT_ON_SUCCESS
             );
-        if (!$stmt ||
-            !@oci_execute($stmt, $flags)) {
+        if (!$stmt
+            || !@oci_execute($stmt, $flags)) {
             $error = oci_error($stmt ?: $this->connection);
             if ($stmt) {
                 oci_free_statement($stmt);
@@ -492,8 +492,8 @@ class Oci8 extends Base
     {
         $blobs = $locators = [];
         foreach ($fields as $column => &$field) {
-            if ($field instanceof Binary ||
-                $field instanceof Text) {
+            if ($field instanceof Binary
+                || $field instanceof Text) {
                 $blobs[$this->quoteColumnName($column)] = $field;
                 $locators[] = ':' . $this->quoteColumnName($column);
                 $field = $field instanceof Text
