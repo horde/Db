@@ -197,9 +197,9 @@ class ColumnDefinition
     }
 
     /**
-     * @param string|null $default
+     * @param string|int|float|bool|null $default
      */
-    public function setDefault(?string $default): void
+    public function setDefault(string|int|float|bool|null $default): void
     {
         $this->default = $default;
     }
