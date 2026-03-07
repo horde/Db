@@ -47,6 +47,9 @@ class Horde_Db_Adapter_Sqlite_Column extends Horde_Db_Adapter_Base_Column
 
     public function binaryToString($value)
     {
+        if ($value === null) {
+            return null;
+        }
         return str_replace(['%00', '%25'], ["\0", '%'], $value);
     }
 
