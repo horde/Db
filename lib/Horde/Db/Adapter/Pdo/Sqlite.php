@@ -183,11 +183,11 @@ class Horde_Db_Adapter_Pdo_Sqlite extends Horde_Db_Adapter_Pdo_Base
     protected function _catchSchemaChanges($method, $args = [])
     {
         try {
-            return call_user_func_array([$this, "parent::$method"], $args);
+            return parent::$method(...$args);
         } catch (Exception $e) {
             if (preg_match('/database schema has changed/i', $e->getMessage())) {
                 $this->reconnect();
-                return call_user_func_array([$this, "parent::$method"], $args);
+                return parent::$method(...$args);
             } else {
                 throw $e;
             }
