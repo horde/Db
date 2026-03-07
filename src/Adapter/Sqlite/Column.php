@@ -52,6 +52,9 @@ class Column extends BaseColumn
 
     public function binaryToString($value)
     {
+        if ($value === null) {
+            return null;
+        }
         return str_replace(['%00', '%25'], ["\0", '%'], $value);
     }
 
