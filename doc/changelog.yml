@@ -1,4 +1,32 @@
 ---
+3.0.0-alpha7:
+  api: 3.0.0-alpha7
+  state:
+    release: alpha
+    api: alpha
+  date: 2026-03-07
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    fix(sqlite): handle null value in _unquote/unquote methods
+    fix(sqlite): handle null value in binaryToString
+    test(sqlite): add unit tests for _catchSchemaChanges method
+    fix(sqlite): replace deprecated parent:: callable syntax
+    remove: broken ExpressionDefaultIntegrationTest (requires TestBase refactor)
+    fix(mysql): auto-upgrade utf8 charset to utf8mb4
+    feat(mysql): add TEXT/BLOB/JSON default value expression support
+    feat(adapter): add CapabilityDetection interface for API compatibility
+    feat(mysql): add typed ServerInfo class for feature detection
+    test: add Value/Lob unit tests
+    test: add SplitRead adapter unit tests
+    test: add ColumnDefinition unit tests
+    test: add comprehensive SearchParser unit tests
+    fix(columndefinition): accept mixed types for setDefault to preserve boolean values
+    fix(columndefinition): add nullable type hints for PHP 8.2 compatibility
+    test(parser): split StatementParser test for PSR-0 and PSR-4
+    chore(qc): run quality control fixes
+    Update Schema.php
 3.0.0-alpha6:
   api: 3.0.0-alpha1
   state:
