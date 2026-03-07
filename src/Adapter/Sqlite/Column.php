@@ -85,6 +85,10 @@ class Column extends BaseColumn
      */
     protected function unquote($string)
     {
+        if ($string === null) {
+            return null;
+        }
+
         $first = substr($string, 0, 1);
         if ($first == "'" || $first == '"') {
             $string = substr($string, 1);
