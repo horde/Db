@@ -1,4 +1,4 @@
-.DS_Store
+B.DS_Store
 .buildpath
 .cache
 .project
@@ -49,3 +49,4 @@ run-tests.log
 /phpstan.neon
 # PHPStan cache directory
 /.phpstan.cache/
+composer.lock
