@@ -1,4 +1,16 @@
 ---
+3.0.0-alpha8:
+  api: 3.0.0-alpha8
+  state:
+    release: alpha
+    api: alpha
+  date: 2026-03-15
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    chore(gitignore) Add composer.lock to ignore list
+    fix: composer.lock shouldn't be versioned
 3.0.0-alpha7:
   api: 3.0.0-alpha7
   state:
