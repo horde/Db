@@ -351,16 +351,21 @@ class Horde_Db_Adapter_Mysql_Schema extends Horde_Db_Adapter_Base_Schema
     }
 
     public static function filterDefault(
-        ?string $default,
+        string|int|float|bool|null $default,
         string $type
     ) {
+
+        if (!is_string($default)) {
+            return $default;
+        }
+
         if (in_array(strtoupper($type), [
             'TEXT', 'TINYTEXT', 'MEDIUMTEXT', 'LONGTEXT',
             'BLOB', 'TINYBLOB', 'MEDIUMBLOB', 'LONGBLOB',
             'GEOMETRY',
             'JSON',
         ])) {
-            if ($default === null || $default === 'NULL') {
+            if ($default === 'NULL') {
                 return $default;
             }
             if ($default[0] !== '(') {

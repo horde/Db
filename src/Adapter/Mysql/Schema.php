@@ -82,9 +82,12 @@ class Schema extends BaseSchema
      * @see https://bugs.horde.org/ticket/15172
      * @since Horde_Db 3.0.0
      */
-    public static function filterDefault(?string $default, ?string $type): ?string
-    {
-        if ($type === null) {
+    public static function filterDefault(
+        string|int|float|bool|null $default,
+        ?string $type
+    ): string|int|float|bool|null {
+
+        if (!is_string($default)) {
             return $default;
         }
 
@@ -102,7 +105,7 @@ class Schema extends BaseSchema
         }
 
         // NULL and 'NULL' pass through unchanged
-        if ($default === null || $default === 'NULL') {
+        if ($default === 'NULL') {
             return $default;
         }
 
