@@ -205,7 +205,7 @@ class SplitReadTest extends TestCase
      */
     public function testRawConnection(): void
     {
-        $mockConnection = (object)['type' => 'pdo'];
+        $mockConnection = (object) ['type' => 'pdo'];
 
         $this->writeAdapter
             ->expects($this->once())

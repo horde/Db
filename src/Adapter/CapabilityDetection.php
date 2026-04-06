@@ -15,6 +15,8 @@ declare(strict_types=1);
 
 namespace Horde\Db\Adapter;
 
+use InvalidArgumentException;
+
 /**
  * Interface for database adapters that support server capability detection.
  *
@@ -81,7 +83,7 @@ interface CapabilityDetection
      *
      * @return bool  True if the capability is supported, false otherwise.
      *
-     * @throws \InvalidArgumentException  If the capability name is not recognized.
+     * @throws InvalidArgumentException  If the capability name is not recognized.
      */
     public function hasCapability(string $capability): bool;
 }

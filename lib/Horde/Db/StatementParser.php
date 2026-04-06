@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2006-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2006-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://www.horde.org/licenses/bsd.
@@ -37,7 +37,7 @@ class Horde_Db_StatementParser implements Iterator
         $this->_file = $file;
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         if (is_null($this->_currentStatement)) {
@@ -46,7 +46,7 @@ class Horde_Db_StatementParser implements Iterator
         return $this->_currentStatement;
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         if (is_null($this->_currentStatement)) {
@@ -55,7 +55,7 @@ class Horde_Db_StatementParser implements Iterator
         return $this->_count;
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function next()
     {
         if ($statement = $this->_getNextStatement()) {
@@ -65,7 +65,7 @@ class Horde_Db_StatementParser implements Iterator
         return null;
     }
 
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function rewind(): void
     {
         $this->_count = 0;

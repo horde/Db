@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2013-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2013-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://www.horde.org/licenses/bsd.
@@ -109,7 +109,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
     /**
      * Implementation of the rewind() method for iterator.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function rewind()
     {
         if ($this->_result) {
@@ -132,7 +132,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      *
      * @return array  The current row, or null if no rows.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function current()
     {
         if (is_null($this->_result)) {
@@ -146,7 +146,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      *
      * @return mixed  The current row number (starts at 0), or null if no rows.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function key()
     {
         if (is_null($this->_result)) {
@@ -161,7 +161,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      * @return array|null  The next row in the resultset or null if there are
      *                     no more results.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function next()
     {
         if (is_null($this->_result)) {
@@ -193,7 +193,7 @@ abstract class Horde_Db_Adapter_Base_Result implements Iterator
      *
      * @return boolean  Whether the iteration is valid.
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function valid()
     {
         if (is_null($this->_result)) {

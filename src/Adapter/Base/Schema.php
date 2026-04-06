@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Copyright 2007 Maintainable Software, LLC
- * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
+ * Copyright 2007-2026 Maintainable Software, LLC
+ * Copyright 2008-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://www.horde.org/licenses/bsd.
@@ -1018,10 +1018,10 @@ abstract class Schema
 
             // Check if default is an expression (e.g., "('value')") - don't quote it
             // MySQL 8.0.13+ requires TEXT/BLOB/JSON defaults as expressions
-            $isExpression = is_string($default) &&
-                           strlen($default) >= 4 &&
-                           substr($default, 0, 2) === '(\'' &&
-                           substr($default, -2) === '\')';
+            $isExpression = is_string($default)
+                           && strlen($default) >= 4
+                           && substr($default, 0, 2) === '(\''
+                           && substr($default, -2) === '\')';
 
             if ($isExpression) {
                 // Expression default - use as-is without quoting

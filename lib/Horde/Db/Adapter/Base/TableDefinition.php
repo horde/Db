@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Copyright 2007 Maintainable Software, LLC
- * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2007-2026 Maintainable Software, LLC
+ * Copyright 2008-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://www.horde.org/licenses/bsd.
@@ -264,7 +264,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param   int     $offset
      * @return  boolean
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         foreach ($this->_columns as $column) {
@@ -281,7 +281,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param   int     $offset
      * @return  object  {@link {@Horde_Db_Adapter_Base_ColumnDefinition}
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         if (!$this->offsetExists($offset)) {
@@ -302,7 +302,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      * @param   int     $offset
      * @param   mixed   $value
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         foreach ($this->_columns as $key => $column) {
@@ -317,7 +317,7 @@ class Horde_Db_Adapter_Base_TableDefinition implements ArrayAccess, IteratorAggr
      *
      * @param   int     $offset
      */
-    #[\ReturnTypeWillChange]
+    #[ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
         foreach ($this->_columns as $key => $column) {

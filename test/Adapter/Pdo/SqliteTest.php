@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Copyright 2007 Maintainable Software, LLC
- * Copyright 2008-2017 Horde LLC (http://www.horde.org/)
+ * Copyright 2007-2026 Maintainable Software, LLC
+ * Copyright 2008-2026 Horde LLC (http://www.horde.org/)
  *
  * @author     Mike Naberezny <mike@maintainable.com>
  * @author     Derek DeVries <derek@maintainable.com>
@@ -512,7 +512,7 @@ class SqliteTest extends TestBase
         // Verify that _catchSchemaChanges only catches schema change errors
         // and propagates other exceptions
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
 
         // Try to execute invalid SQL - this should throw an exception
         // that is NOT caught by _catchSchemaChanges

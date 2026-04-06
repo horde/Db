@@ -15,6 +15,9 @@ declare(strict_types=1);
 
 namespace Horde\Db\Adapter\Mysql;
 
+use PDO;
+use mysqli;
+
 /**
  * MySQL/MariaDB server information and feature detection.
  *
@@ -73,13 +76,13 @@ class ServerInfo
 
         // Parse semantic version from string
         if (preg_match('/^(\d+)\.(\d+)\.(\d+)/', $versionString, $matches)) {
-            $this->majorVersion = (int)$matches[1];
-            $this->minorVersion = (int)$matches[2];
-            $this->patchVersion = (int)$matches[3];
+            $this->majorVersion = (int) $matches[1];
+            $this->minorVersion = (int) $matches[2];
+            $this->patchVersion = (int) $matches[3];
         } else {
             // Fallback: extract from numeric version
-            $this->majorVersion = (int)floor($numericVersion / 10000);
-            $this->minorVersion = (int)floor(($numericVersion % 10000) / 100);
+            $this->majorVersion = (int) floor($numericVersion / 10000);
+            $this->minorVersion = (int) floor(($numericVersion % 10000) / 100);
             $this->patchVersion = $numericVersion % 100;
         }
     }
@@ -87,11 +90,11 @@ class ServerInfo
     /**
      * Create ServerInfo from mysqli connection.
      *
-     * @param \mysqli $connection  Active mysqli connection.
+     * @param mysqli $connection  Active mysqli connection.
      *
      * @return self
      */
-    public static function fromMysqli(\mysqli $connection): self
+    public static function fromMysqli(mysqli $connection): self
     {
         return new self($connection->server_info, $connection->server_version);
     }
@@ -99,17 +102,17 @@ class ServerInfo
     /**
      * Create ServerInfo from PDO connection.
      *
-     * @param \PDO $connection  Active PDO connection.
+     * @param PDO $connection  Active PDO connection.
      *
      * @return self
      */
-    public static function fromPDO(\PDO $connection): self
+    public static function fromPDO(PDO $connection): self
     {
-        $versionString = $connection->getAttribute(\PDO::ATTR_SERVER_VERSION);
+        $versionString = $connection->getAttribute(PDO::ATTR_SERVER_VERSION);
 
         // PDO doesn't provide numeric version directly, so parse it
         if (preg_match('/^(\d+)\.(\d+)\.(\d+)/', $versionString, $m)) {
-            $numericVersion = (int)$m[1] * 10000 + (int)$m[2] * 100 + (int)$m[3];
+            $numericVersion = (int) $m[1] * 10000 + (int) $m[2] * 100 + (int) $m[3];
         } else {
             $numericVersion = 0;
         }

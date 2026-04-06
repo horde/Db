@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Copyright 2007 Maintainable Software, LLC
- * Copyright 2008-2021 Horde LLC (http://www.horde.org/)
+ * Copyright 2007-2026 Maintainable Software, LLC
+ * Copyright 2008-2026 Horde LLC (http://www.horde.org/)
  *
  * See the enclosed file LICENSE for license information (BSD). If you
  * did not receive this file, see http://www.horde.org/licenses/bsd.
@@ -19,6 +19,7 @@
 namespace Horde\Db;
 
 use Horde\Db\Adapter\Base\Result;
+use Horde_Db_Adapter;
 
 /**
  * For compatibility reasons, we need to extend the Horde_Db_Adapter interface.
@@ -36,7 +37,7 @@ use Horde\Db\Adapter\Base\Result;
  * @package    Db
  * @subpackage Adapter
  */
-interface Adapter extends \Horde_Db_Adapter
+interface Adapter extends Horde_Db_Adapter
 {
     /**
      * Returns the human-readable name of the adapter.  Use mixed case - one

@@ -11,4 +11,4 @@ foreach ($candidates as $candidate) {
         break;
     }
 }
-\Horde\Test\Bootstrap::bootstrap(dirname(__FILE__));
+Horde\Test\Bootstrap::bootstrap(dirname(__FILE__));

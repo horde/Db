@@ -20,6 +20,7 @@ use Horde\Db\Adapter\CapabilityDetection;
 use Horde\Db\Adapter\CapabilityDetectionTrait;
 use Horde\Db\Adapter\Mysql\ServerInfo;
 use InvalidArgumentException;
+use ReflectionClass;
 
 /**
  * Test for CapabilityDetectionTrait.
@@ -197,7 +198,7 @@ class CapabilityDetectionTraitTest extends TestCase
         $adapter = new MockCapabilityAdapter(new ServerInfo('8.0.35', 80035));
 
         // Access protected method via reflection
-        $reflection = new \ReflectionClass($adapter);
+        $reflection = new ReflectionClass($adapter);
         $method = $reflection->getMethod('getAvailableCapabilities');
         $method->setAccessible(true);
 
