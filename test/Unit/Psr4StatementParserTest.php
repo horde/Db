@@ -11,25 +11,28 @@
  * @license  http://www.horde.org/licenses/bsd
  */
 
+declare(strict_types=1);
+
 namespace Horde\Db\Test;
 
-use Horde\Test\TestCase;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use SplFileObject;
-use Horde_Db_StatementParser;
+use Horde\Db\StatementParser;
 
 /**
- * Test for PSR-0 StatementParser (Horde_Db_StatementParser).
+ * Test for PSR-4 StatementParser (Horde\Db\StatementParser).
  *
- * This tests the legacy PSR-0 implementation in lib/ directory.
+ * This tests the modern PSR-4 implementation in src/ directory.
  *
  * @category Horde
  * @package  Db
  * @license  http://www.horde.org/licenses/bsd
- * @covers   Horde_Db_StatementParser
  */
-class Psr0StatementParserTest extends TestCase
+#[CoversClass(StatementParser::class)]
+class Psr4StatementParserTest extends TestCase
 {
-    public function testParserFindsMultilineCreateStatement()
+    public function testParserFindsMultilineCreateStatement(): void
     {
         $expected = [
             'DROP TABLE IF EXISTS `exp_actions`',
@@ -46,18 +49,46 @@ class Psr0StatementParserTest extends TestCase
         $this->assertParser($expected, 'drop_create_table.sql');
     }
 
-    public function assertParser(array $expectedStatements, $filename)
+    public function testParserIteratesOverStatements(): void
+    {
+        $file = new SplFileObject(__DIR__ . '/fixtures/drop_create_table.sql', 'r');
+        $parser = new StatementParser($file);
+
+        $statements = [];
+        foreach ($parser as $statement) {
+            $statements[] = $statement;
+        }
+
+        $this->assertCount(5, $statements);
+        $this->assertStringContainsString('DROP TABLE', $statements[0]);
+        $this->assertStringContainsString('CREATE TABLE', $statements[3]);
+    }
+
+    public function testParserHandlesStringInput(): void
+    {
+        $parser = new StatementParser(__DIR__ . '/fixtures/drop_create_table.sql');
+
+        $count = 0;
+        foreach ($parser as $statement) {
+            $count++;
+        }
+
+        $this->assertEquals(5, $count);
+    }
+
+    protected function assertParser(array $expectedStatements, string $filename): void
     {
         $file = new SplFileObject(__DIR__ . '/fixtures/' . $filename, 'r');
-        $parser = new Horde_Db_StatementParser($file);
+        $parser = new StatementParser($file);
 
         foreach ($expectedStatements as $i => $expected) {
             // Strip any whitespace before comparing the strings.
             $this->assertEquals(
                 preg_replace('/\s/', '', $expected),
-                preg_replace('/\s/', '', $parser->next()),
+                preg_replace('/\s/', '', $parser->current()),
                 "Parser differs on statement #$i"
             );
+            $parser->next();
         }
     }
 }

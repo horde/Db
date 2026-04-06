@@ -15,7 +15,7 @@ declare(strict_types=1);
 
 namespace Horde\Db\Test\Adapter\Mysql;
 
-use Horde\Test\TestCase;
+use PHPUnit\Framework\TestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**

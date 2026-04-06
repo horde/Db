@@ -15,7 +15,8 @@ declare(strict_types=1);
 
 namespace Horde\Db\Test;
 
-use Horde\Test\TestCase;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Horde\Db\SearchParser;
 use Horde\Db\DbException;
 
@@ -28,8 +29,8 @@ use Horde\Db\DbException;
  * @category Horde
  * @package  Db
  * @license  http://www.horde.org/licenses/bsd
- * @covers   \Horde\Db\SearchParser
  */
+#[CoversClass(SearchParser::class)]
 class SearchParserTest extends TestCase
 {
     /**

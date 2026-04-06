@@ -15,9 +15,11 @@ declare(strict_types=1);
 
 namespace Horde\Db\Test\Value;
 
-use Horde\Test\TestCase;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Horde\Db\Value\Binary;
 use Horde\Db\Value\Text;
+use Horde\Db\Value\Lob;
 use Horde\Db\Adapter;
 
 /**
@@ -29,10 +31,10 @@ use Horde\Db\Adapter;
  * @category Horde
  * @package  Db
  * @license  http://www.horde.org/licenses/bsd
- * @covers   \Horde\Db\Value\Lob
- * @covers   \Horde\Db\Value\Binary
- * @covers   \Horde\Db\Value\Text
  */
+#[CoversClass(Lob::class)]
+#[CoversClass(Binary::class)]
+#[CoversClass(Text::class)]
 class LobTest extends TestCase
 {
     /**

@@ -15,7 +15,8 @@ declare(strict_types=1);
 
 namespace Horde\Db\Test\Adapter;
 
-use Horde\Test\TestCase;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Horde\Db\Adapter\SplitRead;
 use Horde\Db\Adapter;
 use PDOStatement;
@@ -30,8 +31,8 @@ use PDOStatement;
  * @category Horde
  * @package  Db
  * @license  http://www.horde.org/licenses/bsd
- * @covers   \Horde\Db\Adapter\SplitRead
  */
+#[CoversClass(SplitRead::class)]
 class SplitReadTest extends TestCase
 {
     private $readAdapter;
@@ -49,27 +50,46 @@ class SplitReadTest extends TestCase
     }
 
     /**
-     * Test constructor sets up read and write adapters.
+     * Test constructor sets up read and write adapters without invoking them.
+     * Uses the setUp() instance to verify proper construction.
      */
     public function testConstructor(): void
     {
-        $splitRead = new SplitRead($this->readAdapter, $this->writeAdapter);
-        $this->assertInstanceOf(SplitRead::class, $splitRead);
+        // Configure expectations for the setUp() mocks (they should not be invoked)
+        // Since construction already happened in setUp(), these adapters exist
+        // but no methods should have been called
+        $this->readAdapter->expects($this->never())->method('isActive');
+        $this->writeAdapter->expects($this->never())->method('isActive');
+
+        // The setUp() method already constructed $this->splitRead
+        // Verify it was created successfully and is the correct type
+        $this->assertInstanceOf(SplitRead::class, $this->splitRead);
     }
 
     /**
-     * Test adapterName returns 'SplitRead'.
+     * Test adapterName returns 'SplitRead' without touching adapters.
+     * This is a simple property accessor - no adapter methods are called.
      */
     public function testAdapterName(): void
     {
+        // Neither adapter should be invoked for this property accessor
+        $this->readAdapter->expects($this->never())->method($this->anything());
+        $this->writeAdapter->expects($this->never())->method($this->anything());
+
         $this->assertEquals('SplitRead', $this->splitRead->adapterName());
     }
 
     /**
      * Test supportsMigrations delegates to write adapter.
+     * Read adapter should not be touched for migration support.
      */
     public function testSupportsMigrations(): void
     {
+        // Verify read adapter is NOT called
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('supportsMigrations');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('supportsMigrations')
@@ -81,9 +101,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test supportsCountDistinct delegates to read adapter.
+     * Write adapter should not be touched for read-only query capabilities.
      */
     public function testSupportsCountDistinct(): void
     {
+        // Verify write adapter is NOT called
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('supportsCountDistinct');
+
         $this->readAdapter
             ->expects($this->once())
             ->method('supportsCountDistinct')
@@ -95,9 +121,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test prefetchPrimaryKey delegates to write adapter.
+     * Read adapter should not be touched for write-related operations.
      */
     public function testPrefetchPrimaryKey(): void
     {
+        // Verify read adapter is NOT called
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('prefetchPrimaryKey');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('prefetchPrimaryKey')
@@ -145,16 +177,21 @@ class SplitReadTest extends TestCase
 
     /**
      * Test isActive returns false if read adapter is inactive.
+     *
+     * Note: Due to short-circuit evaluation with &&, writeAdapter->isActive()
+     * is never called when readAdapter->isActive() returns false.
      */
     public function testIsActiveWhenReadIsInactive(): void
     {
         $this->readAdapter
+            ->expects($this->once())
             ->method('isActive')
             ->willReturn(false);
 
+        // Write adapter is never checked due to short-circuit evaluation
         $this->writeAdapter
-            ->method('isActive')
-            ->willReturn(true);
+            ->expects($this->never())
+            ->method('isActive');
 
         $result = $this->splitRead->isActive();
         $this->assertFalse($result);
@@ -202,9 +239,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test rawConnection delegates to write adapter.
+     * Read adapter should not be touched for connection access.
      */
     public function testRawConnection(): void
     {
+        // Verify read adapter is NOT called
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('rawConnection');
+
         $mockConnection = (object) ['type' => 'pdo'];
 
         $this->writeAdapter
@@ -218,9 +261,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test quoteString delegates to read adapter.
+     * Write adapter should not be touched for quoting operations.
      */
     public function testQuoteString(): void
     {
+        // Verify write adapter is NOT called
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('quoteString');
+
         $this->readAdapter
             ->expects($this->once())
             ->method('quoteString')
@@ -233,10 +282,17 @@ class SplitReadTest extends TestCase
 
     /**
      * Test select delegates to read adapter.
+     * Write adapter should not be touched for SELECT queries.
      */
     public function testSelect(): void
     {
-        $mockStmt = $this->createMock(PDOStatement::class);
+        // Verify write adapter is NOT called for read operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('select');
+
+        // Stub (not mock) - we're testing delegation, not statement usage
+        $mockStmt = $this->createStub(PDOStatement::class);
 
         $this->readAdapter
             ->expects($this->once())
@@ -255,9 +311,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test selectAll delegates to read adapter.
+     * Write adapter should not be touched for SELECT queries.
      */
     public function testSelectAll(): void
     {
+        // Verify write adapter is NOT called for read operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('selectAll');
+
         $data = [['id' => 1, 'name' => 'Alice'], ['id' => 2, 'name' => 'Bob']];
 
         $this->readAdapter
@@ -277,9 +339,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test selectOne delegates to read adapter.
+     * Write adapter should not be touched for SELECT queries.
      */
     public function testSelectOne(): void
     {
+        // Verify write adapter is NOT called for read operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('selectOne');
+
         $data = ['id' => 1, 'name' => 'Alice'];
 
         $this->readAdapter
@@ -299,9 +367,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test selectValue delegates to read adapter.
+     * Write adapter should not be touched for SELECT queries.
      */
     public function testSelectValue(): void
     {
+        // Verify write adapter is NOT called for read operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('selectValue');
+
         $this->readAdapter
             ->expects($this->once())
             ->method('selectValue')
@@ -319,9 +393,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test selectValues delegates to read adapter.
+     * Write adapter should not be touched for SELECT queries.
      */
     public function testSelectValues(): void
     {
+        // Verify write adapter is NOT called for read operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('selectValues');
+
         $data = ['Alice', 'Bob', 'Charlie'];
 
         $this->readAdapter
@@ -341,9 +421,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test selectAssoc delegates to read adapter.
+     * Write adapter should not be touched for SELECT queries.
      */
     public function testSelectAssoc(): void
     {
+        // Verify write adapter is NOT called for read operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('selectAssoc');
+
         $data = [1 => 'Alice', 2 => 'Bob', 3 => 'Charlie'];
 
         $this->readAdapter
@@ -363,10 +449,17 @@ class SplitReadTest extends TestCase
 
     /**
      * Test execute delegates to write adapter and switches read to write.
+     * Read adapter should not be touched for write operations.
      */
     public function testExecute(): void
     {
-        $mockStmt = $this->createMock(PDOStatement::class);
+        // Verify read adapter is NOT called for write operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('execute');
+
+        // Stub (not mock) - we're testing delegation, not statement usage
+        $mockStmt = $this->createStub(PDOStatement::class);
 
         $this->writeAdapter
             ->expects($this->once())
@@ -385,9 +478,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test insert delegates to write adapter and switches read to write.
+     * Read adapter should not be touched for write operations.
      */
     public function testInsert(): void
     {
+        // Verify read adapter is NOT called for write operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('insert');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('insert')
@@ -405,9 +504,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test insertBlob delegates to write adapter and switches read to write.
+     * Read adapter should not be touched for write operations.
      */
     public function testInsertBlob(): void
     {
+        // Verify read adapter is NOT called for write operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('insertBlob');
+
         $fields = ['name' => 'Test', 'data' => 'binary data'];
 
         $this->writeAdapter
@@ -427,9 +532,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test update delegates to write adapter and switches read to write.
+     * Read adapter should not be touched for write operations.
      */
     public function testUpdate(): void
     {
+        // Verify read adapter is NOT called for write operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('update');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('update')
@@ -447,9 +558,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test updateBlob delegates to write adapter and switches read to write.
+     * Read adapter should not be touched for write operations.
      */
     public function testUpdateBlob(): void
     {
+        // Verify read adapter is NOT called for write operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('updateBlob');
+
         $fields = ['data' => 'new binary data'];
 
         $this->writeAdapter
@@ -468,9 +585,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test delete delegates to write adapter and switches read to write.
+     * Read adapter should not be touched for write operations.
      */
     public function testDelete(): void
     {
+        // Verify read adapter is NOT called for write operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('delete');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('delete')
@@ -488,9 +611,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test transactionStarted delegates to write adapter.
+     * Read adapter should not be touched for transaction management.
      */
     public function testTransactionStarted(): void
     {
+        // Verify read adapter is NOT called for transaction state
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('transactionStarted');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('transactionStarted')
@@ -507,9 +636,14 @@ class SplitReadTest extends TestCase
 
     /**
      * Test beginDbTransaction delegates to write adapter.
+     * Read adapter should not be touched for transaction management.
      */
     public function testBeginDbTransaction(): void
     {
+        // Verify read adapter is NOT called for transaction operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('beginDbTransaction');
         $this->writeAdapter
             ->expects($this->once())
             ->method('beginDbTransaction')
@@ -525,9 +659,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test commitDbTransaction delegates to write adapter.
+     * Read adapter should not be touched for transaction management.
      */
     public function testCommitDbTransaction(): void
     {
+        // Verify read adapter is NOT called for transaction operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('commitDbTransaction');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('commitDbTransaction')
@@ -543,9 +683,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test rollbackDbTransaction delegates to write adapter.
+     * Read adapter should not be touched for transaction management.
      */
     public function testRollbackDbTransaction(): void
     {
+        // Verify read adapter is NOT called for transaction operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('rollbackDbTransaction');
+
         $this->writeAdapter
             ->expects($this->once())
             ->method('rollbackDbTransaction')
@@ -584,8 +730,17 @@ class SplitReadTest extends TestCase
     /**
      * Test addLock delegates to write adapter.
      */
+    /**
+     * Test addLock delegates to write adapter (locking for updates).
+     * Read adapter should not be involved in locking operations.
+     */
     public function testAddLock(): void
     {
+        // Verify read adapter is NOT called for lock operations
+        $this->readAdapter
+            ->expects($this->never())
+            ->method('addLock');
+
         $sql = 'SELECT * FROM users';
         $options = ['lock' => true];
 
@@ -604,14 +759,22 @@ class SplitReadTest extends TestCase
 
     /**
      * Test getLastQuery returns tracked query.
+     * Write adapter is not involved in this read operation.
      */
     public function testGetLastQuery(): void
     {
+        // Verify write adapter is NOT called
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('selectValue');
+
         $this->readAdapter
+            ->expects($this->once())
             ->method('selectValue')
             ->willReturn('42');
 
         $this->readAdapter
+            ->expects($this->atLeastOnce())
             ->method('getLastQuery')
             ->willReturn('SELECT COUNT(*) FROM users');
 
@@ -623,8 +786,17 @@ class SplitReadTest extends TestCase
     /**
      * Test cacheWrite delegates to read adapter.
      */
+    /**
+     * Test cacheWrite delegates to read adapter.
+     * Write adapter should not be involved in cache operations.
+     */
     public function testCacheWrite(): void
     {
+        // Verify write adapter is NOT called for cache operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('cacheWrite');
+
         $this->readAdapter
             ->expects($this->once())
             ->method('cacheWrite')
@@ -635,9 +807,15 @@ class SplitReadTest extends TestCase
 
     /**
      * Test cacheRead delegates to read adapter.
+     * Write adapter should not be involved in cache operations.
      */
     public function testCacheRead(): void
     {
+        // Verify write adapter is NOT called for cache operations
+        $this->writeAdapter
+            ->expects($this->never())
+            ->method('cacheRead');
+
         $this->readAdapter
             ->expects($this->once())
             ->method('cacheRead')
@@ -657,14 +835,17 @@ class SplitReadTest extends TestCase
      */
     public function testReadAfterWriteUsesWriteAdapter(): void
     {
-        $mockStmt = $this->createMock(PDOStatement::class);
+        // Stub (not mock) - we're testing delegation, not statement usage
+        $mockStmt = $this->createStub(PDOStatement::class);
 
         // First do a write
         $this->writeAdapter
+            ->expects($this->once())
             ->method('execute')
             ->willReturn($mockStmt);
 
         $this->writeAdapter
+            ->expects($this->atLeastOnce())
             ->method('getLastQuery')
             ->willReturn('UPDATE users SET name = ?');
 

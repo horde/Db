@@ -15,7 +15,8 @@ declare(strict_types=1);
 
 namespace Horde\Db\Test\Adapter\Mysql;
 
-use Horde\Test\TestCase;
+use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\CoversClass;
 use Horde\Db\Adapter\Mysql\ServerInfo;
 
 /**
@@ -26,8 +27,8 @@ use Horde\Db\Adapter\Mysql\ServerInfo;
  * @category Horde
  * @package  Db
  * @license  http://www.horde.org/licenses/bsd
- * @covers   \Horde\Db\Adapter\Mysql\ServerInfo
  */
+#[CoversClass(ServerInfo::class)]
 class ServerInfoTest extends TestCase
 {
     /**
