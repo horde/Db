@@ -163,7 +163,7 @@ class SearchParser
 
     protected static function parseKeywords4($column, &$tokens)
     {
-        if ($tokens[0] == '!(') {
+        if (isset($tokens[0]) && $tokens[0] == '!(') {
             array_shift($tokens);
             $lhs = self::parseKeywords1($column, $tokens);
             if (sizeof($tokens) == 0 || $tokens[0] != '!)') {
@@ -173,8 +173,9 @@ class SearchParser
             return $lhs;
         }
 
-        if (substr($tokens[0], 0, 1) != '='
-            && substr($tokens[0], 0, 2) != '=.') {
+        if (!isset($tokens[0])
+            || (substr($tokens[0], 0, 1) != '='
+            && substr($tokens[0], 0, 2) != '=.')) {
             throw new DbException('Expected bare word or quoted search term');
         }
 

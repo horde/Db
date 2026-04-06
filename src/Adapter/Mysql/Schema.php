@@ -87,7 +87,7 @@ class Schema extends BaseSchema
         ?string $type
     ): string|int|float|bool|null {
 
-        if (!is_string($default)) {
+        if (!is_string($default) || $type === null) {
             return $default;
         }
 

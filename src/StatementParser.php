@@ -42,7 +42,7 @@ class StatementParser implements Iterator
         $this->file = $file;
     }
 
-    public function current()
+    public function current(): mixed
     {
         if (is_null($this->currentStatement)) {
             $this->rewind();
@@ -50,7 +50,7 @@ class StatementParser implements Iterator
         return $this->currentStatement;
     }
 
-    public function key()
+    public function key(): mixed
     {
         if (is_null($this->currentStatement)) {
             $this->rewind();
@@ -58,16 +58,17 @@ class StatementParser implements Iterator
         return $this->count;
     }
 
-    public function next()
+    public function next(): void
     {
         if ($statement = $this->getNextStatement()) {
             $this->count++;
-            return $statement;
+            $this->currentStatement = $statement;
+        } else {
+            $this->currentStatement = null;
         }
-        return null;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->count = 0;
         $this->currentStatement = null;
@@ -75,7 +76,7 @@ class StatementParser implements Iterator
         $this->next();
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return !$this->file->eof() && $this->file->isReadable();
     }
