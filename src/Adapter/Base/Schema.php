@@ -214,7 +214,7 @@ abstract class Schema
      * @param string $key  Property name. Only 'cache' and 'logger' are
      *                     supported.
      *
-     * @return object|null  The request property object.
+     * @return mixed  The requested property object, or null if not supported.
      */
     public function __get($key)
     {

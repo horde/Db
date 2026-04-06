@@ -208,6 +208,8 @@ abstract class Result implements Iterator
      *
      * @param integer $fetchmode  The default fetch mode for this result. One
      *                            of the Constants::FETCH_* constants.
+     *
+     * @return array|null  The row data, or null if no more rows.
      */
     public function fetch($fetchmode = Constants::FETCH_ASSOC)
     {

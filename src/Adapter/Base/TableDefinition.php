@@ -287,7 +287,7 @@ class TableDefinition implements ArrayAccess, IteratorAggregate
      * ArrayAccess: Return the value for the given offset.
      *
      * @param   int     $offset
-     * @return  object  {@link {@Horde_Db_Adapter_Base_ColumnDefinition}
+     * @return  mixed  ColumnDefinition object, or null if not found.
      */
     public function offsetGet($offset)
     {

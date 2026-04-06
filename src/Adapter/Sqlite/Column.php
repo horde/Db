@@ -50,6 +50,13 @@ class Column extends BaseColumn
     # Type Juggling
     ##########################################################################*/
 
+    /**
+     * Converts binary data to string.
+     *
+     * @param mixed $value  The binary value.
+     *
+     * @return string|null  Converted string, or null if value is null.
+     */
     public function binaryToString($value)
     {
         if ($value === null) {
@@ -60,7 +67,7 @@ class Column extends BaseColumn
 
     /**
      * @param   mixed  $value
-     * @return  boolean
+     * @return  bool|null  Boolean value, or null for empty strings.
      */
     public function valueToBoolean($value)
     {
@@ -81,7 +88,9 @@ class Column extends BaseColumn
     /**
      * Unquote a string value
      *
-     * @return string
+     * @param string|null $string  The string to unquote.
+     *
+     * @return string|null  Unquoted string, or null if input is null.
      */
     protected function unquote($string)
     {

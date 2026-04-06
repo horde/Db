@@ -163,7 +163,7 @@ abstract class Base extends BaseAdapter
      * @param   string  $sql
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
-     * @return  string
+     * @return  mixed  The value (string, int, float, bool, or null).
      */
     public function selectValue($sql, $arg1 = null, $arg2 = null)
     {
@@ -184,6 +184,7 @@ abstract class Base extends BaseAdapter
      * @param   string  $sql
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
+     * @return  array|null  Array of values, or null if query fails.
      */
     public function selectValues($sql, $arg1 = null, $arg2 = null)
     {
@@ -206,6 +207,7 @@ abstract class Base extends BaseAdapter
      * @param   string  $sql
      * @param   mixed   $arg1  Either an array of bound parameters or a query name.
      * @param   string  $arg2  If $arg1 contains bound parameters, the query name.
+     * @return  array|null  Associative array, or null if query fails.
      */
     public function selectAssoc($sql, $arg1 = null, $arg2 = null)
     {

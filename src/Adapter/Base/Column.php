@@ -102,6 +102,10 @@ class Column
 
     /**
      * Casts value (which is a String) to an appropriate instance.
+     *
+     * @param mixed $value  The value to cast.
+     *
+     * @return mixed  Casted value. Can be string, int, float, bool, Horde_Date, or null.
      */
     public function typeCast($value)
     {
@@ -154,7 +158,7 @@ class Column
     }
 
     /**
-     * @return  string
+     * @return  mixed  The default value. Can be string, int, float, bool, Horde_Date, or null.
      */
     public function getDefault()
     {
@@ -234,7 +238,7 @@ class Column
 
     /**
      * @param   string  $string
-     * @return  Horde_Date
+     * @return  Horde_Date|null  Date object, or null for empty/zero dates.
      */
     public function stringToDate($string)
     {
@@ -252,7 +256,7 @@ class Column
 
     /**
      * @param   string  $string
-     * @return  Horde_Date
+     * @return  Horde_Date|null  Timestamp object, or null for empty/zero timestamps.
      */
     public function stringToTime($string)
     {
@@ -307,7 +311,7 @@ class Column
 
     /**
      * @param   string  $sqlType
-     * @return  int
+     * @return  int|null  The limit value, or null if not specified.
      */
     protected function extractLimit($sqlType)
     {
@@ -319,7 +323,7 @@ class Column
 
     /**
      * @param   string  $sqlType
-     * @return  int
+     * @return  int|null  The precision value, or null if not a numeric type.
      */
     protected function extractPrecision($sqlType)
     {
