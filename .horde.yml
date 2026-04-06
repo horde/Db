@@ -36,7 +36,7 @@ license:
   uri: http://www.horde.org/licenses/bsd
 dependencies:
   required:
-    php: ^7.4 || ^8
+    php: ^8.1
     composer:
       horde/date: ^3
       horde/exception: ^3
@@ -59,3 +59,7 @@ dependencies:
       horde/cache: ^3
       horde/log: ^3
 vendor: horde
+keywords:
+  - dbal
+  - schema
+  - migration
