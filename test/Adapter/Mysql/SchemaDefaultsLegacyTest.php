@@ -16,58 +16,33 @@ declare(strict_types=1);
 namespace Horde\Db\Test\Adapter\Mysql;
 
 use Horde\Test\TestCase;
-use Horde\Db\Adapter\Mysql\Schema;
+use Horde_Db_Adapter_Mysql_Schema;
 use PHPUnit\Framework\Attributes\CoversClass;
 
 /**
- * Test for MySQL Schema filterDefault() method.
+ * Test for MySQL Schema filterDefault() method (legacy lib/ structure).
  *
  * Tests the MySQL 8.0.13+ requirement that TEXT/BLOB/JSON/GEOMETRY columns
  * must have default values specified as expressions, not literals.
  *
  * Bug #15172: MySQL 8.0.13+ requires expression syntax for certain column types.
  *
+ * This test covers the legacy Horde_Db_Adapter_Mysql_Schema class from lib/.
+ *
  * @category Horde
  * @package  Db
  * @license  http://www.horde.org/licenses/bsd
  */
-#[CoversClass(Schema::class)]
-class SchemaDefaultsTest extends TestCase
+#[CoversClass(Horde_Db_Adapter_Mysql_Schema::class)]
+class SchemaDefaultsLegacyTest extends TestCase
 {
     /**
      * Test TEXT column default is wrapped in expression syntax.
      */
     public function testTextColumnDefaultWrapped(): void
     {
-        $result = Schema::filterDefault('default value', 'TEXT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('default value', 'TEXT');
         $this->assertEquals("('default value')", $result);
-    }
-
-    /**
-     * Test TINYTEXT column default is wrapped.
-     */
-    public function testTinyTextColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('tiny', 'TINYTEXT');
-        $this->assertEquals("('tiny')", $result);
-    }
-
-    /**
-     * Test MEDIUMTEXT column default is wrapped.
-     */
-    public function testMediumTextColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('medium', 'MEDIUMTEXT');
-        $this->assertEquals("('medium')", $result);
-    }
-
-    /**
-     * Test LONGTEXT column default is wrapped.
-     */
-    public function testLongTextColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('long', 'LONGTEXT');
-        $this->assertEquals("('long')", $result);
     }
 
     /**
@@ -75,35 +50,8 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testBlobColumnDefaultWrapped(): void
     {
-        $result = Schema::filterDefault('blob data', 'BLOB');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('blob data', 'BLOB');
         $this->assertEquals("('blob data')", $result);
-    }
-
-    /**
-     * Test TINYBLOB column default is wrapped.
-     */
-    public function testTinyBlobColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('tiny', 'TINYBLOB');
-        $this->assertEquals("('tiny')", $result);
-    }
-
-    /**
-     * Test MEDIUMBLOB column default is wrapped.
-     */
-    public function testMediumBlobColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('medium', 'MEDIUMBLOB');
-        $this->assertEquals("('medium')", $result);
-    }
-
-    /**
-     * Test LONGBLOB column default is wrapped.
-     */
-    public function testLongBlobColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('long', 'LONGBLOB');
-        $this->assertEquals("('long')", $result);
     }
 
     /**
@@ -111,17 +59,8 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testJsonColumnDefaultWrapped(): void
     {
-        $result = Schema::filterDefault('{"key":"value"}', 'JSON');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('{"key":"value"}', 'JSON');
         $this->assertEquals("('{\"key\":\"value\"}')", $result);
-    }
-
-    /**
-     * Test GEOMETRY column default is wrapped.
-     */
-    public function testGeometryColumnDefaultWrapped(): void
-    {
-        $result = Schema::filterDefault('POINT(0 0)', 'GEOMETRY');
-        $this->assertEquals("('POINT(0 0)')", $result);
     }
 
     /**
@@ -129,7 +68,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testExpressionNotDoubleWrapped(): void
     {
-        $result = Schema::filterDefault("('already wrapped')", 'TEXT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault("('already wrapped')", 'TEXT');
         $this->assertEquals("('already wrapped')", $result);
     }
 
@@ -138,7 +77,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testNullDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(null, 'TEXT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(null, 'TEXT');
         $this->assertNull($result);
     }
 
@@ -147,7 +86,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testNullStringDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault('NULL', 'TEXT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('NULL', 'TEXT');
         $this->assertEquals('NULL', $result);
     }
 
@@ -156,7 +95,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testVarcharDefaultUnchanged(): void
     {
-        $result = Schema::filterDefault('default', 'VARCHAR');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('default', 'VARCHAR');
         $this->assertEquals('default', $result);
     }
 
@@ -165,26 +104,8 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testIntegerDefaultUnchanged(): void
     {
-        $result = Schema::filterDefault('42', 'INTEGER');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('42', 'INTEGER');
         $this->assertEquals('42', $result);
-    }
-
-    /**
-     * Test CHAR column default is not affected.
-     */
-    public function testCharDefaultUnchanged(): void
-    {
-        $result = Schema::filterDefault('X', 'CHAR');
-        $this->assertEquals('X', $result);
-    }
-
-    /**
-     * Test DATE column default is not affected.
-     */
-    public function testDateDefaultUnchanged(): void
-    {
-        $result = Schema::filterDefault('2026-01-01', 'DATE');
-        $this->assertEquals('2026-01-01', $result);
     }
 
     /**
@@ -192,8 +113,8 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testCaseInsensitiveTypeMatching(): void
     {
-        $result1 = Schema::filterDefault('value', 'TEXT');
-        $result2 = Schema::filterDefault('value', 'text');
+        $result1 = Horde_Db_Adapter_Mysql_Schema::filterDefault('value', 'TEXT');
+        $result2 = Horde_Db_Adapter_Mysql_Schema::filterDefault('value', 'text');
         $this->assertEquals($result1, $result2);
     }
 
@@ -202,17 +123,8 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testEmptyStringWrapped(): void
     {
-        $result = Schema::filterDefault('', 'TEXT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('', 'TEXT');
         $this->assertEquals("('')", $result);
-    }
-
-    /**
-     * Test null type parameter returns default unchanged.
-     */
-    public function testNullTypeReturnsUnchanged(): void
-    {
-        $result = Schema::filterDefault('value', null);
-        $this->assertEquals('value', $result);
     }
 
     /**
@@ -222,7 +134,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testIntegerDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(42, 'INTEGER');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(42, 'INTEGER');
         $this->assertSame(42, $result);
     }
 
@@ -233,7 +145,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testIntegerDefaultForTextPassesThrough(): void
     {
-        $result = Schema::filterDefault(0, 'TEXT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(0, 'TEXT');
         $this->assertSame(0, $result);
     }
 
@@ -242,7 +154,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testFloatDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(3.14, 'DECIMAL');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(3.14, 'DECIMAL');
         $this->assertSame(3.14, $result);
     }
 
@@ -251,7 +163,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testBooleanTrueDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(true, 'BOOLEAN');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(true, 'BOOLEAN');
         $this->assertTrue($result);
     }
 
@@ -260,7 +172,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testBooleanFalseDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(false, 'BOOLEAN');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(false, 'BOOLEAN');
         $this->assertFalse($result);
     }
 
@@ -269,7 +181,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testZeroIntegerDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(0, 'INTEGER');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(0, 'INTEGER');
         $this->assertSame(0, $result);
     }
 
@@ -278,7 +190,7 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testNegativeIntegerDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(-1, 'INTEGER');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(-1, 'INTEGER');
         $this->assertSame(-1, $result);
     }
 
@@ -287,7 +199,70 @@ class SchemaDefaultsTest extends TestCase
      */
     public function testZeroFloatDefaultPassesThrough(): void
     {
-        $result = Schema::filterDefault(0.0, 'FLOAT');
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault(0.0, 'FLOAT');
         $this->assertSame(0.0, $result);
+    }
+
+    /**
+     * Test TINYTEXT column default is wrapped.
+     */
+    public function testTinyTextColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('tiny', 'TINYTEXT');
+        $this->assertEquals("('tiny')", $result);
+    }
+
+    /**
+     * Test MEDIUMTEXT column default is wrapped.
+     */
+    public function testMediumTextColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('medium', 'MEDIUMTEXT');
+        $this->assertEquals("('medium')", $result);
+    }
+
+    /**
+     * Test LONGTEXT column default is wrapped.
+     */
+    public function testLongTextColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('long', 'LONGTEXT');
+        $this->assertEquals("('long')", $result);
+    }
+
+    /**
+     * Test TINYBLOB column default is wrapped.
+     */
+    public function testTinyBlobColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('tiny', 'TINYBLOB');
+        $this->assertEquals("('tiny')", $result);
+    }
+
+    /**
+     * Test MEDIUMBLOB column default is wrapped.
+     */
+    public function testMediumBlobColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('medium', 'MEDIUMBLOB');
+        $this->assertEquals("('medium')", $result);
+    }
+
+    /**
+     * Test LONGBLOB column default is wrapped.
+     */
+    public function testLongBlobColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('long', 'LONGBLOB');
+        $this->assertEquals("('long')", $result);
+    }
+
+    /**
+     * Test GEOMETRY column default is wrapped.
+     */
+    public function testGeometryColumnDefaultWrapped(): void
+    {
+        $result = Horde_Db_Adapter_Mysql_Schema::filterDefault('POINT(0 0)', 'GEOMETRY');
+        $this->assertEquals("('POINT(0 0)')", $result);
     }
 }
