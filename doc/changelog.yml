@@ -1,4 +1,23 @@
 ---
+3.0.0-beta1:
+  api: 3.0.0-beta1
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-06
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    fix: iterator return types and null safety checks
+    test: Modernize test suite
+    docs: Add upgrading guide for 3.0 src/
+    docs: Make type hints more correct
+    chore(hordeyml): Add keywords
+    chore: add phpunit.cache to gitignore file
+    style: php-cs-fixer on whole code base
+    test: Cover PR #10 with unit tests for different types
+    fix filterDefault for non-string values in mysql schema
 3.0.0-alpha8:
   api: 3.0.0-alpha8
   state:

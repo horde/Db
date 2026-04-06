@@ -1,7 +1,7 @@
 {
     "name": "horde/db",
     "description": "Database abstraction library",
-    "type": "library",
+    "type": "horde-library",
     "homepage": "https://www.horde.org/libraries/Horde_Db",
     "license": "BSD-2-Clause",
     "authors": [
@@ -21,10 +21,16 @@
             "role": "lead"
         }
     ],
-    "time": "2026-03-15",
+    "keywords": [
+        "dbal",
+        "schema",
+        "migration"
+    ],
+    "time": "2026-04-06",
     "repositories": [],
     "require": {
-        "php": "^7.4 || ^8",
+        "horde/horde-installer-plugin": "dev-FRAMEWORK_6_0 || ^3 || ^2",
+        "php": "^8.1",
         "horde/date": "^3 || dev-FRAMEWORK_6_0",
         "horde/exception": "^3 || dev-FRAMEWORK_6_0",
         "horde/support": "^3 || dev-FRAMEWORK_6_0",
@@ -54,16 +60,19 @@
         }
     },
     "autoload-dev": {
-        "psr-4": {
-            "Horde\\Db\\Test\\": "test/",
-            "Horde\\Db\\Test\\Fixtures\\": "test/fixtures/"
-        }
+        "classmap": [
+            "test/Integration/",
+            "test/Legacy/",
+            "test/Unit/"
+        ]
     },
     "bin": [
         "bin/horde-db-migrate-component"
     ],
     "config": {
-        "allow-plugins": {}
+        "allow-plugins": {
+            "horde/horde-installer-plugin": true
+        }
     },
     "extra": {
         "branch-alias": {
