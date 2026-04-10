@@ -558,6 +558,30 @@ class SplitRead implements Adapter
         $this->lastQuery = $this->write->getLastQuery();
     }
 
+    /*##########################################################################
+    # QuotingInterface — proxy to write adapter
+    ##########################################################################*/
+
+    public function quoteColumnName(string $name): string
+    {
+        return $this->write->quoteColumnName($name);
+    }
+
+    public function quoteTableName(string $name): string
+    {
+        return $this->write->quoteTableName($name);
+    }
+
+    public function quoteTrue(): string
+    {
+        return $this->write->quoteTrue();
+    }
+
+    public function quoteFalse(): string
+    {
+        return $this->write->quoteFalse();
+    }
+
     public function getLastQuery(): string
     {
         return $this->lastQuery;

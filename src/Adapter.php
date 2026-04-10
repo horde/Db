@@ -19,6 +19,7 @@
 namespace Horde\Db;
 
 use Horde\Db\Adapter\Base\Result;
+use Horde\Db\Query\QuotingInterface;
 use Horde_Db_Adapter;
 
 /**
@@ -37,7 +38,7 @@ use Horde_Db_Adapter;
  * @package    Db
  * @subpackage Adapter
  */
-interface Adapter extends Horde_Db_Adapter
+interface Adapter extends Horde_Db_Adapter, QuotingInterface
 {
     /**
      * Returns the human-readable name of the adapter.  Use mixed case - one

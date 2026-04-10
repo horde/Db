@@ -46,7 +46,7 @@ class AnsiQuotingStub implements QuotingInterface
         return '0';
     }
 
-    public function addLimitOffset(string $sql, array $options): string
+    public function addLimitOffset($sql, $options)
     {
         if (isset($options['limit']) && $options['limit'] !== null) {
             $sql .= ' LIMIT ' . (int) $options['limit'];
@@ -57,7 +57,7 @@ class AnsiQuotingStub implements QuotingInterface
         return $sql;
     }
 
-    public function addLock(string &$sql, array $options = []): void
+    public function addLock(&$sql, array $options = [])
     {
         if (isset($options['lock']) && is_string($options['lock'])) {
             $sql .= ' ' . $options['lock'];
