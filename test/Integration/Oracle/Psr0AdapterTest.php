@@ -14,6 +14,7 @@ namespace Horde\Db\Test\Integration\Oracle;
 
 use Horde_Db_Adapter_Oracle;
 use Horde\Db\Test\Integration\DatabaseTestCase;
+use Exception;
 
 /**
  * Test Horde_Db with Oracle using PSR-0 (lib/) variant.
@@ -39,7 +40,7 @@ class Psr0AdapterTest extends DatabaseTestCase
             // Drop sequences
             try {
                 $this->conn->execute('DROP SEQUENCE test_users_seq');
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Ignore if doesn't exist
             }
             $this->conn->disconnect();
