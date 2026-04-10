@@ -13,6 +13,9 @@ declare(strict_types=1);
 namespace Horde\Db\Test\Integration;
 
 use PHPUnit\Framework\TestCase;
+use Exception;
+use PDO;
+use PDOException;
 
 /**
  * Base class for database integration tests.
@@ -31,7 +34,7 @@ abstract class DatabaseTestCase extends TestCase
         return [
             'adapter' => 'mysqli',
             'host' => getenv('DB_MYSQL_HOST') ?: 'localhost',
-            'port' => (int)(getenv('DB_MYSQL_PORT') ?: 3306),
+            'port' => (int) (getenv('DB_MYSQL_PORT') ?: 3306),
             'username' => getenv('DB_MYSQL_USER') ?: 'root',
             'password' => getenv('DB_MYSQL_PASS') ?: '',
             'database' => getenv('DB_MYSQL_DB') ?: 'horde_test',
@@ -49,7 +52,7 @@ abstract class DatabaseTestCase extends TestCase
         return [
             'adapter' => 'pdo_pgsql',
             'host' => getenv('DB_PGSQL_HOST') ?: 'localhost',
-            'port' => (int)(getenv('DB_PGSQL_PORT') ?: 5432),
+            'port' => (int) (getenv('DB_PGSQL_PORT') ?: 5432),
             'username' => getenv('DB_PGSQL_USER') ?: 'postgres',
             'password' => getenv('DB_PGSQL_PASS') ?: '',
             'database' => getenv('DB_PGSQL_DB') ?: 'horde_test',
@@ -66,7 +69,7 @@ abstract class DatabaseTestCase extends TestCase
         return [
             'adapter' => 'oci8',
             'host' => getenv('DB_ORACLE_HOST') ?: 'localhost',
-            'port' => (int)(getenv('DB_ORACLE_PORT') ?: 1521),
+            'port' => (int) (getenv('DB_ORACLE_PORT') ?: 1521),
             'username' => getenv('DB_ORACLE_USER') ?: 'system',
             'password' => getenv('DB_ORACLE_PASS') ?: 'oracle',
             'database' => getenv('DB_ORACLE_DB') ?: 'XE',
@@ -133,9 +136,9 @@ abstract class DatabaseTestCase extends TestCase
                 $config['port'],
                 'postgres'
             );
-            $pdo = new \PDO($dsn, $config['username'], $config['password']);
+            $pdo = new PDO($dsn, $config['username'], $config['password']);
             return true;
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return false;
         }
     }
@@ -190,7 +193,7 @@ abstract class DatabaseTestCase extends TestCase
         foreach ($tables as $table) {
             try {
                 $conn->execute("DROP TABLE IF EXISTS $table");
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // Ignore errors - table might not exist
             }
         }
