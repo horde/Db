@@ -51,18 +51,22 @@ interface QuotingInterface
     /**
      * Append LIMIT and OFFSET to a SQL statement.
      *
+     * Signature matches Horde_Db_Adapter for interface compatibility.
+     *
      * @param string $sql     SQL statement.
      * @param array  $options Hash with 'limit' and (optional) 'offset' values.
      *
      * @return string Modified SQL.
      */
-    public function addLimitOffset(string $sql, array $options): string;
+    public function addLimitOffset($sql, $options);
 
     /**
      * Append a locking clause to a SQL statement.
      *
-     * @param string $sql     SQL statement (modified in-place).
+     * Signature matches Horde_Db_Adapter for interface compatibility.
+     *
+     * @param string &$sql    SQL statement (modified in-place).
      * @param array  $options Lock options.
      */
-    public function addLock(string &$sql, array $options = []): void;
+    public function addLock(&$sql, array $options = []);
 }

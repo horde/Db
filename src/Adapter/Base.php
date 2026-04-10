@@ -20,6 +20,7 @@ namespace Horde\Db\Adapter;
 
 use Horde\Db\Adapter;
 use Horde\Db\DbException;
+use Horde\Db\Query\QuotingInterface;
 use Horde_Cache;
 use Horde_Log_Logger;
 use Horde\Db\Adapter\Base\Schema;
@@ -697,6 +698,51 @@ abstract class Base implements Adapter
     public function transactionStarted()
     {
         return (bool) $this->transactionStarted;
+    }
+
+
+    /*##########################################################################
+    # QuotingInterface — proxy to schema
+    ##########################################################################*/
+
+    /**
+     * Returns a quoted form of the column name.
+     *
+     * Delegates to the driver-specific schema object.
+     */
+    public function quoteColumnName(string $name): string
+    {
+        return $this->__call('quoteColumnName', [$name]);
+    }
+
+    /**
+     * Returns a quoted form of the table name.
+     *
+     * Delegates to the driver-specific schema object.
+     */
+    public function quoteTableName(string $name): string
+    {
+        return $this->__call('quoteTableName', [$name]);
+    }
+
+    /**
+     * Returns the SQL representation of boolean true.
+     *
+     * Delegates to the driver-specific schema object.
+     */
+    public function quoteTrue(): string
+    {
+        return $this->__call('quoteTrue', []);
+    }
+
+    /**
+     * Returns the SQL representation of boolean false.
+     *
+     * Delegates to the driver-specific schema object.
+     */
+    public function quoteFalse(): string
+    {
+        return $this->__call('quoteFalse', []);
     }
 
     /**
