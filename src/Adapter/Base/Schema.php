@@ -28,6 +28,8 @@ use InvalidArgumentException;
 use Horde_Date;
 use DateTime;
 use Horde_String;
+use Horde_Db_Adapter_Base_TableDefinition;
+use Horde_Db_Value;
 
 /**
  * Base class for managing database schemes and handling database-specific SQL
@@ -250,7 +252,7 @@ abstract class Schema
             return $value->quotedId();
         }
 
-        if ($value instanceof Value) {
+        if ($value instanceof Value || $value instanceof Horde_Db_Value) {
             return $value->quote($this->adapter);
         }
 
@@ -586,7 +588,7 @@ abstract class Schema
      */
     public function endTable($name, $options = [])
     {
-        if ($name instanceof TableDefinition) {
+        if ($name instanceof TableDefinition || $name instanceof Horde_Db_Adapter_Base_TableDefinition) {
             $tableDefinition = $name;
             $options = array_merge($tableDefinition->getOptions(), $options);
         } else {

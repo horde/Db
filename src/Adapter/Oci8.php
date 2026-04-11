@@ -24,6 +24,8 @@ use Horde\Db\Value\Text;
 use Horde\Db\Value\Binary;
 use Horde_Support_Timer;
 use Horde_String;
+use Horde_Db_Value_Binary;
+use Horde_Db_Value_Text;
 
 /**
  *
@@ -317,7 +319,7 @@ class Oci8 extends Base
         $descriptors = [];
         foreach ($lobs as $name => $lob) {
             $descriptors[$name] = oci_new_descriptor($this->connection, OCI_DTYPE_LOB);
-            oci_bind_by_name($stmt, ':' . $name, $descriptors[$name], -1, $lob instanceof Text ? OCI_B_CLOB : OCI_B_BLOB);
+            oci_bind_by_name($stmt, ':' . $name, $descriptors[$name], -1, ($lob instanceof Text || $lob instanceof Horde_Db_Value_Text) ? OCI_B_CLOB : OCI_B_BLOB);
         }
 
         $flags = $lobs
@@ -492,11 +494,11 @@ class Oci8 extends Base
     {
         $blobs = $locators = [];
         foreach ($fields as $column => &$field) {
-            if ($field instanceof Binary
-                || $field instanceof Text) {
+            if ($field instanceof Binary || $field instanceof Horde_Db_Value_Binary
+                || $field instanceof Text || $field instanceof Horde_Db_Value_Text) {
                 $blobs[$this->quoteColumnName($column)] = $field;
                 $locators[] = ':' . $this->quoteColumnName($column);
-                $field = $field instanceof Text
+                $field = ($field instanceof Text || $field instanceof Horde_Db_Value_Text)
                     ? 'EMPTY_CLOB()'
                     : 'EMPTY_BLOB()';
             } else {

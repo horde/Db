@@ -26,6 +26,8 @@ use Horde\Db\DbException;
 use Horde\Db\Value\Binary;
 use Horde_Support_Timer;
 use Horde\Db\Value;
+use Horde_Db_Value;
+use Horde_Db_Value_Binary;
 
 /**
  *
@@ -333,7 +335,7 @@ abstract class Base extends BaseAdapter
         $placeholders = $values = $binary = [];
         $binary_cnt = 0;
         foreach ($fields as $name => $value) {
-            if ($value instanceof Binary) {
+            if ($value instanceof Binary || $value instanceof Horde_Db_Value_Binary) {
                 $placeholders[] = ':binary' . $binary_cnt++;
                 $binary[] = $value->stream;
             } else {
@@ -389,7 +391,7 @@ abstract class Base extends BaseAdapter
         $binary_cnt = 0;
 
         foreach ($fields as $field => $value) {
-            if ($value instanceof Value) {
+            if ($value instanceof Value || $value instanceof Horde_Db_Value) {
                 $fnames[] = $this->quoteColumnName($field) . ' = :binary' . $binary_cnt++;
                 $binary_values[] = $value->stream;
             } else {
