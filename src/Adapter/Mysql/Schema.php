@@ -24,6 +24,7 @@ use Horde\Db\Adapter\Base\Index;
 use Horde\Db\Adapter\Base\TableDefinition;
 use Horde\Db\DbException;
 use Horde_String;
+use Horde_Db_Adapter_Base_TableDefinition;
 
 /**
  * Class for MySQL-specific managing of database schemes and handling of SQL
@@ -311,7 +312,7 @@ class Schema extends BaseSchema
      */
     public function endTable($name, $options = [])
     {
-        if ($name instanceof TableDefinition) {
+        if ($name instanceof TableDefinition || $name instanceof Horde_Db_Adapter_Base_TableDefinition) {
             $options = array_merge($name->getOptions(), $options);
         }
         if (isset($options['options'])) {

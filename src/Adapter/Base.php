@@ -28,6 +28,7 @@ use Horde_Support_Stub;
 use BadMethodCallException;
 use Horde_Support_Backtrace;
 use Horde\Db\Value\Binary;
+use Horde_Db_Value_Binary;
 
 /**
  *
@@ -885,7 +886,7 @@ abstract class Base implements Adapter
         $sql = array_shift($sqlPieces);
         while (count($sqlPieces)) {
             $value = array_shift($args);
-            if ($no_binary && $value instanceof Binary) {
+            if ($no_binary && ($value instanceof Binary || $value instanceof Horde_Db_Value_Binary)) {
                 $sql_value = '<binary_data>';
             } else {
                 $sql_value = $this->quote($value);
