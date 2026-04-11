@@ -199,8 +199,11 @@ class Mysqli extends Base
      */
     public function isActive()
     {
+        if (!$this->active) {
+            return false;
+        }
         $this->lastQuery = 'SELECT 1';
-        return isset($this->connection) && $this->connection->query('SELECT 1');
+        return (bool) $this->connection->query('SELECT 1');
     }
 
 
@@ -217,6 +220,8 @@ class Mysqli extends Base
      */
     public function quoteString($string)
     {
+        $this->ensureConnected();
+
         return "'" . $this->connection->real_escape_string($string) . "'";
     }
 
@@ -330,6 +335,8 @@ class Mysqli extends Base
      */
     public function execute($sql, $arg1 = null, $arg2 = null)
     {
+        $this->ensureConnected();
+
         if (is_array($arg1)) {
             $query = $this->replaceParameters($sql, $arg1);
             $name = $arg2;
@@ -383,6 +390,8 @@ class Mysqli extends Base
      */
     public function beginDbTransaction()
     {
+        $this->ensureConnected();
+
         $this->connection->autocommit(false);
         $this->transactionStarted++;
     }
@@ -392,6 +401,8 @@ class Mysqli extends Base
      */
     public function commitDbTransaction()
     {
+        $this->ensureConnected();
+
         $this->transactionStarted--;
         if (!$this->transactionStarted) {
             $this->connection->commit();
@@ -405,6 +416,8 @@ class Mysqli extends Base
      */
     public function rollbackDbTransaction()
     {
+        $this->ensureConnected();
+
         if (!$this->transactionStarted) {
             return;
         }

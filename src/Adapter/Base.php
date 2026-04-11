@@ -180,7 +180,8 @@ abstract class Base implements Adapter
             $this->schemaClass = __CLASS__ . '_Schema';
         }
 
-        $this->connect();
+        // Connection is deferred until first query (lazy connect).
+        // Subclass methods that need $this->connection call ensureConnected().
     }
 
     /**
@@ -204,8 +205,10 @@ abstract class Base implements Adapter
      */
     public function __wakeup()
     {
-        $this->schema->setAdapter($this);
-        $this->connect();
+        if ($this->schema) {
+            $this->schema->setAdapter($this);
+        }
+        // Connection is deferred until first query (lazy connect).
     }
 
     /**
@@ -470,7 +473,22 @@ abstract class Base implements Adapter
      */
     public function rawConnection()
     {
+        $this->ensureConnected();
         return $this->connection;
+    }
+
+    /**
+     * Ensure the database connection is established.
+     *
+     * Called by subclass methods that need $this->connection. If not yet
+     * connected, triggers connect(). Safe to call multiple times — returns
+     * immediately when already active.
+     */
+    protected function ensureConnected(): void
+    {
+        if (!$this->active) {
+            $this->connect();
+        }
     }
 
 

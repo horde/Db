@@ -299,6 +299,8 @@ class Oci8 extends Base
      */
     public function execute($sql, $arg1 = null, $arg2 = null, $lobs = [])
     {
+        $this->ensureConnected();
+
         if (is_array($arg1)) {
             $query = $this->replaceParameters($sql, $arg1);
             $name = $arg2;
@@ -519,6 +521,8 @@ class Oci8 extends Base
      */
     public function commitDbTransaction()
     {
+        $this->ensureConnected();
+
         $this->transactionStarted--;
         if (!$this->transactionStarted) {
             if (!oci_commit($this->connection)) {
@@ -533,6 +537,8 @@ class Oci8 extends Base
      */
     public function rollbackDbTransaction()
     {
+        $this->ensureConnected();
+
         if (!$this->transactionStarted) {
             return;
         }
