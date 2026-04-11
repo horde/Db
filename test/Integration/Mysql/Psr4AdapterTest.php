@@ -42,6 +42,9 @@ class Psr4AdapterTest extends DatabaseTestCase
 
     public function testConnection()
     {
+        // Lazy connect: not active until first query
+        $this->assertFalse($this->conn->isActive());
+        $this->conn->selectValue('SELECT 1');
         $this->assertTrue($this->conn->isActive());
     }
 
