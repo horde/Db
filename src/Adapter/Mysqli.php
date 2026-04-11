@@ -175,7 +175,7 @@ class Mysqli extends Base
             if ($charset === 'utf8') {
                 $charset = 'utf8mb4';
             }
-            $this->schema->setCharset($charset);
+            $this->setCharset($charset);
         }
 
         $this->hasMysqliFetchAll = function_exists('mysqli_fetch_all');
