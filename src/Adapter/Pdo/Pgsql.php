@@ -67,12 +67,12 @@ class Pgsql extends Base
         // Temporarily set the client message level above error to prevent unintentional
         // error messages in the logs when working on a PostgreSQL database server that
         // does not support standard conforming strings.
-        $clientMinMessagesOld = $this->schema->getClientMinMessages();
-        $this->schema->setClientMinMessages('panic');
+        $clientMinMessagesOld = $this->getClientMinMessages();
+        $this->setClientMinMessages('panic');
 
         $hasSupport = $this->selectValue('SHOW standard_conforming_strings');
 
-        $this->schema->setClientMinMessages($clientMinMessagesOld);
+        $this->setClientMinMessages($clientMinMessagesOld);
         return $hasSupport;
     }
 
@@ -163,7 +163,7 @@ class Pgsql extends Base
 
         // If neither pk nor sequence name is given, look them up.
         if (!($pk || $sequenceName)) {
-            [$pk, $sequenceName] = $this->schema->pkAndSequenceFor($table);
+            [$pk, $sequenceName] = $this->pkAndSequenceFor($table);
         }
 
         // Otherwise, insert then grab last_insert_id.
@@ -176,8 +176,8 @@ class Pgsql extends Base
         // Don't fetch last insert id for a table without a pk.
         if ($pk
             && ($sequenceName
-             || $sequenceName = $this->schema->defaultSequenceName($table, $pk))) {
-            $this->schema->resetPkSequence($table, $pk, $sequenceName);
+             || $sequenceName = $this->defaultSequenceName($table, $pk))) {
+            $this->resetPkSequence($table, $pk, $sequenceName);
             return $this->lastInsertId($table, $sequenceName);
         }
         return 0;
@@ -244,9 +244,9 @@ class Pgsql extends Base
         }
 
         if (!empty($this->config['client_min_messages'])) {
-            $this->schema->setClientMinMessages($this->config['client_min_messages']);
+            $this->setClientMinMessages($this->config['client_min_messages']);
         }
-        $this->schema->setSchemaSearchPath(!empty($this->config['schema_search_path']) || !empty($this->config['schema_order']));
+        $this->setSchemaSearchPath(!empty($this->config['schema_search_path']) || !empty($this->config['schema_order']));
     }
 
     /**
@@ -302,6 +302,6 @@ class Pgsql extends Base
      */
     protected function lastInsertId($table, $sequenceName)
     {
-        return (int) $this->selectValue('SELECT currval(' . $this->schema->quoteSequenceName($sequenceName) . ')');
+        return (int) $this->selectValue('SELECT currval(' . $this->quoteSequenceName($sequenceName) . ')');
     }
 }

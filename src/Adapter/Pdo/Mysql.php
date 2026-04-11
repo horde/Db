@@ -82,7 +82,7 @@ class Mysql extends Base
             if ($charset === 'utf8') {
                 $charset = 'utf8mb4';
             }
-            $this->schema->setCharset($charset);
+            $this->setCharset($charset);
         }
     }
 
