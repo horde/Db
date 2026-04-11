@@ -74,6 +74,7 @@ class Sqlite extends Base
      */
     public function supportsCountDistinct()
     {
+        $this->ensureConnected();
         return $this->sqliteVersion >= '3.2.6';
     }
 
@@ -90,6 +91,7 @@ class Sqlite extends Base
 
     public function supportsAutoIncrement()
     {
+        $this->ensureConnected();
         return $this->sqliteVersion >= '3.1.0';
     }
 

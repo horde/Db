@@ -85,10 +85,12 @@ abstract class Base extends BaseAdapter
      */
     public function isActive()
     {
+        if (!$this->active) {
+            return false;
+        }
         $this->lastQuery = $sql = 'SELECT 1';
         try {
-            return isset($this->connection)
-                && $this->connection->query($sql);
+            return (bool) $this->connection->query($sql);
         } catch (PDOException $e) {
             throw new DbException($e);
         }
@@ -239,6 +241,8 @@ abstract class Base extends BaseAdapter
      */
     public function execute($sql, $arg1 = null, $arg2 = null)
     {
+        $this->ensureConnected();
+
         if (is_array($arg1)) {
             $query = $this->replaceParameters($sql, $arg1);
             $name = $arg2;
@@ -281,6 +285,8 @@ abstract class Base extends BaseAdapter
      */
     protected function executePrepared($sql, $values, $binary_values)
     {
+        $this->ensureConnected();
+
         $query = $this->replaceParameters($sql, $values);
         try {
             $stmt = $this->connection->prepare($query);
@@ -457,6 +463,8 @@ abstract class Base extends BaseAdapter
      */
     public function beginDbTransaction()
     {
+        $this->ensureConnected();
+
         if (!$this->transactionStarted) {
             try {
                 $this->connection->beginTransaction();
@@ -472,6 +480,8 @@ abstract class Base extends BaseAdapter
      */
     public function commitDbTransaction()
     {
+        $this->ensureConnected();
+
         $this->transactionStarted--;
         if (!$this->transactionStarted) {
             try {
@@ -488,6 +498,8 @@ abstract class Base extends BaseAdapter
      */
     public function rollbackDbTransaction()
     {
+        $this->ensureConnected();
+
         if (!$this->transactionStarted) {
             return;
         }
@@ -514,6 +526,8 @@ abstract class Base extends BaseAdapter
      */
     public function quoteString($string)
     {
+        $this->ensureConnected();
+
         try {
             return $this->connection->quote($string);
         } catch (PDOException $e) {
