@@ -20,6 +20,7 @@ use Horde\Db\Adapter\Pdo\Sqlite;
 use Horde\Db\Value\Binary;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use TypeError;
 
 /**
  * Tests for lazy database connection behaviour.
@@ -122,7 +123,7 @@ class LazyConnectTest extends TestCase
         // before any query — may throw TypeError, but must not trigger connect.
         try {
             $this->adapter->getLastQuery();
-        } catch (\TypeError $e) {
+        } catch (TypeError $e) {
             // Expected: lastQuery is null before any query
         }
         $this->assertNotConnected();
