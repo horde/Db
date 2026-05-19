@@ -110,6 +110,23 @@
   notes: |-
     Original version string was 3.0.0alpha3
     |+
+3.0.0-RC1:
+  api: 3.0.0-RC1
+  state:
+    release: RC
+    api: RC
+  date: 2026-05-19
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    test: Lazy connection
+    test: Coverage for lazy adapter scenarios
+    feat: Really make the adapter lazy
+    feat: Defer setting charset and other settings until we really need the internal handle
+    feat: Accept both old-style and new-style types in new-style adapter for upgrade path
+    feat: Add Delete/Inser/Update builders
+    feat: OO Immutable Query Builder
 2.4.2:
   api: 2.4.0
   state:
