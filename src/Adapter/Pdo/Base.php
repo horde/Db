@@ -279,7 +279,7 @@ abstract class Base extends BaseAdapter
      *     placeholders named like ':binary0', ':binary1' etc...
      *
      * @param  array $values        An array of non-stream values.
-     * @param  array $binary_values An array of stream resources.
+     * @param  array $binary_values LOB payloads (strings or stream resources).
      *
      * @throws  DbException
      */
@@ -291,8 +291,11 @@ abstract class Base extends BaseAdapter
         try {
             $stmt = $this->connection->prepare($query);
             foreach ($binary_values as $key => $bvalue) {
-                rewind($bvalue);
-                $stmt->bindParam(':binary' . $key, $bvalue, PDO::PARAM_LOB);
+                $stmt->bindValue(
+                    ':binary' . $key,
+                    $this->materializeLobPayload($bvalue),
+                    PDO::PARAM_LOB
+                );
             }
         } catch (PDOException $e) {
             $this->logInfo($sql, $values, null);
@@ -320,6 +323,36 @@ abstract class Base extends BaseAdapter
     }
 
     /**
+     * Materialize a LOB payload for PDO binding.
+     *
+     * @param string|resource $payload
+     *
+     * @return string
+     */
+    protected function materializeLobPayload($payload)
+    {
+        if (is_resource($payload)) {
+            rewind($payload);
+            return stream_get_contents($payload);
+        }
+
+        return (string) $payload;
+    }
+
+    /**
+     * Return the string payload of a LOB value wrapper.
+     *
+     * @param Value|Horde_Db_Value $value
+     *
+     * @return string
+     */
+    protected function lobValueString($value)
+    {
+        $data = $value->value;
+        return is_string($data) ? $data : '';
+    }
+
+    /**
      * Inserts a row including BLOBs into a table.
      *
      * @since Horde_Db 2.4.0
@@ -343,7 +376,7 @@ abstract class Base extends BaseAdapter
         foreach ($fields as $name => $value) {
             if ($value instanceof Binary || $value instanceof Horde_Db_Value_Binary) {
                 $placeholders[] = ':binary' . $binary_cnt++;
-                $binary[] = $value->stream;
+                $binary[] = $this->lobValueString($value);
             } else {
                 $placeholders[] = '?';
                 $values[] = $value;
@@ -399,7 +432,7 @@ abstract class Base extends BaseAdapter
         foreach ($fields as $field => $value) {
             if ($value instanceof Value || $value instanceof Horde_Db_Value) {
                 $fnames[] = $this->quoteColumnName($field) . ' = :binary' . $binary_cnt++;
-                $binary_values[] = $value->stream;
+                $binary_values[] = $this->lobValueString($value);
             } else {
                 $fnames[] = $this->quoteColumnName($field) . ' = ?';
                 $values[] = $value;

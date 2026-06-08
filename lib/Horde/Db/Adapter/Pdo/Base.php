@@ -260,7 +260,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
      *     placeholders named like ':binary0', ':binary1' etc...
      *
      * @param  array $values        An array of non-stream values.
-     * @param  array $binary_values An array of stream resources.
+     * @param  array $binary_values LOB payloads (strings or stream resources).
      *
      * @throws  Horde_Db_Exception
      */
@@ -270,8 +270,11 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         try {
             $stmt = $this->_connection->prepare($query);
             foreach ($binary_values as $key => $bvalue) {
-                rewind($bvalue);
-                $stmt->bindParam(':binary' . $key, $bvalue, PDO::PARAM_LOB);
+                $stmt->bindValue(
+                    ':binary' . $key,
+                    $this->_materializeLobPayload($bvalue),
+                    PDO::PARAM_LOB
+                );
             }
         } catch (PDOException $e) {
             $this->_logInfo($sql, $values, null);
@@ -299,6 +302,40 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
     }
 
     /**
+     * Materialize a LOB payload for PDO binding.
+     *
+     * Stream handles must not be bound by reference across multiple LOB
+     * placeholders: exhausted or shared streams can persist empty or wrong
+     * column data when more than one Horde_Db_Value column is updated.
+     *
+     * @param string|resource $payload
+     *
+     * @return string
+     */
+    protected function _materializeLobPayload($payload)
+    {
+        if (is_resource($payload)) {
+            rewind($payload);
+            return stream_get_contents($payload);
+        }
+
+        return (string) $payload;
+    }
+
+    /**
+     * Return the string payload of a Horde_Db_Value LOB wrapper.
+     *
+     * @param Horde_Db_Value $value
+     *
+     * @return string
+     */
+    protected function _lobValueString(Horde_Db_Value $value)
+    {
+        $data = $value->value;
+        return is_string($data) ? $data : '';
+    }
+
+    /**
      * Inserts a row including BLOBs into a table.
      *
      * @since Horde_Db 2.4.0
@@ -322,7 +359,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         foreach ($fields as $name => $value) {
             if ($value instanceof Horde_Db_Value_Binary) {
                 $placeholders[] = ':binary' . $binary_cnt++;
-                $binary[] = $value->stream;
+                $binary[] = $this->_lobValueString($value);
             } else {
                 $placeholders[] = '?';
                 $values[] = $value;
@@ -378,7 +415,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         foreach ($fields as $field => $value) {
             if ($value instanceof Horde_Db_Value) {
                 $fnames[] = $this->quoteColumnName($field) . ' = :binary' . $binary_cnt++;
-                $binary_values[] = $value->stream;
+                $binary_values[] = $this->_lobValueString($value);
             } else {
                 $fnames[] = $this->quoteColumnName($field) . ' = ?';
                 $values[] = $value;
