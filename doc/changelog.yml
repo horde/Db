@@ -110,6 +110,19 @@
   notes: |-
     Original version string was 3.0.0alpha3
     |+
+3.0.0-RC2:
+  api: 3.0.0-RC2
+  state:
+    release: RC
+    api: RC
+  date: 2026-06-09
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: |-
+    moved test to correct folder
+    fix(pdo): materialize multi-column LOB bindings before execute
+    chore: Update workflow dependency
 3.0.0-RC1:
   api: 3.0.0-RC1
   state:
