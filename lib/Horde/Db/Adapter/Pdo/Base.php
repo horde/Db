@@ -332,7 +332,7 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
     protected function _lobValueString(Horde_Db_Value $value)
     {
         $data = $value->value;
-        return is_string($data) ? $data : '';
+        return is_string($data) ? $data : (is_scalar($data) ? (string) $data : '');
     }
 
     /**

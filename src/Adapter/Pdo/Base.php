@@ -349,7 +349,7 @@ abstract class Base extends BaseAdapter
     protected function lobValueString($value)
     {
         $data = $value->value;
-        return is_string($data) ? $data : '';
+        return is_string($data) ? $data : (is_scalar($data) ? (string) $data : '');
     }
 
     /**
