@@ -18,6 +18,7 @@ use Horde\Db\Test\Integration\DatabaseTestCase;
 
 /**
  * @covers Horde_Db_Adapter_Pdo_Base::_executePrepared
+ * @covers Horde_Db_Adapter_Pdo_Base::_lobValueString
  */
 class MultiBlobBindingTest extends DatabaseTestCase
 {
@@ -107,5 +108,63 @@ class MultiBlobBindingTest extends DatabaseTestCase
 
         $this->assertSame($folder, $row['sync_data']);
         $this->assertSame($pending, $row['sync_pending']);
+    }
+
+    /**
+     * @dataProvider scalarBinaryPayloadProvider
+     */
+    public function testInsertBlobStoresScalarBinaryPayload($payload, $expected)
+    {
+        $key = '{test}scalar-insert-' . md5((string) $expected);
+
+        $this->conn->insertBlob(
+            'activesync_state',
+            [
+                'sync_key' => $key,
+                'sync_data' => new Horde_Db_Value_Binary($payload),
+                'sync_pending' => '',
+                'sync_mod' => 0,
+            ],
+            'sync_key',
+            $key
+        );
+
+        $stored = $this->conn->selectValue(
+            'SELECT sync_data FROM activesync_state WHERE sync_key = ?',
+            [$key]
+        );
+
+        $this->assertSame($expected, $stored);
+    }
+
+    /**
+     * @dataProvider scalarBinaryPayloadProvider
+     */
+    public function testUpdateBlobRoundTripsScalarBinaryPayload($payload, $expected)
+    {
+        $this->conn->updateBlob(
+            'activesync_state',
+            [
+                'sync_data' => new Horde_Db_Value_Binary($payload),
+            ],
+            ['sync_key = ?', ['{test}1']]
+        );
+
+        $stored = $this->conn->selectValue(
+            'SELECT sync_data FROM activesync_state WHERE sync_key = ?',
+            ['{test}1']
+        );
+
+        $this->assertSame($expected, $stored);
+    }
+
+    public static function scalarBinaryPayloadProvider(): array
+    {
+        return [
+            'integer one' => [1, '1'],
+            'integer zero' => [0, '0'],
+            'string one' => ['1', '1'],
+            'string zero' => ['0', '0'],
+        ];
     }
 }
