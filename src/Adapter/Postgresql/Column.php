@@ -127,7 +127,7 @@ class Column extends BaseColumn
     /**
      * Extracts the value from a PostgreSQL column default definition.
      *
-     * @param string $default  The default value expression.
+     * @param string|null $default  The default value expression.
      *
      * @return mixed  Extracted default value (string, int, float, bool, or null).
      */
