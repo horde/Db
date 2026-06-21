@@ -149,4 +149,10 @@ class ColumnTest extends ColumnBase
         $col = new Column('name', '', 'character varying(255)');
         $this->assertEquals('', $col->getDefault());
     }
+
+    public function testMissingDefaultNull()
+    {
+        $col = new Column('name', null, 'integer');
+        $this->assertNull($col->getDefault());
+    }
 }

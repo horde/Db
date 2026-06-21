@@ -133,6 +133,10 @@ class Column extends BaseColumn
      */
     protected function extractValueFromDefault($default)
     {
+        if ($default === null) {
+            return null;
+        }
+
         switch (true) {
             case preg_match('/\A-?\d+(\.\d*)?\z/', $default):
                 // Numeric types
