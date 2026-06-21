@@ -123,6 +123,10 @@ class Horde_Db_Adapter_Postgresql_Column extends Horde_Db_Adapter_Base_Column
      */
     protected function _extractValueFromDefault($default)
     {
+        if ($default === null) {
+            return null;
+        }
+
         switch (true) {
             case preg_match('/\A-?\d+(\.\d*)?\z/', $default):
                 // Numeric types
