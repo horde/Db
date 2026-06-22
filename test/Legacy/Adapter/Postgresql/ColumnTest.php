@@ -155,4 +155,14 @@ class ColumnTest extends ColumnBase
         $col = new Column('name', null, 'integer');
         $this->assertNull($col->getDefault());
     }
+
+    /**
+     * Regression test: null must not be passed to preg_replace_callback()
+     * (deprecated in PHP 8.1+).
+     */
+    public function testBinaryToStringNull()
+    {
+        $col = new Column('data', null, 'bytea');
+        $this->assertNull($col->binaryToString(null));
+    }
 }

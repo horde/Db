@@ -42,4 +42,14 @@ class ColumnLegacyTest extends TestCase
         $col = new Horde_Db_Adapter_Postgresql_Column('name', null, 'integer');
         $this->assertNull($col->getDefault());
     }
+
+    /**
+     * Regression test: null must not be passed to preg_replace_callback()
+     * (deprecated in PHP 8.1+).
+     */
+    public function testBinaryToStringNull(): void
+    {
+        $col = new Horde_Db_Adapter_Postgresql_Column('data', null, 'bytea');
+        $this->assertNull($col->binaryToString(null));
+    }
 }
