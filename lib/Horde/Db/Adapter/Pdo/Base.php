@@ -413,7 +413,11 @@ abstract class Horde_Db_Adapter_Pdo_Base extends Horde_Db_Adapter_Base
         $binary_cnt = 0;
 
         foreach ($fields as $field => $value) {
-            if ($value instanceof Horde_Db_Value) {
+            // Only true binary LOBs may use the PDO::PARAM_LOB binding: on
+            // PDO PostgreSQL that path is sent as bytea, so a CLOB/text value
+            // would be stored as its "\x..." hex representation. Text values
+            // are written as normal string literals, matching insertBlob().
+            if ($value instanceof Horde_Db_Value_Binary) {
                 $fnames[] = $this->quoteColumnName($field) . ' = :binary' . $binary_cnt++;
                 $binary_values[] = $this->_lobValueString($value);
             } else {

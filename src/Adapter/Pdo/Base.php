@@ -430,7 +430,11 @@ abstract class Base extends BaseAdapter
         $binary_cnt = 0;
 
         foreach ($fields as $field => $value) {
-            if ($value instanceof Value || $value instanceof Horde_Db_Value) {
+            // Only true binary LOBs may use the PDO::PARAM_LOB binding: on
+            // PDO PostgreSQL that path is sent as bytea, so a CLOB/text value
+            // would be stored as its "\x..." hex representation. Text values
+            // are written as normal string literals, matching insertBlob().
+            if ($value instanceof Binary || $value instanceof Horde_Db_Value_Binary) {
                 $fnames[] = $this->quoteColumnName($field) . ' = :binary' . $binary_cnt++;
                 $binary_values[] = $this->lobValueString($value);
             } else {
