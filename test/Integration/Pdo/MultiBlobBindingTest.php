@@ -14,6 +14,7 @@ namespace Horde\Db\Test\Integration\Pdo;
 
 use Horde_Db_Adapter_Pdo_Sqlite;
 use Horde_Db_Value_Binary;
+use Horde_Db_Value_Text;
 use Horde\Db\Test\Integration\DatabaseTestCase;
 
 /**
@@ -166,5 +167,64 @@ class MultiBlobBindingTest extends DatabaseTestCase
             'string one' => ['1', '1'],
             'string zero' => ['0', '0'],
         ];
+    }
+
+    /**
+     * Regression test for the PostgreSQL CLOB-in-bytea-binding bug.
+     *
+     * Before the fix, updateBlob() routed every Horde_Db_Value through the
+     * PDO::PARAM_LOB binding path, which PDO PostgreSQL sends as a bytea
+     * literal. Writing a Horde_Db_Value_Text into a text column therefore
+     * stored the value as its "\x..." hex representation rather than the
+     * original string. SQLite is too permissive to reproduce the corruption,
+     * but it still exercises the code path that decides text values must NOT
+     * use the LOB binding.
+     */
+    public function testUpdateBlobWithTextValueRoundTripsThroughTextColumn()
+    {
+        $pending = serialize([['id' => 1, 'type' => 'reminder', 'body' => 'hello']]);
+
+        $this->conn->updateBlob(
+            'activesync_state',
+            [
+                'sync_pending' => new Horde_Db_Value_Text($pending),
+                'sync_mod' => 5,
+            ],
+            ['sync_key = ?', ['{test}1']]
+        );
+
+        $row = $this->conn->selectOne(
+            'SELECT sync_pending, sync_mod FROM activesync_state WHERE sync_key = ?',
+            ['{test}1']
+        );
+
+        $this->assertSame($pending, $row['sync_pending']);
+        $this->assertStringStartsNotWith('\\x', (string) $row['sync_pending']);
+        $this->assertSame(5, (int) $row['sync_mod']);
+    }
+
+    public function testUpdateBlobMixesTextAndBinaryValues()
+    {
+        $folder = str_repeat('H', 128);
+        $pending = serialize([['id' => 7]]);
+
+        $this->conn->updateBlob(
+            'activesync_state',
+            [
+                'sync_data' => new Horde_Db_Value_Binary($folder),
+                'sync_pending' => new Horde_Db_Value_Text($pending),
+                'sync_mod' => 3,
+            ],
+            ['sync_key = ?', ['{test}1']]
+        );
+
+        $row = $this->conn->selectOne(
+            'SELECT sync_data, sync_pending, sync_mod FROM activesync_state WHERE sync_key = ?',
+            ['{test}1']
+        );
+
+        $this->assertSame($folder, $row['sync_data']);
+        $this->assertSame($pending, $row['sync_pending']);
+        $this->assertSame(3, (int) $row['sync_mod']);
     }
 }
