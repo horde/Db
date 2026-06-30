@@ -1,115 +1,14 @@
 ---
-3.0.0-beta1:
-  api: 3.0.0-beta1
-  state:
-    release: beta
-    api: beta
-  date: 2026-04-06
-  license:
-    identifier: BSD-2-Clause
-    uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    fix: iterator return types and null safety checks
-    test: Modernize test suite
-    docs: Add upgrading guide for 3.0 src/
-    docs: Make type hints more correct
-    chore(hordeyml): Add keywords
-    chore: add phpunit.cache to gitignore file
-    style: php-cs-fixer on whole code base
-    test: Cover PR #10 with unit tests for different types
-    fix filterDefault for non-string values in mysql schema
-3.0.0-alpha8:
-  api: 3.0.0-alpha8
-  state:
-    release: alpha
-    api: alpha
-  date: 2026-03-15
-  license:
-    identifier: BSD-2-Clause
-    uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    chore(gitignore) Add composer.lock to ignore list
-    fix: composer.lock shouldn't be versioned
-3.0.0-alpha7:
-  api: 3.0.0-alpha7
-  state:
-    release: alpha
-    api: alpha
-  date: 2026-03-07
-  license:
-    identifier: BSD-2-Clause
-    uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    fix(sqlite): handle null value in _unquote/unquote methods
-    fix(sqlite): handle null value in binaryToString
-    test(sqlite): add unit tests for _catchSchemaChanges method
-    fix(sqlite): replace deprecated parent:: callable syntax
-    remove: broken ExpressionDefaultIntegrationTest (requires TestBase refactor)
-    fix(mysql): auto-upgrade utf8 charset to utf8mb4
-    feat(mysql): add TEXT/BLOB/JSON default value expression support
-    feat(adapter): add CapabilityDetection interface for API compatibility
-    feat(mysql): add typed ServerInfo class for feature detection
-    test: add Value/Lob unit tests
-    test: add SplitRead adapter unit tests
-    test: add ColumnDefinition unit tests
-    test: add comprehensive SearchParser unit tests
-    fix(columndefinition): accept mixed types for setDefault to preserve boolean values
-    fix(columndefinition): add nullable type hints for PHP 8.2 compatibility
-    test(parser): split StatementParser test for PSR-0 and PSR-4
-    chore(qc): run quality control fixes
-    Update Schema.php
-3.0.0-alpha6:
-  api: 3.0.0-alpha1
-  state:
-    release: alpha
-    api: alpha
-  date: 2025-05-29
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    fix: Also apply defaults filter when changing an existing column's type
-    fix: Special case default field values must not be quoted if they are expressions
-    feat: Optionally supply sqlType to addColumnOptions
-    fix: #15172 Add a filter to support column defaults on mysql >= 8.0.13 for TEXT, BLOB and JSON format
-3.0.0-alpha5:
-  api: 3.0.0-alpha1
-  state:
-    release: alpha
-    api: alpha
-  date: 2025-05-13
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    style: Apply php-cs-fixer
-    ci: Add php-cs-fixer preset
-    fix: Mysql and MariaDB no longer support aliasing utf8mb4 as utf8 and just fail on older configs
-3.0.0-alpha4:
+3.0.0:
   api: 3.0.0
   state:
-    release: alpha
-    api: alpha
-  date: 2022-10-08
+    release: stable
+    api: stable
+  date: 2026-06-30
   license:
     identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 3.0.0alpha4
-    [rla] Improved PHP 8.1 compatibility.
-    |+
-3.0.0-alpha3:
-  api: 3.0.0
-  state:
-    release: alpha
-    api: alpha
-  date: 2021-03-13
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |-
-    Original version string was 3.0.0alpha3
-    |+
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: "chore: update CI\ntest: cover Horde_Db_Value_Text round-trip via updateBlob\nfix(postgresql): keep text/CLOB values out of bytea LOB binding in updateBlob\nMerge pull request #16 from horde/fix/postgresql-null-column-default\nfix(postgresql): handle null value in binaryToString\nfix(postgresql): guard null column defaults in extractValueFromDefault\ntest: add legacy Horde_Db_Adapter_Postgresql_Column null default test\nFix @param type for extractValueFromDefault to string|null\nfix(postgresql): guard null column defaults in extractValueFromDefault\nMerge pull request #14 from horde/fix/string_into_binary_storage\nAdd blob handling tests for scalar binary payloads\nfix(prefs): cast values to string before binary SQL storage"
 3.0.0-RC2:
   api: 3.0.0-RC2
   state:
@@ -119,10 +18,7 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    moved test to correct folder
-    fix(pdo): materialize multi-column LOB bindings before execute
-    chore: Update workflow dependency
+  notes: "moved test to correct folder\nfix(pdo): materialize multi-column LOB bindings before execute\nchore: Update workflow dependency"
 3.0.0-RC1:
   api: 3.0.0-RC1
   state:
@@ -132,14 +28,77 @@
   license:
     identifier: BSD-2-Clause
     uri: https://spdx.org/licenses/BSD-2-Clause.html
-  notes: |-
-    test: Lazy connection
-    test: Coverage for lazy adapter scenarios
-    feat: Really make the adapter lazy
-    feat: Defer setting charset and other settings until we really need the internal handle
-    feat: Accept both old-style and new-style types in new-style adapter for upgrade path
-    feat: Add Delete/Inser/Update builders
-    feat: OO Immutable Query Builder
+  notes: "test: Lazy connection\ntest: Coverage for lazy adapter scenarios\nfeat: Really make the adapter lazy\nfeat: Defer setting charset and other settings until we really need the internal handle\nfeat: Accept both old-style and new-style types in new-style adapter for upgrade path\nfeat: Add Delete/Inser/Update builders\nfeat: OO Immutable Query Builder"
+3.0.0-beta1:
+  api: 3.0.0-beta1
+  state:
+    release: beta
+    api: beta
+  date: 2026-04-06
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: "fix: iterator return types and null safety checks\ntest: Modernize test suite\ndocs: Add upgrading guide for 3.0 src/\ndocs: Make type hints more correct\nchore(hordeyml): Add keywords\nchore: add phpunit.cache to gitignore file\nstyle: php-cs-fixer on whole code base\ntest: Cover PR #10 with unit tests for different types\nfix filterDefault for non-string values in mysql schema"
+3.0.0-alpha8:
+  api: 3.0.0-alpha8
+  state:
+    release: alpha
+    api: alpha
+  date: 2026-03-15
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: "chore(gitignore) Add composer.lock to ignore list\nfix: composer.lock shouldn't be versioned"
+3.0.0-alpha7:
+  api: 3.0.0-alpha7
+  state:
+    release: alpha
+    api: alpha
+  date: 2026-03-07
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: "fix(sqlite): handle null value in _unquote/unquote methods\nfix(sqlite): handle null value in binaryToString\ntest(sqlite): add unit tests for _catchSchemaChanges method\nfix(sqlite): replace deprecated parent:: callable syntax\nremove: broken ExpressionDefaultIntegrationTest (requires TestBase refactor)\nfix(mysql): auto-upgrade utf8 charset to utf8mb4\nfeat(mysql): add TEXT/BLOB/JSON default value expression support\nfeat(adapter): add CapabilityDetection interface for API compatibility\nfeat(mysql): add typed ServerInfo class for feature detection\ntest: add Value/Lob unit tests\ntest: add SplitRead adapter unit tests\ntest: add ColumnDefinition unit tests\ntest: add comprehensive SearchParser unit tests\nfix(columndefinition): accept mixed types for setDefault to preserve boolean values\nfix(columndefinition): add nullable type hints for PHP 8.2 compatibility\ntest(parser): split StatementParser test for PSR-0 and PSR-4\nchore(qc): run quality control fixes\nUpdate Schema.php"
+3.0.0-alpha6:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-05-29
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "fix: Also apply defaults filter when changing an existing column's type\nfix: Special case default field values must not be quoted if they are expressions\nfeat: Optionally supply sqlType to addColumnOptions\nfix: #15172 Add a filter to support column defaults on mysql >= 8.0.13 for TEXT, BLOB and JSON format\n"
+3.0.0-alpha5:
+  api: 3.0.0-alpha1
+  state:
+    release: alpha
+    api: alpha
+  date: 2025-05-13
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "style: Apply php-cs-fixer\nci: Add php-cs-fixer preset\nfix: Mysql and MariaDB no longer support aliasing utf8mb4 as utf8 and just fail on older configs\n"
+3.0.0-alpha4:
+  api: 3.0.0
+  state:
+    release: alpha
+    api: alpha
+  date: 2022-10-08
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 3.0.0alpha4\n[rla] Improved PHP 8.1 compatibility.\n|+\n"
+3.0.0-alpha3:
+  api: 3.0.0
+  state:
+    release: alpha
+    api: alpha
+  date: 2021-03-13
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 3.0.0alpha3\n|+"
 2.4.2:
   api: 2.4.0
   state:
@@ -149,7 +108,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |+
+  notes: ''
 2.4.1:
   api: 2.4.0
   state:
@@ -159,9 +118,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix sequences on PostgreSQL 10+ (Ivan Sergio Borgonovo <mail@webthatworks.it>, PR #3).
-    [mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski <PaulSzymanski@users.noreply.github.com>).
+  notes: "[jan] Fix sequences on PostgreSQL 10+ (Ivan Sergio Borgonovo <mail@webthatworks.it>, PR #3).\n[mjr] Fix connecting over SSL with MySQLi driver (PR #2, PaulSzymanski <PaulSzymanski@users.noreply.github.com>).\n"
 2.4.0:
   api: 2.4.0
   state:
@@ -171,9 +128,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mjr] Improve Horde_Db logging options (Request #10773).
-    [mjr] Allow Horde_Value objects to contain stream data (Request #10805).
+  notes: "[mjr] Improve Horde_Db logging options (Request #10773).\n[mjr] Allow Horde_Value objects to contain stream data (Request #10805).\n"
 2.3.4:
   api: 2.3.0
   state:
@@ -183,8 +138,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix some PHP 7.2 issues.
+  notes: "[jan] Fix some PHP 7.2 issues.\n"
 2.3.3:
   api: 2.3.0
   state:
@@ -194,9 +148,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Make sure to return NULL values in result sets from Oracle.
-    [jan] Fix failing transactions if retrieving last INSERT ID from PostgreSQL fails on PHP 7.2.
+  notes: "[jan] Make sure to return NULL values in result sets from Oracle.\n[jan] Fix failing transactions if retrieving last INSERT ID from PostgreSQL fails on PHP 7.2.\n"
 2.3.2:
   api: 2.3.0
   state:
@@ -206,9 +158,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Drop ereg_replace() usage (Remi Collet <fedora@famillecollet.com>).
-    [mjr] Fix setting Oracle charset in certain cases.
+  notes: "[jan] Drop ereg_replace() usage (Remi Collet <fedora@famillecollet.com>).\n[mjr] Fix setting Oracle charset in certain cases.\n"
 2.3.1:
   api: 2.3.0
   state:
@@ -218,10 +168,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Bump earliest supported PostgreSQL version to 8.3.
-    [jan] Improve getting tables and indexes from PostgreSQL servers (Ivan Sergio Borgonovo <mail@webthatworks.it>).
-    [jan] Mark PHP 7 as supported.
+  notes: "[jan] Bump earliest supported PostgreSQL version to 8.3.\n[jan] Improve getting tables and indexes from PostgreSQL servers (Ivan Sergio Borgonovo <mail@webthatworks.it>).\n[jan] Mark PHP 7 as supported.\n"
 2.3.0:
   api: 2.3.0
   state:
@@ -231,9 +178,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mjr] Fix SQL error when setting blob fields to empty in oracle driver (Bug #14163).
-    [jan] Add 'status' argument to horde-db-migrate-component (Nicolas Rochelemagne <nicolas.rochelemagne@cpanel.net>).
+  notes: "[mjr] Fix SQL error when setting blob fields to empty in oracle driver (Bug #14163).\n[jan] Add 'status' argument to horde-db-migrate-component (Nicolas Rochelemagne <nicolas.rochelemagne@cpanel.net>).\n"
 2.2.3:
   api: 2.2.0
   state:
@@ -243,9 +188,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix certain migrations on Oracle.
-    [jan] Fix issues with certain locales like Turkish.
+  notes: "[jan] Fix certain migrations on Oracle.\n[jan] Fix issues with certain locales like Turkish.\n"
 2.2.2:
   api: 2.2.0
   state:
@@ -255,8 +198,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Make Oracle's updateBlob() compatible with PHP 5.3.
+  notes: "[jan] Make Oracle's updateBlob() compatible with PHP 5.3.\n"
 2.2.1:
   api: 2.2.0
   state:
@@ -266,10 +208,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix using addColumn() with autoincrementKey types in SQLite.
-    [jan] Fix several issues with changing autoincrementKey columns in Oracle.
-    [mms] Fix SplitRead driver to work with the recent blob changes.
+  notes: "[jan] Fix using addColumn() with autoincrementKey types in SQLite.\n[jan] Fix several issues with changing autoincrementKey columns in Oracle.\n[mms] Fix SplitRead driver to work with the recent blob changes.\n"
 2.2.0:
   api: 2.2.0
   state:
@@ -279,11 +218,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix returning primary key value from insertBlob().
-    [jan] Add Horde_Db_Adapter::updateBlob().
-    [jan] Add Horde_Db_Value_Text to encapsulate long text values.
-    [jan] Add missing insertBlob to adapter interface.
+  notes: "[jan] Fix returning primary key value from insertBlob().\n[jan] Add Horde_Db_Adapter::updateBlob().\n[jan] Add Horde_Db_Value_Text to encapsulate long text values.\n[jan] Add missing insertBlob to adapter interface.\n"
 2.1.5:
   api: 2.1.0
   state:
@@ -293,8 +228,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix migrating NULL values to BLOB on Oracle.
+  notes: "[jan] Fix migrating NULL values to BLOB on Oracle.\n"
 2.1.4:
   api: 2.1.0
   state:
@@ -304,8 +238,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Catch exceptions from PDO result set methods.
+  notes: "[jan] Catch exceptions from PDO result set methods.\n"
 2.1.3:
   api: 2.1.0
   state:
@@ -315,8 +248,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix changing columns to NULL/NOT NULL on Oracle and SQLite.
+  notes: "[jan] Fix changing columns to NULL/NOT NULL on Oracle and SQLite.\n"
 2.1.2:
   api: 2.1.0
   state:
@@ -326,9 +258,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix migrating large values to BLOB on Oracle.
-    [jan] Fix certain migrations with Oracle.
+  notes: "[jan] Fix migrating large values to BLOB on Oracle.\n[jan] Fix certain migrations with Oracle.\n"
 2.1.1:
   api: 2.1.0
   state:
@@ -338,10 +268,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mms] Fix regression preventing caching of any internal DB information.
-    [mms] SECURITY: Don't leak PDO DSN authentication/connection information in exception messages.
-    [jan] Fix columnCount() result of PDO result objects.
+  notes: "[mms] Fix regression preventing caching of any internal DB information.\n[mms] SECURITY: Don't leak PDO DSN authentication/connection information in exception messages.\n[jan] Fix columnCount() result of PDO result objects.\n"
 2.1.0:
   api: 2.1.0
   state:
@@ -351,21 +278,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Return generated (or manipulated) index name from addIndex().
-    [jan] Avoid cache collisions when changing adapters or configurations.
-    [jan] Add Horde_Db_Adapter_Base#writeCache() and readCache().
-    [jan] Add Horde_Db_Adapter#insertBlob().
-    [jan] Make value of Horde_Db_Value_Binary publically accessible.
-    [jan] Add Oracle driver (Request #11974).
-    [jan] Add Horde_Db_Adapter_Base_Schema#column() method.
-    [jan] Always re-throw PDOExceptions as Horde_Db_Exceptions.
-    [jan] Fix issues with active Turkish locale.
-    [jan] Always return a Horde_Db_Adapter_Base_Result sub-class from the select() method.
-    [jan] Don't ping server before each query in PDO drivers (Bug #12656).
-    [jan] Re-organize unit tests.
-    [jan] Make several methods abstract in Horde_Db_Adapter_Base.
-    [jan] Deprecate external usage of execute() method.
+  notes: "[jan] Return generated (or manipulated) index name from addIndex().\n[jan] Avoid cache collisions when changing adapters or configurations.\n[jan] Add Horde_Db_Adapter_Base#writeCache() and readCache().\n[jan] Add Horde_Db_Adapter#insertBlob().\n[jan] Make value of Horde_Db_Value_Binary publically accessible.\n[jan] Add Oracle driver (Request #11974).\n[jan] Add Horde_Db_Adapter_Base_Schema#column() method.\n[jan] Always re-throw PDOExceptions as Horde_Db_Exceptions.\n[jan] Fix issues with active Turkish locale.\n[jan] Always return a Horde_Db_Adapter_Base_Result sub-class from the select() method.\n[jan] Don't ping server before each query in PDO drivers (Bug #12656).\n[jan] Re-organize unit tests.\n[jan] Make several methods abstract in Horde_Db_Adapter_Base.\n[jan] Deprecate external usage of execute() method.\n"
 2.0.4:
   api: 1.2.0
   state:
@@ -375,8 +288,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix schema version table names when using horde-db-migrate-component.
+  notes: "[jan] Fix schema version table names when using horde-db-migrate-component.\n"
 2.0.3:
   api: 1.2.0
   state:
@@ -386,10 +298,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mms] Fix storing schema information in Horde_Cache.
-    [jan] Use LONGBLOB columns in MySQL when creating binary fields (l.kiraly@madalbal.hu, Bug #12195).
-    [jan] Fix updating existing rows with default values when adding columns in PostgreSQL (Bug #12101).
+  notes: "[mms] Fix storing schema information in Horde_Cache.\n[jan] Use LONGBLOB columns in MySQL when creating binary fields (l.kiraly@madalbal.hu, Bug #12195).\n[jan] Fix updating existing rows with default values when adding columns in PostgreSQL (Bug #12101).\n"
 2.0.2:
   api: 1.2.0
   state:
@@ -399,8 +308,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Improve unit tests.
+  notes: "[jan] Improve unit tests.\n"
 2.0.1:
   api: 1.2.0
   state:
@@ -410,47 +318,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mms] Use new Horde_Test layout.
-2.0.0-beta1:
-  api: 1.2.0
-  state:
-    release: beta
-    api: stable
-  date: 2012-07-19
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 2.0.0beta1
-    First beta release for Horde 5.
-    [jan] Allow for nested transactions.
-2.0.0-alpha1:
-  api: 1.2.0
-  state:
-    release: alpha
-    api: stable
-  date: 2012-07-05
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 2.0.0alpha1
-    First alpha release for Horde 5.
-2.0.0-RC1:
-  api: 1.2.0
-  state:
-    release: beta
-    api: stable
-  date: 2012-10-26
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 2.0.0RC1
-    [mms] Fix resetting postgresql error reporting.
-    [mms] Fix Horde_Db_Adapter_Base_Table#offsetExists().
-    [mms] Fix addLock() command.
+  notes: "[mms] Use new Horde_Test layout.\n"
 2.0.0:
   api: 1.2.0
   state:
@@ -460,8 +328,37 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    First stable release for Horde 5.
+  notes: "First stable release for Horde 5.\n"
+2.0.0-RC1:
+  api: 1.2.0
+  state:
+    release: beta
+    api: stable
+  date: 2012-10-26
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 2.0.0RC1\n[mms] Fix resetting postgresql error reporting.\n[mms] Fix Horde_Db_Adapter_Base_Table#offsetExists().\n[mms] Fix addLock() command.\n"
+2.0.0-beta1:
+  api: 1.2.0
+  state:
+    release: beta
+    api: stable
+  date: 2012-07-19
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 2.0.0beta1\nFirst beta release for Horde 5.\n[jan] Allow for nested transactions.\n"
+2.0.0-alpha1:
+  api: 1.2.0
+  state:
+    release: alpha
+    api: stable
+  date: 2012-07-05
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 2.0.0alpha1\nFirst alpha release for Horde 5.\n"
 1.2.2:
   api: 1.2.0
   state:
@@ -471,10 +368,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mms] Fix resetting postgresql error reporting.
-    [mms] Fix Horde_Db_Adapter_Base_Table#offsetExists().
-    [mms] Fix addLock() command.
+  notes: "[mms] Fix resetting postgresql error reporting.\n[mms] Fix Horde_Db_Adapter_Base_Table#offsetExists().\n[mms] Fix addLock() command.\n"
 1.2.1:
   api: 1.2.0
   state:
@@ -484,8 +378,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix escaping of binary values in SQLite.
+  notes: "[jan] Fix escaping of binary values in SQLite.\n"
 1.2.0:
   api: 1.2.0
   state:
@@ -495,9 +388,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [gwr] Alternative API to support modified dates with SQLite as well.
-    [mjr] Add support for mediumtext and longtext field types.
+  notes: "[gwr] Alternative API to support modified dates with SQLite as well.\n[mjr] Add support for mediumtext and longtext field types.\n"
 1.1.2:
   api: 1.1.0
   state:
@@ -507,10 +398,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [mms] Greatly reduce memory usage when working with binary data in PostgreSQL 9.0+ (Bug #10774).
-    [mms] Cache postgresql version.
-    [jan] Improve API documentation.
+  notes: "[mms] Greatly reduce memory usage when working with binary data in PostgreSQL 9.0+ (Bug #10774).\n[mms] Cache postgresql version.\n[jan] Improve API documentation.\n"
 1.1.1:
   api: 1.1.0
   state:
@@ -520,12 +408,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] More flexible conversion of charset names to native MySQL names.
-    [jan] Correctly escape binding characters in buildClause() (Bug #10610).
-    [jan] Fix transactions with MySQLi driver (Bug #10578).
-    [jan] Fix DISTINCT clause generation on PostgreSQL (Bug #10543).
-    [mms] Fix escaping binary data on Postgresql 9.1+ servers (Bug #10602).
+  notes: "[jan] More flexible conversion of charset names to native MySQL names.\n[jan] Correctly escape binding characters in buildClause() (Bug #10610).\n[jan] Fix transactions with MySQLi driver (Bug #10578).\n[jan] Fix DISTINCT clause generation on PostgreSQL (Bug #10543).\n[mms] Fix escaping binary data on Postgresql 9.1+ servers (Bug #10602).\n"
 1.1.0:
   api: 1.1.0
   state:
@@ -535,10 +418,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Add methods to add and drop primary keys (Request #10469).
-    [gwr] Fix usage of Horde_Exception_Wrapped.
-    [jan] Fix setting unix socket in PostgreSQL DSN (bug-reports@flipjam.co.uk, Bug #10466).
+  notes: "[jan] Add methods to add and drop primary keys (Request #10469).\n[gwr] Fix usage of Horde_Exception_Wrapped.\n[jan] Fix setting unix socket in PostgreSQL DSN (bug-reports@flipjam.co.uk, Bug #10466).\n"
 1.0.5:
   api: 1.0.0
   state:
@@ -548,8 +428,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix determination of last insert id on PostgreSQL up to 8.1.
+  notes: "[jan] Fix determination of last insert id on PostgreSQL up to 8.1.\n"
 1.0.4:
   api: 1.0.0
   state:
@@ -559,10 +438,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix migrations from primary keys that have not been created with Horde_Db in PostgreSQL.
-    [jan] Fix autoincrementKey sequences not incrementing after manually inserting key values in PostgreSQL.
-    [jan] Fix changeColumn() migration to autoincrementKey if no primary key exists yet.
+  notes: "[jan] Fix migrations from primary keys that have not been created with Horde_Db in PostgreSQL.\n[jan] Fix autoincrementKey sequences not incrementing after manually inserting key values in PostgreSQL.\n[jan] Fix changeColumn() migration to autoincrementKey if no primary key exists yet.\n"
 1.0.3:
   api: 1.0.0
   state:
@@ -572,8 +448,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Correctly format float values independently from the current locale (Bug #10371).
+  notes: "[jan] Correctly format float values independently from the current locale (Bug #10371).\n"
 1.0.2:
   api: 1.0.0
   state:
@@ -583,10 +458,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Convert host parameter from "localhost" to "127.0.0.1" in MySQL drivers (Request #9738).
-    [gwr] Renamed migration helper to avoid namespace clash with a similar tool from the horde base package.
-    [jan] Keep using the write backend in the same request after writing once with the split read/write driver.
+  notes: "[jan] Convert host parameter from \"localhost\" to \"127.0.0.1\" in MySQL drivers (Request #9738).\n[gwr] Renamed migration helper to avoid namespace clash with a similar tool from the horde base package.\n[jan] Keep using the write backend in the same request after writing once with the split read/write driver.\n"
 1.0.1:
   api: 1.0.0
   state:
@@ -596,61 +468,7 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    [jan] Fix migration detection on Windows.
-    [jan] Fix setting incorrect charset in PDO drivers.
-1.0.0-beta1:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-16
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 1.0.0beta1
-    Drop schema table when migrating down to schema version 0.
-    Don't try to create schema tables if they exist, to avoid irritating log entries.
-1.0.0-alpha1:
-  api: 1.0.0
-  state:
-    release: alpha
-    api: alpha
-  date: 2011-03-08
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 1.0.0alpha1
-    First alpha release for Horde 4.
-    Add support for adding autoincrement to a column.
-1.0.0-RC2:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-29
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 1.0.0RC2
-    Second release candidate for Horde 4.
-    [jan] Don't throw exception when setting port number while using localhost in PDO MySQL driver (Bug #9738).
-    [jan] Rename pseudo-type primaryKey to autoincrementKey.
-1.0.0-RC1:
-  api: 1.0.0
-  state:
-    release: beta
-    api: beta
-  date: 2011-03-22
-  license:
-    identifier: BSD-2-Clause
-    uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Original version string was 1.0.0RC1
-    First release candidate for Horde 4.
+  notes: "[jan] Fix migration detection on Windows.\n[jan] Fix setting incorrect charset in PDO drivers.\n"
 1.0.0:
   api: 1.0.0
   state:
@@ -660,9 +478,47 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    First stable release for Horde 4.
-    [jan] Add buildClause() from obsolete Horde_Sql.
+  notes: "First stable release for Horde 4.\n[jan] Add buildClause() from obsolete Horde_Sql.\n"
+1.0.0-RC2:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-29
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 1.0.0RC2\nSecond release candidate for Horde 4.\n[jan] Don't throw exception when setting port number while using localhost in PDO MySQL driver (Bug #9738).\n[jan] Rename pseudo-type primaryKey to autoincrementKey.\n"
+1.0.0-RC1:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-22
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 1.0.0RC1\nFirst release candidate for Horde 4.\n"
+1.0.0-beta1:
+  api: 1.0.0
+  state:
+    release: beta
+    api: beta
+  date: 2011-03-16
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 1.0.0beta1\nDrop schema table when migrating down to schema version 0.\nDon't try to create schema tables if they exist, to avoid irritating log entries.\n"
+1.0.0-alpha1:
+  api: 1.0.0
+  state:
+    release: alpha
+    api: alpha
+  date: 2011-03-08
+  license:
+    identifier: BSD-2-Clause
+    uri: http://www.horde.org/licenses/bsd
+  notes: "Original version string was 1.0.0alpha1\nFirst alpha release for Horde 4.\nAdd support for adding autoincrement to a column.\n"
 0.1.0:
   api: 0.1.0
   state:
@@ -672,5 +528,4 @@
   license:
     identifier: BSD-2-Clause
     uri: http://www.horde.org/licenses/bsd
-  notes: |
-    Initial release
+  notes: "Initial release\n"
