@@ -1,4 +1,14 @@
 ---
+3.0.1:
+  api: 3.0.1
+  state:
+    release: stable
+    api: stable
+  date: 2026-07-21
+  license:
+    identifier: BSD-2-Clause
+    uri: https://spdx.org/licenses/BSD-2-Clause.html
+  notes: 'chore: Add @method annotations to legacy Horde_Db_Migration_Base class call() magic methods'
 3.0.0:
   api: 3.0.0
   state:
