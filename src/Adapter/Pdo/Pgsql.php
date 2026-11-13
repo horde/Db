@@ -152,6 +152,15 @@ class Pgsql extends Base
             $sequenceName = $fetched_sequence;
         }
 
+        // A serial column rejects an explicit NULL. DEFAULT runs nextval().
+        if ($sequenceName && $pk) {
+            $parameters = is_array($arg1) ? $arg1 : [];
+            [$sql, $parameters] = NullSerialInsert::apply($sql, $parameters, (string) $pk);
+            if (is_array($arg1)) {
+                $arg1 = $parameters;
+            }
+        }
+
         // Try an insert with 'returning id'
         if ($pk) {
             $id = $this->selectValue($sql . ' RETURNING ' . $this->quoteColumnName($pk), $arg1, $arg2);
