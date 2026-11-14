@@ -16,6 +16,8 @@
  * @subpackage Adapter
  */
 
+use Horde\Db\Adapter\Pdo\NullSerialInsert;
+
 /**
  * PDO_PostgreSQL Horde_Db_Adapter
  *
@@ -144,6 +146,15 @@ class Horde_Db_Adapter_Pdo_Pgsql extends Horde_Db_Adapter_Pdo_Base
         }
         if (!$sequenceName) {
             $sequenceName = $fetched_sequence;
+        }
+
+        // A serial column rejects an explicit NULL. DEFAULT runs nextval().
+        if ($sequenceName && $pk) {
+            $parameters = is_array($arg1) ? $arg1 : [];
+            [$sql, $parameters] = NullSerialInsert::apply($sql, $parameters, (string) $pk);
+            if (is_array($arg1)) {
+                $arg1 = $parameters;
+            }
         }
 
         // Try an insert with 'returning id'
